@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>{{ user ? 'Edit account' : 'New account' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (error()) {
+    <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+  }
+
+  <ion-list lines="none">
+    <ion-input label="Full name *" labelPlacement="floating" fill="outline" [(ngModel)]="form.fullName"></ion-input>
+    <ion-input label="Username *" labelPlacement="floating" fill="outline" autocapitalize="off"
+               [(ngModel)]="form.username"></ion-input>
+    <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="form.email"></ion-input>
+    <ion-input label="Phone" labelPlacement="floating" fill="outline" type="tel" inputmode="numeric" maxlength="10"
+               helperText="10 digits, used for WhatsApp reminders" [(ngModel)]="form.phone"></ion-input>
+
+    <ion-select label="Role" labelPlacement="floating" fill="outline" interface="popover"
+                [disabled]="isSelf" [(ngModel)]="form.role">
+      @for (role of roles; track role) {
+        <ion-select-option [value]="role">{{ role }}</ion-select-option>
+      }
+    </ion-select>
+
+    <ion-input [label]="user ? 'New password (leave blank to keep)' : 'Password *'" labelPlacement="floating"
+               fill="outline" type="password" autocomplete="new-password" [(ngModel)]="form.password">
+      <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+    </ion-input>
+
+    <ion-item lines="none">
+      <ion-toggle [disabled]="isSelf" [(ngModel)]="form.active">Active (can sign in)</ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  @if (user && auth.isAdmin() && !isSelf) {
+    <div class="danger-zone">
+      <ion-button expand="block" fill="outline" color="danger" [disabled]="saving()" (click)="remove()">
+        Delete account
+      </ion-button>
+    </div>
+  }
+</ion-content>

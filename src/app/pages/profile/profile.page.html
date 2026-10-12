@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>My profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="wrap">
+    <div class="who">
+      <div class="avatar">{{ initials() }}</div>
+      <div>
+        <h2>{{ profile()?.fullName ?? auth.user()?.fullName }}</h2>
+        <p>{{ auth.user()?.username }}</p>
+        <ion-badge color="secondary">{{ auth.role() }}</ion-badge>
+      </div>
+    </div>
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+
+    @if (profile()) {
+      <ion-list lines="none">
+        <ion-list-header>Details</ion-list-header>
+        <ion-input label="Full name" labelPlacement="floating" fill="outline" [(ngModel)]="form.fullName"></ion-input>
+        <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="form.email"></ion-input>
+        <ion-input label="Phone" labelPlacement="floating" fill="outline" type="tel" inputmode="numeric" maxlength="10"
+                   helperText="Due-date reminders are sent to this number" [(ngModel)]="form.phone"></ion-input>
+        <ion-input label="Date of birth" labelPlacement="stacked" fill="outline" type="date" [max]="today"
+                   [(ngModel)]="form.dateOfBirth"></ion-input>
+        <ion-textarea label="Address" labelPlacement="floating" fill="outline" rows="2" [autoGrow]="true"
+                      [(ngModel)]="form.address"></ion-textarea>
+
+        <ion-list-header>Change password</ion-list-header>
+        <ion-input label="New password" labelPlacement="floating" fill="outline" type="password"
+                   autocomplete="new-password" helperText="Leave blank to keep your current password"
+                   [(ngModel)]="newPassword">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+        <ion-input label="Confirm new password" labelPlacement="floating" fill="outline" type="password"
+                   autocomplete="new-password" [(ngModel)]="confirmPassword">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-list>
+
+      <ion-button expand="block" [disabled]="saving()" (click)="save()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
+      </ion-button>
+    } @else if (!error()) {
+      @for (i of [1, 2, 3, 4]; track i) {
+        <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
+      }
+    }
+
+    <ion-button expand="block" fill="outline" color="medium" class="logout" (click)="logout()">
+      <ion-icon slot="start" name="log-out-outline"></ion-icon>
+      Sign out
+    </ion-button>
+  </div>
+</ion-content>

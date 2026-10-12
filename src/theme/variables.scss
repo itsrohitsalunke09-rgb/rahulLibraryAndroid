@@ -1,0 +1,54 @@
+// App colours follow the website (sidebar purple #2a1261, lavender #ece9fc).
+// https://ionicframework.com/docs/theming/colors
+:root {
+  --ion-color-primary: #3b1d8f;
+  --ion-color-primary-rgb: 59, 29, 143;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #341a7e;
+  --ion-color-primary-tint: #4f349a;
+
+  --ion-color-secondary: #ece9fc;
+  --ion-color-secondary-rgb: 236, 233, 252;
+  --ion-color-secondary-contrast: #2a1261;
+  --ion-color-secondary-contrast-rgb: 42, 18, 97;
+  --ion-color-secondary-shade: #d0cdde;
+  --ion-color-secondary-tint: #eeebfc;
+
+  --ion-color-success: #2f6a4a;
+  --ion-color-success-rgb: 47, 106, 74;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #295d41;
+  --ion-color-success-tint: #44795c;
+
+  --app-brand-dark: #2a1261;
+}
+
+// Dark mode follows the phone setting (dark.system.css); lift the brand colours so they stay readable.
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-color-primary: #a993f5;
+    --ion-color-primary-rgb: 169, 147, 245;
+    --ion-color-primary-contrast: #1a0b3d;
+    --ion-color-primary-contrast-rgb: 26, 11, 61;
+    --ion-color-primary-shade: #9581d8;
+    --ion-color-primary-tint: #b29ef6;
+
+    --ion-color-secondary: #2c2350;
+    --ion-color-secondary-rgb: 44, 35, 80;
+    --ion-color-secondary-contrast: #e6e0ff;
+    --ion-color-secondary-contrast-rgb: 230, 224, 255;
+    --ion-color-secondary-shade: #271f46;
+    --ion-color-secondary-tint: #413962;
+
+    --ion-color-success: #6fcf97;
+    --ion-color-success-rgb: 111, 207, 151;
+    --ion-color-success-contrast: #0b2a18;
+    --ion-color-success-contrast-rgb: 11, 42, 24;
+    --ion-color-success-shade: #62b685;
+    --ion-color-success-tint: #7dd4a1;
+
+    --app-brand-dark: #e6e0ff;
+  }
+}

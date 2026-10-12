@@ -1,0 +1,26 @@
+.hero {
+  h1 {
+    margin: 0 0 4px;
+    font-size: 1.35rem;
+    color: var(--app-brand-dark);
+  }
+
+  .author {
+    margin: 0 0 10px;
+    color: var(--ion-color-medium);
+  }
+
+  .description {
+    margin: 12px 0 0;
+    line-height: 1.45;
+  }
+}
+
+.actions .row {
+  display: flex;
+  gap: 8px;
+
+  ion-button {
+    flex: 1;
+  }
+}

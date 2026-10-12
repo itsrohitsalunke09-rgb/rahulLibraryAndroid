@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rahul Library</string>
+    <string name="title_activity_main">Rahul Library</string>
+    <string name="package_name">org.ngolibrary.rahullibrary</string>
+    <string name="custom_url_scheme">org.ngolibrary.rahullibrary</string>
+</resources>

@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Catalog</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Title, author, category, reg. no."
+      [debounce]="350"
+      (ionInput)="search($event.detail.value)">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="books.refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (books.error()) {
+    <ion-text color="danger"><p class="ion-padding-horizontal">{{ books.error() }}</p></ion-text>
+  }
+
+  @if (books.loaded()) {
+    @if (books.items().length) {
+      <p class="count">{{ books.total() }} book{{ books.total() === 1 ? '' : 's' }}</p>
+      <ion-list>
+        @for (book of books.items(); track book.id) {
+          <ion-item button detail="false" (click)="open(book)">
+            <ion-label>
+              <h2 [class.marathi]="isMarathi(book)">{{ book.title }}</h2>
+              <p [class.marathi]="isMarathi(book)">{{ book.author }}</p>
+              @if (book.category || book.registrationNumber) {
+                <p class="item-meta">
+                  {{ book.category }}{{ book.category && book.registrationNumber ? ' · ' : '' }}{{ book.registrationNumber }}
+                </p>
+              }
+            </ion-label>
+            <div slot="end" class="availability">
+              <ion-badge [color]="book.availableCopies > 0 ? 'success' : 'medium'">
+                {{ book.availableCopies > 0 ? 'Available' : 'All issued' }}
+              </ion-badge>
+              <ion-note>{{ book.availableCopies }}/{{ book.totalCopies }} copies</ion-note>
+            </div>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!books.error()) {
+      <div class="empty-state">
+        <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
+        <p>{{ query() ? 'No books match "' + query() + '".' : 'No books in the catalog yet.' }}</p>
+      </div>
+    }
+  } @else {
+    <ion-list>
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <ion-item>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 70%"></ion-skeleton-text></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 40%"></ion-skeleton-text></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <ion-infinite-scroll [disabled]="books.finished()" (ionInfinite)="books.more($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  @if (auth.isStaff()) {
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button (click)="add()" aria-label="Add book">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  }
+</ion-content>

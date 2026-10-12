@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Book details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (current(); as book) {
+    <div class="hero ion-padding">
+      <h1 [class.marathi]="book.category === 'Marathi Literature'">{{ book.title }}</h1>
+      <p class="author" [class.marathi]="book.category === 'Marathi Literature'">{{ book.author }}</p>
+      <ion-badge [color]="book.availableCopies > 0 ? 'success' : 'medium'">
+        {{ book.availableCopies }} of {{ book.totalCopies }} available
+      </ion-badge>
+      @if (book.description) {
+        <p class="description">{{ book.description }}</p>
+      }
+    </div>
+
+    @if (auth.isStaff()) {
+      <div class="actions ion-padding-horizontal">
+        <ion-button expand="block" [disabled]="book.availableCopies < 1 || busy()" (click)="issue()">
+          <ion-icon slot="start" name="send-outline"></ion-icon>
+          Issue to a student
+        </ion-button>
+        <div class="row">
+          <ion-button fill="outline" [disabled]="busy()" (click)="edit()">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Edit
+          </ion-button>
+          @if (auth.isAdmin()) {
+            <ion-button fill="outline" color="danger" [disabled]="busy()" (click)="remove()">
+              @if (busy()) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else {
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+                Delete
+              }
+            </ion-button>
+          }
+        </div>
+      </div>
+    }
+
+    <ion-list>
+      <ion-list-header>Details</ion-list-header>
+      <ion-item><ion-label>Category</ion-label><ion-note slot="end">{{ book.category || '-' }}</ion-note></ion-item>
+      <ion-item><ion-label>Registration no.</ion-label><ion-note slot="end">{{ book.registrationNumber || '-' }}</ion-note></ion-item>
+      <ion-item><ion-label>Publication</ion-label><ion-note slot="end">{{ book.publication || '-' }}</ion-note></ion-item>
+      <ion-item><ion-label>Year</ion-label><ion-note slot="end">{{ book.publicationYear ?? '-' }}</ion-note></ion-item>
+      <ion-item><ion-label>Pages</ion-label><ion-note slot="end">{{ book.pageCount ?? '-' }}</ion-note></ion-item>
+      @if (auth.isStaff()) {
+        <ion-item><ion-label>Added on</ion-label><ion-note slot="end">{{ formatDate(book.date) }}</ion-note></ion-item>
+        <ion-item><ion-label>Seller</ion-label><ion-note slot="end">{{ book.seller || '-' }}</ion-note></ion-item>
+        <ion-item><ion-label>Receipt no.</ion-label><ion-note slot="end">{{ book.receiptNumber || '-' }}</ion-note></ion-item>
+        <ion-item><ion-label>Price</ion-label><ion-note slot="end">{{ book.price !== null && book.price !== undefined ? '₹' + book.price : '-' }}</ion-note></ion-item>
+      }
+    </ion-list>
+
+    @if (auth.isStaff()) {
+      <ion-list>
+        <ion-list-header>Issue history</ion-list-header>
+        @if (history(); as history) {
+          @for (issue of history; track issue.id) {
+            <ion-item>
+              <ion-label>
+                <h3>{{ issue.studentName }}</h3>
+                <p>Issued {{ formatDate(issue.issueDate) }} · {{ dueText(issue) }}</p>
+              </ion-label>
+              <ion-badge slot="end" [color]="statusColor(issue)">{{ issue.status }}</ion-badge>
+            </ion-item>
+          } @empty {
+            <ion-item><ion-label color="medium">Never issued yet.</ion-label></ion-item>
+          }
+        } @else {
+          <ion-item><ion-spinner name="dots"></ion-spinner></ion-item>
+        }
+      </ion-list>
+    }
+  }
+</ion-content>

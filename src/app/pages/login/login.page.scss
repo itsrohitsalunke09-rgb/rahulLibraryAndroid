@@ -1,0 +1,45 @@
+.wrap {
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 24px;
+
+  img {
+    width: 120px;
+  }
+
+  h1 {
+    color: var(--app-brand-dark);
+    font-size: 1.4rem;
+    margin: 12px 0 4px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+ion-input {
+  margin-bottom: 12px;
+}
+
+.error {
+  margin: 0 0 12px;
+}
+
+.switch {
+  text-align: center;
+  color: var(--ion-color-medium);
+}
+
+ion-list {
+  background: transparent;
+}

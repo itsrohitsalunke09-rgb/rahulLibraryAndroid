@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>My books</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="issues.refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (issues.error()) {
+    <ion-text color="danger"><p class="ion-padding-horizontal">{{ issues.error() }}</p></ion-text>
+  }
+
+  @if (issues.loaded()) {
+    @if (overdueCount()) {
+      <div class="banner">
+        You have {{ overdueCount() }} overdue book{{ overdueCount() === 1 ? '' : 's' }}.
+        Please return {{ overdueCount() === 1 ? 'it' : 'them' }} to the library as soon as possible.
+      </div>
+    }
+
+    @if (issues.items().length) {
+      <ion-list>
+        <ion-list-header>With you now</ion-list-header>
+        @for (issue of current(); track issue.id) {
+          <ion-item>
+            <ion-label>
+              <h2 [class.marathi]="issue.category === 'Marathi Literature'">{{ issue.bookTitle }}</h2>
+              <p>{{ issue.author }}</p>
+              <p class="item-meta">Issued {{ formatDate(issue.issueDate) }} · Due {{ formatDate(issue.dueDate) }}</p>
+            </ion-label>
+            <div slot="end" class="end">
+              <ion-badge [color]="statusColor(issue)">{{ dueText(issue) }}</ion-badge>
+            </div>
+          </ion-item>
+        } @empty {
+          <ion-item lines="none"><ion-label color="medium">No books with you right now.</ion-label></ion-item>
+        }
+      </ion-list>
+
+      @if (returned().length) {
+        <ion-list>
+          <ion-list-header>History</ion-list-header>
+          @for (issue of returned(); track issue.id) {
+            <ion-item>
+              <ion-label>
+                <h3 [class.marathi]="issue.category === 'Marathi Literature'">{{ issue.bookTitle }}</h3>
+                <p class="item-meta">{{ formatDate(issue.issueDate) }} – {{ formatDate(issue.returnDate) }}</p>
+              </ion-label>
+              <ion-badge slot="end" color="success">Returned</ion-badge>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    } @else if (!issues.error()) {
+      <div class="empty-state">
+        <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
+        <p>You haven't borrowed any books yet.<br />Browse the Catalog and ask the librarian to issue one.</p>
+      </div>
+    }
+  } @else {
+    <ion-list>
+      @for (i of [1, 2, 3]; track i) {
+        <ion-item>
+          <ion-label>
+            <h2><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></h2>
+            <p><ion-skeleton-text [animated]="true" style="width: 35%"></ion-skeleton-text></p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <ion-infinite-scroll [disabled]="issues.finished()" (ionInfinite)="issues.more($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

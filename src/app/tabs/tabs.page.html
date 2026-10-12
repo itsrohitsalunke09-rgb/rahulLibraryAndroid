@@ -1,0 +1,37 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    @if (auth.isStaff()) {
+      <ion-tab-button tab="dashboard" href="/tabs/dashboard">
+        <ion-icon aria-hidden="true" name="grid-outline"></ion-icon>
+        <ion-label>Dashboard</ion-label>
+      </ion-tab-button>
+    }
+
+    <ion-tab-button tab="catalog" href="/tabs/catalog">
+      <ion-icon aria-hidden="true" name="library-outline"></ion-icon>
+      <ion-label>Catalog</ion-label>
+    </ion-tab-button>
+
+    @if (auth.isStaff()) {
+      <ion-tab-button tab="issues" href="/tabs/issues">
+        <ion-icon aria-hidden="true" name="swap-horizontal-outline"></ion-icon>
+        <ion-label>Issues</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button tab="people" href="/tabs/people">
+        <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
+        <ion-label>People</ion-label>
+      </ion-tab-button>
+    } @else {
+      <ion-tab-button tab="my-books" href="/tabs/my-books">
+        <ion-icon aria-hidden="true" name="bookmarks"></ion-icon>
+        <ion-label>My books</ion-label>
+      </ion-tab-button>
+    }
+
+    <ion-tab-button tab="profile" href="/tabs/profile">
+      <ion-icon aria-hidden="true" name="person-circle-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

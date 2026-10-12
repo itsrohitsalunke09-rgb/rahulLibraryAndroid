@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>Issue book</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search student by name, username or phone" [debounce]="300"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    <p class="book">{{ book.title }}</p>
+    <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} available</p>
+  </div>
+
+  <ion-list>
+    @for (student of students(); track student.id) {
+      <ion-item button detail="false" (click)="selected.set(student)">
+        <ion-icon slot="start" [name]="selected()?.id === student.id ? 'checkmark-circle' : 'ellipse-outline'"
+                  [color]="selected()?.id === student.id ? 'primary' : 'medium'"></ion-icon>
+        <ion-label>
+          <h3>{{ student.fullName }}</h3>
+          <p>{{ student.username }}{{ student.phone ? ' · ' + student.phone : '' }}</p>
+        </ion-label>
+      </ion-item>
+    } @empty {
+      <ion-item lines="none">
+        <ion-label color="medium">
+          @if (searching()) {
+            Searching…
+          } @else if (searched()) {
+            No active student matches. Check the spelling or start of the name.
+          } @else {
+            Type the start of a student's name to find them.
+          }
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="ion-padding-horizontal">
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+    <ion-input label="Loan period (days)" labelPlacement="start" type="number" min="1" inputmode="numeric"
+               [helperText]="'Due back ' + dueDate()" [(ngModel)]="days"></ion-input>
+    <ion-button expand="block" [disabled]="!selected() || saving()" (click)="issue()">
+      @if (saving()) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        Issue{{ selected() ? ' to ' + selected()!.fullName : '' }}
+      }
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>
