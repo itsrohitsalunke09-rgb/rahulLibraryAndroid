@@ -9,9 +9,8 @@ Ionic 9 + Angular 22 + Capacitor 8 app for the NGO library. It uses the same Spr
 
 ## Requirements
 
-- **Node 24** (Angular 22 needs Node ≥ 22.22 or ≥ 24.15). With nvm: `nvm install 24`, then `nvm use 24` while working here.
-  The website (`../frontend`, Angular 14) still uses Node 16.
-- For APKs only: JDK 21 and the Android SDK (Android Studio, or just the command-line tools).
+- **Node 24** (Angular 22 needs Node ≥ 22.22 or ≥ 24.15). The website (`../frontend`) uses the same Node 24.
+- For APKs only: JDK 21 (already the system JDK) and the Android SDK (Android Studio, or just the command-line tools).
 
 ## Run in the browser
 
