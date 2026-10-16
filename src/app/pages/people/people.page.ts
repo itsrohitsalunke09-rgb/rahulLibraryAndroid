@@ -11,8 +11,9 @@ import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { clearLinkFilters } from '../../core/link-filters';
-import { Page, Role, UserAccount, roleLabel } from '../../core/models';
+import { Page, Role, UserAccount } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
+import { InitialsPipe, RoleColorPipe, RoleLabelPipe } from '../../core/pipes';
 import { UiService } from '../../core/ui.service';
 import { UserFormModal } from './user-form.modal';
 
@@ -26,7 +27,8 @@ const FILTERS: Filter[] = ['ALL', 'STUDENT', 'LIBRARIAN', 'ADMIN'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonFab, IonFabButton, IonIcon,
-    IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
+    IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText,
+    InitialsPipe, RoleColorPipe, RoleLabelPipe
   ],
 })
 export class PeoplePage implements ViewWillEnter {
@@ -39,7 +41,7 @@ export class PeoplePage implements ViewWillEnter {
 
   readonly filter = signal<Filter>('ALL');
   readonly query = signal('');
-  readonly people = new PagedList<UserAccount>(page => this.fetch(page), 'Could not load people.');
+  readonly people = new PagedList<UserAccount>((page, size) => this.fetch(page, size), 'Could not load people.');
 
   constructor() {
     addIcons({ personAdd, peopleOutline });
@@ -58,7 +60,7 @@ export class PeoplePage implements ViewWillEnter {
   }
 
   ionViewWillEnter() {
-    this.people.reset();
+    this.people.revisit();
   }
 
   setFilter(value: unknown) {
@@ -96,24 +98,14 @@ export class PeoplePage implements ViewWillEnter {
     }
   }
 
-  roleColor(role: Role) {
-    return role === 'ADMIN' ? 'primary' : role === 'LIBRARIAN' ? 'warning' : 'medium';
-  }
-
-  protected readonly roleLabel = roleLabel;
-
-  initials(name: string) {
-    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
-  }
-
-  private fetch(page: number): Observable<Page<UserAccount>> {
+  private fetch(page: number, size: number): Observable<Page<UserAccount>> {
     const q = this.query();
     if (q) {
       // The backend's search covers active students only and is not paged.
       return this.api.searchStudents(q).pipe(map(list => asSinglePage(list)));
     }
     const role = this.filter();
-    return this.api.users(page, 20, role === 'ALL' ? undefined : role);
+    return this.api.users(page, size, role === 'ALL' ? undefined : role);
   }
 }
 

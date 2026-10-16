@@ -44,8 +44,8 @@
         @for (book of books.items(); track book.id) {
           <ion-item button detail="false" (click)="open(book)">
             <ion-label>
-              <h2 [class.marathi]="isMarathi(book)">{{ book.title }}</h2>
-              <p class="author" [class.marathi]="isMarathi(book)">{{ book.author }}</p>
+              <h2 [class.marathi]="book.category | marathi">{{ book.title }}</h2>
+              <p class="author" [class.marathi]="book.category | marathi">{{ book.author }}</p>
               @if (book.category || book.registrationNumber) {
                 <p class="meta">
                   {{ book.category }}{{ book.category && book.registrationNumber ? ' · ' : '' }}{{ book.registrationNumber }}

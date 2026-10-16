@@ -13,21 +13,31 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (error()) {
-    <p class="form-error" role="alert">{{ error() }}</p>
-  }
-
   <form class="form" (ngSubmit)="save()">
-    <ion-list lines="none">
-      <h2 class="form-section">Book category</h2>
-      <ion-input label="Category number *" labelPlacement="floating" fill="outline" name="categoryNumber"
-                 maxlength="20" [(ngModel)]="form.categoryNumber"></ion-input>
-      <ion-input class="marathi" label="Category name *" labelPlacement="floating" fill="outline" name="name"
-                 maxlength="100" [(ngModel)]="form.name"></ion-input>
-      <p class="hint">
-        Numbers and names must be unique. Renaming a category also renames it on every book that uses it.
-      </p>
-    </ion-list>
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <h3 class="form-section">Book category</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Category number *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+          <input name="categoryNumber" maxlength="20" [(ngModel)]="form.categoryNumber" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Category name *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+          <input class="marathi" name="name" maxlength="100" [(ngModel)]="form.name" />
+        </span>
+        <span class="form-helper">
+          Numbers and names must be unique. Renaming a category also renames it on every book that uses it.
+        </span>
+      </label>
+    </div>
 
     @if (category) {
       <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">

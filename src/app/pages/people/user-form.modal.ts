@@ -1,22 +1,29 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonInput, IonInputPasswordToggle, IonItem, IonList,
-  IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToggle, IonToolbar, ModalController
+  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonSpinner, IonTitle, IonToggle, IonToolbar,
+  ModalController
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Role, UserAccount, UserRequest } from '../../core/models';
+import { RoleLabelPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 @Component({
   selector: 'app-user-form',
   templateUrl: 'user-form.modal.html',
   imports: [
-    FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput,
-    IonInputPasswordToggle, IonSelect, IonSelectOption, IonToggle, IonSpinner
+    FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonItem, IonIcon, IonToggle,
+    IonSpinner, RoleLabelPipe
   ],
-  styles: [`.form { padding: 0; max-width: 520px; margin: 0 auto; } ion-input[helperText] { margin-bottom: 20px; } .danger-zone { max-width: 520px; margin: 32px auto 16px; }`],
+  styles: [`
+    .form { max-width: 520px; margin: 0 auto; }
+    .active-row { margin-top: 14px; }
+    .danger-zone { max-width: 520px; margin: 32px auto 16px; }
+  `],
 })
 export class UserFormModal implements OnInit {
   /** Account to edit; leave empty to create one. */
@@ -32,6 +39,11 @@ export class UserFormModal implements OnInit {
   roles: Role[] = [];
   readonly saving = signal(false);
   readonly error = signal('');
+  readonly showPassword = signal(false);
+
+  constructor() {
+    addIcons({ eyeOutline, eyeOffOutline });
+  }
 
   ngOnInit() {
     this.roles = this.auth.isAdmin() ? ['STUDENT', 'LIBRARIAN', 'ADMIN'] : ['STUDENT', 'LIBRARIAN'];

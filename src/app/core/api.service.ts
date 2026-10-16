@@ -1,6 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, Page,
   ProfileUpdate, Role, UnlinkedCategory, UserAccount, UserRequest
@@ -35,13 +37,13 @@ export class ApiService {
   }
 
   saveBook(book: BookRequest, id?: number) {
-    return id
+    return changes(id
       ? this.http.put<Book>(`${this.base}/books/${id}`, book)
-      : this.http.post<Book>(`${this.base}/books`, book);
+      : this.http.post<Book>(`${this.base}/books`, book));
   }
 
   deleteBook(id: number) {
-    return this.http.delete<void>(`${this.base}/books/${id}`);
+    return changes(this.http.delete<void>(`${this.base}/books/${id}`));
   }
 
   /** Book category master, sorted by category number. */
@@ -55,20 +57,20 @@ export class ApiService {
   }
 
   saveCategory(category: BookCategoryRequest, id?: number) {
-    return id
+    return changes(id
       ? this.http.put<BookCategory>(`${this.base}/categories/${id}`, category)
-      : this.http.post<BookCategory>(`${this.base}/categories`, category);
+      : this.http.post<BookCategory>(`${this.base}/categories`, category));
   }
 
   deleteCategory(id: number) {
-    return this.http.delete<void>(`${this.base}/categories/${id}`);
+    return changes(this.http.delete<void>(`${this.base}/categories/${id}`));
   }
 
   /** Bulk-add books from an .xlsx sheet (admin and librarian only). */
   importBooks(file: File) {
     const form = new FormData();
     form.append('file', file);
-    return this.http.post<BookImportResult>(`${this.base}/books/import`, form);
+    return changes(this.http.post<BookImportResult>(`${this.base}/books/import`, form));
   }
 
   bookIssues(bookId: number) {
@@ -126,11 +128,11 @@ export class ApiService {
   }
 
   issueBook(bookId: number, studentId: number, days: number) {
-    return this.http.post<BookIssue>(`${this.base}/issues`, { bookId, studentId, days });
+    return changes(this.http.post<BookIssue>(`${this.base}/issues`, { bookId, studentId, days }));
   }
 
   returnBook(issueId: number) {
-    return this.http.post<BookIssue>(`${this.base}/issues/${issueId}/return`, {});
+    return changes(this.http.post<BookIssue>(`${this.base}/issues/${issueId}/return`, {}));
   }
 
   // ---- Users ----
@@ -148,16 +150,21 @@ export class ApiService {
   }
 
   saveUser(user: UserRequest, id?: number) {
-    return id
+    return changes(id
       ? this.http.put<UserAccount>(`${this.base}/users/${id}`, user)
-      : this.http.post<UserAccount>(`${this.base}/users`, user);
+      : this.http.post<UserAccount>(`${this.base}/users`, user));
   }
 
   deleteUser(id: number) {
-    return this.http.delete<void>(`${this.base}/users/${id}`);
+    return changes(this.http.delete<void>(`${this.base}/users/${id}`));
   }
 
   updateProfile(profile: ProfileUpdate) {
-    return this.http.put<UserAccount>(`${this.base}/users/profile`, profile);
+    return changes(this.http.put<UserAccount>(`${this.base}/users/profile`, profile));
   }
+}
+
+/** Marks cached tab data stale once a write succeeds, so other tabs reload on the next visit. */
+function changes<T>(request: Observable<T>): Observable<T> {
+  return request.pipe(tap({ next: () => markDataChanged() }));
 }

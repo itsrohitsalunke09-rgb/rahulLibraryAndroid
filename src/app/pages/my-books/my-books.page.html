@@ -25,14 +25,14 @@
       <h2 class="section-title">With you now</h2>
       <ion-list inset="true" lines="full">
         @for (issue of current(); track issue.id) {
-          <ion-item class="spine" [class]="'spine-' + statusColor(issue)">
+          <ion-item class="spine" [class]="'spine-' + (issue | statusColor)">
             <ion-label>
-              <h2 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h2>
+              <h2 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h2>
               <p>{{ issue.author }}</p>
-              <p class="item-meta">Due back {{ formatDate(issue.dueDate) }}</p>
+              <p class="item-meta">Due back {{ issue.dueDate | shortDate }}</p>
             </ion-label>
             <div slot="end" class="end">
-              <ion-badge class="stamp" [color]="statusColor(issue)">{{ dueText(issue) }}</ion-badge>
+              <ion-badge class="stamp" [color]="issue | statusColor">{{ issue | dueText }}</ion-badge>
             </div>
           </ion-item>
         } @empty {
@@ -46,8 +46,8 @@
           @for (issue of returned(); track issue.id) {
             <ion-item>
               <ion-label>
-                <h3 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h3>
-                <p class="item-meta">{{ formatDate(issue.issueDate) }} – {{ formatDate(issue.returnDate) }}</p>
+                <h3 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h3>
+                <p class="item-meta">{{ issue.issueDate | shortDate }} – {{ issue.returnDate | shortDate }}</p>
               </ion-label>
               <ion-badge slot="end" class="stamp" color="success">Returned</ion-badge>
             </ion-item>

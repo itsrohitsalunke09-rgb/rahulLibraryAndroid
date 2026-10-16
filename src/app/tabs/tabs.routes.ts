@@ -3,7 +3,11 @@ import { Routes } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import { roleGuard } from '../core/guards';
 import { STAFF_ROLES } from '../core/models';
+import { PreloadFor } from '../core/role-preloading';
 import { TabsPage } from './tabs.page';
+
+/** Staff-only pages: guarded, and preloaded only for staff. */
+const STAFF_ONLY = { canMatch: [roleGuard(STAFF_ROLES)], data: { preload: STAFF_ROLES satisfies PreloadFor } };
 
 export const routes: Routes = [
   {
@@ -12,7 +16,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        canMatch: [roleGuard(STAFF_ROLES)],
+        ...STAFF_ONLY,
         loadComponent: () => import('../pages/dashboard/dashboard.page').then(m => m.DashboardPage),
       },
       {
@@ -21,27 +25,28 @@ export const routes: Routes = [
       },
       {
         path: 'issues',
-        canMatch: [roleGuard(STAFF_ROLES)],
+        ...STAFF_ONLY,
         loadComponent: () => import('../pages/issues/issues.page').then(m => m.IssuesPage),
       },
       {
         path: 'people',
-        canMatch: [roleGuard(STAFF_ROLES)],
+        ...STAFF_ONLY,
         loadComponent: () => import('../pages/people/people.page').then(m => m.PeoplePage),
       },
       {
         path: 'config',
-        canMatch: [roleGuard(STAFF_ROLES)],
+        ...STAFF_ONLY,
         loadComponent: () => import('../pages/config/config.page').then(m => m.ConfigPage),
       },
       {
         path: 'config/categories',
-        canMatch: [roleGuard(STAFF_ROLES)],
+        ...STAFF_ONLY,
         loadComponent: () => import('../pages/config/categories.page').then(m => m.CategoriesPage),
       },
       {
         path: 'my-books',
         canMatch: [roleGuard(['STUDENT'])],
+        data: { preload: ['STUDENT'] satisfies PreloadFor },
         loadComponent: () => import('../pages/my-books/my-books.page').then(m => m.MyBooksPage),
       },
       {

@@ -35,7 +35,7 @@
       <ion-list inset="true" lines="full">
         @for (user of people.items(); track user.id) {
           <ion-item [button]="canEdit(user)" detail="false" (click)="open(user)">
-            <div slot="start" class="avatar" [class]="'role-' + user.role.toLowerCase()" [class.inactive]="!user.active" aria-hidden="true">{{ initials(user.fullName) }}</div>
+            <div slot="start" class="avatar" [class]="'role-' + user.role.toLowerCase()" [class.inactive]="!user.active" aria-hidden="true">{{ user.fullName | initials }}</div>
             <ion-label>
               <h2>{{ user.fullName }}</h2>
               <p>{{ user.username }}{{ user.phone ? ' · ' + user.phone : '' }}</p>
@@ -44,7 +44,7 @@
               }
             </ion-label>
             <div slot="end" class="end">
-              <ion-badge class="chip" [color]="roleColor(user.role)">{{ roleLabel(user.role) }}</ion-badge>
+              <ion-badge class="chip" [color]="user.role | roleColor">{{ user.role | roleLabel }}</ion-badge>
               @if (!user.active) {
                 <ion-badge class="chip" color="medium">Inactive</ion-badge>
               }

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
+import { Freshness } from './freshness';
 import { BookCategory, BookCategoryRequest } from './models';
 import { errorMessage } from './ui.service';
 
@@ -16,6 +17,7 @@ export class CategoriesStore {
   readonly loaded = signal(false);
   readonly loading = signal(false);
   readonly error = signal('');
+  private freshness = new Freshness();
 
   /** Loads the list if it hasn't been loaded yet (or `force` to refresh). */
   load(force = false) {
@@ -24,6 +26,7 @@ export class CategoriesStore {
     }
     this.loading.set(true);
     this.error.set('');
+    this.freshness.mark();
     this.api.categories().subscribe({
       next: list => {
         this.items.set(list);
@@ -31,10 +34,18 @@ export class CategoriesStore {
         this.loading.set(false);
       },
       error: err => {
+        this.freshness.invalidate();
         this.error.set(errorMessage(err, 'Could not load book categories.'));
         this.loading.set(false);
       }
     });
+  }
+
+  /** For ionViewWillEnter: reloads only if the list is stale (see Freshness). */
+  revisit() {
+    if (this.freshness.isStale()) {
+      this.load(true);
+    }
   }
 
   save(category: BookCategoryRequest, id?: number): Observable<BookCategory> {

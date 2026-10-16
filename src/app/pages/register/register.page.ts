@@ -2,9 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonInputPasswordToggle,
-  IonList, IonSpinner, IonTextarea, IonTitle, IonToolbar
+  IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonSpinner, IonTitle, IonToolbar
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
 import { RegistrationRequest } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
@@ -14,8 +15,8 @@ import { errorMessage } from '../../core/ui.service';
   templateUrl: 'register.page.html',
   styleUrls: ['register.page.scss'],
   imports: [
-    FormsModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList,
-    IonInput, IonInputPasswordToggle, IonTextarea, IonButton, IonSpinner
+    FormsModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonIcon, IonButton,
+    IonSpinner
   ],
 })
 export class RegisterPage {
@@ -28,6 +29,11 @@ export class RegisterPage {
   readonly today = new Date().toISOString().slice(0, 10);
   readonly loading = signal(false);
   readonly error = signal('');
+  readonly showPassword = signal(false);
+
+  constructor() {
+    addIcons({ eyeOutline, eyeOffOutline });
+  }
 
   submit() {
     const problem = this.validate();

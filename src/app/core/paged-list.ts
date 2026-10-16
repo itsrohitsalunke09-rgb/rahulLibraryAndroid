@@ -1,12 +1,18 @@
 import { signal } from '@angular/core';
 import { InfiniteScrollCustomEvent, RefresherCustomEvent } from '@ionic/angular';
 import { Observable, Subscription } from 'rxjs';
+import { Freshness } from './freshness';
 import { Page } from './models';
 import { errorMessage } from './ui.service';
 
+/** Rows per infinite-scroll page. */
+export const PAGE_SIZE = 20;
+/** Most rows reloaded in one request when the user comes back to a long, scrolled list. */
+const MAX_REVISIT_ROWS = 100;
+
 /**
  * State for an infinite-scrolling list backed by a Spring `Page` endpoint.
- * `fetch(page)` returns the requested page; `reset()` starts over (e.g. after a search change).
+ * `fetch(page, size)` returns the requested page; `reset()` starts over (e.g. after a search change).
  */
 export class PagedList<T> {
   readonly items = signal<T[]>([]);
@@ -17,16 +23,32 @@ export class PagedList<T> {
   /** True once the first page has arrived, so templates can tell "empty" from "not loaded yet". */
   readonly loaded = signal(false);
 
+  /** Next page index, counted in PAGE_SIZE pages. */
   private page = 0;
   private request?: Subscription;
+  private freshness = new Freshness();
 
-  constructor(private fetch: (page: number) => Observable<Page<T>>, private errorText = 'Could not load the list.') {}
+  constructor(
+    private fetch: (page: number, size: number) => Observable<Page<T>>,
+    private errorText = 'Could not load the list.'
+  ) {}
 
   reset(done?: () => void) {
-    this.request?.unsubscribe();
-    this.page = 0;
-    this.finished.set(false);
-    this.load(true, done);
+    this.load(0, PAGE_SIZE, done);
+  }
+
+  /**
+   * For ionViewWillEnter: reloads only if the list is stale (see Freshness). The rows already
+   * shown stay on screen meanwhile and are reloaded in one request, so the scroll position holds.
+   * Returns whether it reloaded.
+   */
+  revisit(): boolean {
+    if (this.loading() || !this.freshness.isStale()) {
+      return false;
+    }
+    const shown = Math.ceil(this.items().length / PAGE_SIZE) * PAGE_SIZE;
+    this.load(0, Math.min(Math.max(shown, PAGE_SIZE), MAX_REVISIT_ROWS));
+    return true;
   }
 
   /** ion-infinite-scroll handler. */
@@ -35,7 +57,7 @@ export class PagedList<T> {
       event.target.complete();
       return;
     }
-    this.load(false, () => event.target.complete());
+    this.load(this.page, PAGE_SIZE, () => event.target.complete());
   }
 
   /** ion-refresher handler. */
@@ -53,20 +75,30 @@ export class PagedList<T> {
     this.total.update(n => Math.max(0, n - 1));
   }
 
-  private load(replace: boolean, done?: () => void) {
+  /** `size` is a multiple of PAGE_SIZE, so later pages still line up with what is loaded. */
+  private load(page: number, size: number, done?: () => void) {
+    const replace = page === 0;
+    if (replace) {
+      this.request?.unsubscribe();
+      this.finished.set(false);
+      this.freshness.mark();
+    }
     this.loading.set(true);
-    this.request = this.fetch(this.page).subscribe({
-      next: page => {
-        this.items.update(list => (replace ? page.content : [...list, ...page.content]));
-        this.total.set(page.totalElements);
-        this.finished.set(page.last || page.content.length === 0);
-        this.page++;
+    this.request = this.fetch(page, size).subscribe({
+      next: result => {
+        this.items.update(list => (replace ? result.content : [...list, ...result.content]));
+        this.total.set(result.totalElements);
+        this.finished.set(result.last || result.content.length === 0);
+        this.page = page + size / PAGE_SIZE;
         this.error.set('');
         this.loading.set(false);
         this.loaded.set(true);
         done?.();
       },
       error: err => {
+        if (replace) {
+          this.freshness.invalidate();
+        }
         this.error.set(errorMessage(err, this.errorText));
         this.loading.set(false);
         this.loaded.set(true);

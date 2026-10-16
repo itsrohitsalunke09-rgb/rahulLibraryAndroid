@@ -13,38 +13,84 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (error()) {
-    <p class="form-error" role="alert">{{ error() }}</p>
-  }
+  <form class="form" (ngSubmit)="save()">
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
 
-  <ion-list lines="none" class="form">
-    <h2 class="form-section">Person</h2>
-    <ion-input label="Full name *" labelPlacement="floating" fill="outline" [(ngModel)]="form.fullName"></ion-input>
-    <ion-input label="Username *" labelPlacement="floating" fill="outline" autocapitalize="off"
-               [(ngModel)]="form.username"></ion-input>
-    <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="form.email"></ion-input>
-    <ion-input label="Phone" labelPlacement="floating" fill="outline" type="tel" inputmode="numeric" maxlength="10"
-               helperText="10 digits, used for WhatsApp reminders" [(ngModel)]="form.phone"></ion-input>
+    <h3 class="form-section">Person</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Full name *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-user.svg)" aria-hidden="true"></span>
+          <input name="fullName" autocomplete="off" [(ngModel)]="form.fullName" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Username *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+          <input name="username" autocapitalize="off" autocomplete="off" [(ngModel)]="form.username" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Email</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-mail.svg)" aria-hidden="true"></span>
+          <input name="email" type="email" autocomplete="off" [(ngModel)]="form.email" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Phone</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-phone.svg)" aria-hidden="true"></span>
+          <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="off" [(ngModel)]="form.phone" />
+        </span>
+        <span class="form-helper">10 digits, used for WhatsApp reminders</span>
+      </label>
+    </div>
 
-    <h2 class="form-section">Access</h2>
-    <ion-select label="Role" labelPlacement="floating" fill="outline" interface="popover"
-                [disabled]="isSelf" [(ngModel)]="form.role">
-      @for (role of roles; track role) {
-        <ion-select-option [value]="role">{{ role }}</ion-select-option>
-      }
-    </ion-select>
+    <h3 class="form-section">Access</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Role</span>
+        <span class="form-box select" [class.disabled]="isSelf">
+          <span class="icon" style="--icon: url(assets/icons/field-shield.svg)" aria-hidden="true"></span>
+          <select name="role" [disabled]="isSelf" [(ngModel)]="form.role">
+            @for (role of roles; track role) {
+              <option [value]="role">{{ role | roleLabel }}</option>
+            }
+          </select>
+          <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+        </span>
+        @if (isSelf) {
+          <span class="form-helper">You can't change your own role.</span>
+        }
+      </label>
+      <label class="form-field">
+        <span class="form-label">{{ user ? 'New password' : 'Password *' }}</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-lock.svg)" aria-hidden="true"></span>
+          <input name="password" [type]="showPassword() ? 'text' : 'password'" autocomplete="new-password"
+                 [(ngModel)]="form.password" />
+          <button type="button" class="form-box-action" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                  (click)="showPassword.set(!showPassword())">
+            <ion-icon [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+          </button>
+        </span>
+        @if (user) {
+          <span class="form-helper">Leave blank to keep the current password.</span>
+        }
+      </label>
+    </div>
 
-    <ion-input [label]="user ? 'New password (leave blank to keep)' : 'Password *'" labelPlacement="floating"
-               fill="outline" type="password" autocomplete="new-password" [(ngModel)]="form.password">
-      <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-    </ion-input>
-
-    <div class="form-panel">
+    <div class="form-panel active-row">
       <ion-item lines="none">
-        <ion-toggle [disabled]="isSelf" [(ngModel)]="form.active">Active (can sign in)</ion-toggle>
+        <ion-toggle name="active" [disabled]="isSelf" [(ngModel)]="form.active">Active (can sign in)</ion-toggle>
       </ion-item>
     </div>
-  </ion-list>
+  </form>
 
   @if (user && auth.isAdmin() && !isSelf) {
     <div class="danger-zone">

@@ -61,15 +61,15 @@
       <ion-list inset="true" lines="full">
         @for (issue of issues.items(); track issue.id) {
           <ion-item-sliding #sliding [disabled]="issue.status === 'RETURNED'">
-            <ion-item class="spine" [class]="'spine-' + statusColor(issue)">
+            <ion-item class="spine" [class]="'spine-' + (issue | statusColor)">
               <ion-label>
-                <h2 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h2>
+                <h2 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h2>
                 <p>{{ issue.studentName }}</p>
-                <p class="due" [class]="'due-' + statusColor(issue)">{{ dueText(issue) }}</p>
-                <p class="item-meta">Issued {{ formatDate(issue.issueDate) }} by {{ issue.issuedByName }}</p>
+                <p class="due" [class]="'due-' + (issue | statusColor)">{{ issue | dueText }}</p>
+                <p class="item-meta">Issued {{ issue.issueDate | shortDate }} by {{ issue.issuedByName }}</p>
               </ion-label>
               <div slot="end" class="end">
-                <ion-badge class="stamp" [color]="statusColor(issue)">{{ statusLabel(issue) }}</ion-badge>
+                <ion-badge class="stamp" [color]="issue | statusColor">{{ issue | statusLabel }}</ion-badge>
                 @if (issue.status !== 'RETURNED') {
                   <ion-button size="small" fill="outline" class="return" [disabled]="returning() === issue.id"
                               (click)="markReturned(issue)">

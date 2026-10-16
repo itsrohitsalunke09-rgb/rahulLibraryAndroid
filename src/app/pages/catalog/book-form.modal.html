@@ -13,43 +13,128 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (error()) {
-    <p class="form-error" role="alert">{{ error() }}</p>
-  }
+  <form class="form" (ngSubmit)="save()">
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
 
-  <ion-list lines="none" class="form">
-    <h2 class="form-section">Book</h2>
-    <ion-input label="Title *" labelPlacement="floating" fill="outline" [(ngModel)]="form.title"></ion-input>
-    <ion-input label="Author *" labelPlacement="floating" fill="outline" [(ngModel)]="form.author"></ion-input>
-    <ion-select label="Category" labelPlacement="floating" fill="outline" interface="alert"
-                [interfaceOptions]="{ header: 'Book category' }" [(ngModel)]="form.categoryChoice"
-                [helperText]="categories.loaded() && !categories.items().length ? 'No categories yet. Add them in Config → Book categories.' : ''">
-      <ion-select-option value="">No category</ion-select-option>
-      @for (c of categories.items(); track c.id) {
-        <ion-select-option [value]="'' + c.id">{{ c.categoryNumber }} · {{ c.name }}</ion-select-option>
-      }
-      @if (oldCategory) {
-        <ion-select-option [value]="keepText">{{ oldCategory }} (not in master)</ion-select-option>
-      }
-    </ion-select>
-    <ion-input label="Total copies *" labelPlacement="floating" fill="outline" type="number" min="1"
-               inputmode="numeric" [(ngModel)]="form.totalCopies"></ion-input>
-    <ion-textarea label="Description" labelPlacement="floating" fill="outline" rows="3" [autoGrow]="true"
-                  [(ngModel)]="form.description"></ion-textarea>
+    <h3 class="form-section">Book</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Title *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
+          <input name="title" [(ngModel)]="form.title" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Author *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-user.svg)" aria-hidden="true"></span>
+          <input name="author" [(ngModel)]="form.author" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Category</span>
+        <span class="form-box select">
+          <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+          <select class="marathi" name="categoryChoice" [(ngModel)]="form.categoryChoice">
+            <option value="">No category</option>
+            @for (c of categories.items(); track c.id) {
+              <option [value]="'' + c.id">{{ c.categoryNumber }} · {{ c.name }}</option>
+            }
+            @if (oldCategory) {
+              <option [value]="keepText">{{ oldCategory }} (not in master)</option>
+            }
+          </select>
+          <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+        </span>
+        @if (categories.loaded() && !categories.items().length) {
+          <span class="form-helper">No categories yet. Add them in Config → Book categories.</span>
+        }
+      </label>
+      <label class="form-field">
+        <span class="form-label">Total copies *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/copies.svg)" aria-hidden="true"></span>
+          <input name="totalCopies" type="number" min="1" inputmode="numeric" [(ngModel)]="form.totalCopies" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Description</span>
+        <span class="form-box tall">
+          <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+          <textarea name="description" rows="3" [(ngModel)]="form.description"></textarea>
+        </span>
+      </label>
+    </div>
 
-    <h2 class="form-section">Catalogue details</h2>
-    <ion-input label="Registration number" labelPlacement="floating" fill="outline" [(ngModel)]="form.registrationNumber"></ion-input>
-    <ion-input label="Publication" labelPlacement="floating" fill="outline" [(ngModel)]="form.publication"></ion-input>
-    <ion-input label="Publication year" labelPlacement="floating" fill="outline" type="number" inputmode="numeric"
-               [(ngModel)]="form.publicationYear"></ion-input>
-    <ion-input label="Page count" labelPlacement="floating" fill="outline" type="number" inputmode="numeric"
-               [(ngModel)]="form.pageCount"></ion-input>
+    <h3 class="form-section">Catalogue details</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Registration number</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+          <input name="registrationNumber" [(ngModel)]="form.registrationNumber" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Publication</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-pin.svg)" aria-hidden="true"></span>
+          <input class="marathi" name="publication" [(ngModel)]="form.publication" />
+        </span>
+      </label>
+      <div class="form-pair">
+        <label class="form-field">
+          <span class="form-label">Publication year</span>
+          <span class="form-box">
+            <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+            <input name="publicationYear" type="number" inputmode="numeric" [(ngModel)]="form.publicationYear" />
+          </span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Page count</span>
+          <span class="form-box">
+            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+            <input name="pageCount" type="number" inputmode="numeric" [(ngModel)]="form.pageCount" />
+          </span>
+        </label>
+      </div>
+    </div>
 
-    <h2 class="form-section">Purchase</h2>
-    <ion-input label="Date added" labelPlacement="stacked" fill="outline" type="date" [(ngModel)]="form.date"></ion-input>
-    <ion-input label="Seller" labelPlacement="floating" fill="outline" [(ngModel)]="form.seller"></ion-input>
-    <ion-input label="Receipt number" labelPlacement="floating" fill="outline" [(ngModel)]="form.receiptNumber"></ion-input>
-    <ion-input label="Price (₹)" labelPlacement="floating" fill="outline" type="number" step="0.01" inputmode="decimal"
-               [(ngModel)]="form.price"></ion-input>
-  </ion-list>
+    <h3 class="form-section">Purchase</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Date added</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+          <input name="date" type="date" [(ngModel)]="form.date" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Seller</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/user.svg)" aria-hidden="true"></span>
+          <input class="marathi" name="seller" [(ngModel)]="form.seller" />
+        </span>
+      </label>
+      <div class="form-pair">
+        <label class="form-field">
+          <span class="form-label">Receipt number</span>
+          <span class="form-box">
+            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+            <input name="receiptNumber" [(ngModel)]="form.receiptNumber" />
+          </span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Price (₹)</span>
+          <span class="form-box">
+            <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+            <input name="price" type="number" step="0.01" inputmode="decimal" [(ngModel)]="form.price" />
+          </span>
+        </label>
+      </div>
+    </div>
+  </form>
 </ion-content>

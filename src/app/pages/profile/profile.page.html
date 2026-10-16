@@ -16,24 +16,24 @@
       @if (editing()) {
         <form (ngSubmit)="save()">
           <h3 class="heading">Personal details</h3>
-          <div class="card">
-            <label class="field">
-              <span class="label">Full name</span>
-              <span class="box">
+          <div class="form-card">
+            <label class="form-field">
+              <span class="form-label">Full name</span>
+              <span class="form-box">
                 <span class="icon" style="--icon: url(assets/icons/field-user.svg)"></span>
                 <input name="fullName" autocomplete="name" [(ngModel)]="form.fullName" />
               </span>
             </label>
-            <label class="field">
-              <span class="label">Date of birth</span>
-              <span class="box">
+            <label class="form-field">
+              <span class="form-label">Date of birth</span>
+              <span class="form-box">
                 <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)"></span>
                 <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
               </span>
             </label>
-            <label class="field">
-              <span class="label">Address</span>
-              <span class="box tall">
+            <label class="form-field">
+              <span class="form-label">Address</span>
+              <span class="form-box tall">
                 <span class="icon" style="--icon: url(assets/icons/field-pin.svg)"></span>
                 <textarea name="address" rows="2" autocomplete="street-address" [(ngModel)]="form.address"></textarea>
               </span>
@@ -41,19 +41,19 @@
           </div>
 
           <h3 class="heading">Contact</h3>
-          <div class="card">
-            <label class="field">
-              <span class="label">Mobile number</span>
-              <span class="box">
+          <div class="form-card">
+            <label class="form-field">
+              <span class="form-label">Mobile number</span>
+              <span class="form-box">
                 <span class="icon" style="--icon: url(assets/icons/field-phone.svg)"></span>
                 <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"
                        [(ngModel)]="form.phone" />
               </span>
-              <span class="helper">Due-date reminders are sent to this number</span>
+              <span class="form-helper">Due-date reminders are sent to this number</span>
             </label>
-            <label class="field">
-              <span class="label">Email</span>
-              <span class="box">
+            <label class="form-field">
+              <span class="form-label">Email</span>
+              <span class="form-box">
                 <span class="icon" style="--icon: url(assets/icons/field-mail.svg)"></span>
                 <input name="email" type="email" autocomplete="email" [(ngModel)]="form.email" />
               </span>

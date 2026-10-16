@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonInput, IonList, IonSpinner, IonTitle, IonToolbar, ModalController
+  IonButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { CategoriesStore } from '../../core/categories.store';
 import { BookCategory, BookCategoryRequest } from '../../core/models';
@@ -11,10 +11,9 @@ import { UiService, errorMessage } from '../../core/ui.service';
 @Component({
   selector: 'app-category-form',
   templateUrl: 'category-form.modal.html',
-  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonInput, IonSpinner],
+  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSpinner],
   styles: [`
     .form { padding: 0 0 24px; max-width: 520px; margin: 0 auto; }
-    .hint { margin: 4px 4px 0; font-size: 12px; line-height: 1.4; color: var(--app-muted); }
     .delete {
       display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 44px;
       margin-top: 28px; border: 1px solid var(--app-rust); border-radius: var(--app-radius-control);

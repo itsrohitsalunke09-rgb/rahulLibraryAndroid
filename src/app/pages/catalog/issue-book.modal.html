@@ -5,43 +5,64 @@
     </ion-buttons>
     <ion-title>Issue book</ion-title>
   </ion-toolbar>
-  <ion-toolbar>
-    <ion-searchbar placeholder="Search student by name, username or phone" [debounce]="300"
-                   (ionInput)="search($event.detail.value)"></ion-searchbar>
-  </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="book-card">
-    <p class="book" [class.marathi]="isMarathi(book.category)">{{ book.title }}</p>
-    <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} on the shelf</p>
-  </div>
+<ion-content class="ion-padding">
+  <div class="wrap">
+    <div class="book-card">
+      <p class="book" [class.marathi]="book.category | marathi">{{ book.title }}</p>
+      <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} on the shelf</p>
+    </div>
 
-  <h2 class="section-title">Choose a student</h2>
-  <ion-list inset="true" lines="full">
-    @for (student of students(); track student.id) {
-      <ion-item button detail="false" (click)="selected.set(student)">
-        <ion-icon slot="start" [name]="selected()?.id === student.id ? 'checkmark-circle' : 'ellipse-outline'"
-                  [color]="selected()?.id === student.id ? 'primary' : 'medium'"></ion-icon>
-        <ion-label>
-          <h3>{{ student.fullName }}</h3>
-          <p>{{ student.username }}{{ student.phone ? ' · ' + student.phone : '' }}</p>
-        </ion-label>
-      </ion-item>
-    } @empty {
-      <ion-item lines="none">
-        <ion-label color="medium">
-          @if (searching()) {
-            Searching…
-          } @else if (searched()) {
-            No active student matches. Check the spelling or start of the name.
+    <h3 class="form-section">Student</h3>
+    <div class="form-card">
+      <!-- Searchable dropdown: type to search, tap a name to choose it. -->
+      <div class="form-field picker">
+        <label class="form-label" for="student-search">Issue to</label>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/search.svg)" aria-hidden="true"></span>
+          <input #input id="student-search" type="search" autocomplete="off" enterkeyhint="search"
+                 placeholder="Name, username or phone" role="combobox" aria-autocomplete="list"
+                 aria-controls="student-options" [attr.aria-expanded]="open()"
+                 [value]="query()" (input)="type($any($event.target).value)" (focus)="open.set(true)" />
+          @if (query()) {
+            <button type="button" class="form-box-action" aria-label="Clear student" (click)="clear(); input.focus()">
+              <span class="icon" style="--icon: url(assets/icons/close.svg)" aria-hidden="true"></span>
+            </button>
           } @else {
-            Type the start of a student's name to find them.
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           }
-        </ion-label>
-      </ion-item>
-    }
-  </ion-list>
+        </span>
+
+        @if (open() && !selected()) {
+          <div id="student-options" class="options" role="listbox" aria-label="Students">
+            @for (student of students(); track student.id) {
+              <button type="button" class="option" role="option" [attr.aria-selected]="false" (click)="choose(student)">
+                <span class="name">{{ student.fullName }}</span>
+                <span class="meta">{{ student.username }}{{ student.phone ? ' · ' + student.phone : '' }}</span>
+              </button>
+            } @empty {
+              <p class="status">
+                @if (searching()) {
+                  Searching…
+                } @else if (searched()) {
+                  No active student matches. Check the spelling or start of the name.
+                } @else {
+                  Type the start of a student's name.
+                }
+              </p>
+            }
+          </div>
+        }
+
+        @if (selected(); as s) {
+          <span class="form-helper chosen">
+            {{ s.username }}{{ s.phone ? ' · ' + s.phone : '' }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
 </ion-content>
 
 <ion-footer>
@@ -49,8 +70,14 @@
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
-    <ion-input label="Loan period (days)" labelPlacement="floating" fill="outline" type="number" min="1"
-               inputmode="numeric" [helperText]="'Due back ' + dueDate()" [(ngModel)]="days"></ion-input>
+    <label class="form-field">
+      <span class="form-label">Loan period (days)</span>
+      <span class="form-box">
+        <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+        <input type="number" min="1" inputmode="numeric" name="days" [(ngModel)]="days" />
+      </span>
+      <span class="form-helper">Due back {{ dueDate() }}</span>
+    </label>
     <ion-button expand="block" [disabled]="!selected() || saving()" (click)="issue()">
       @if (saving()) {
         <ion-spinner name="crescent"></ion-spinner>

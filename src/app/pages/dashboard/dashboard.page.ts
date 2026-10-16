@@ -7,6 +7,7 @@ import {
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { Freshness } from '../../core/freshness';
 import { Dashboard } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 
@@ -56,11 +57,14 @@ export class DashboardPage implements ViewWillEnter {
   readonly years = signal<number[]>([]);
   private readonly yearSelect = viewChild<IonSelect>('yearSelect');
   private request?: Subscription;
+  private freshness = new Freshness();
 
   ionViewWillEnter() {
     // Tab pages stay alive in the background, so refresh the date on every visit.
     this.today.set(todayText());
-    this.load();
+    if (this.freshness.isStale()) {
+      this.load();
+    }
   }
 
   refresh(event: RefresherCustomEvent) {
@@ -108,6 +112,7 @@ export class DashboardPage implements ViewWillEnter {
   private load(done?: () => void) {
     // Drop an older request so a quick year change never shows stale numbers.
     this.request?.unsubscribe();
+    this.freshness.mark();
     this.request = this.api.dashboard(this.year()).subscribe({
       next: stats => {
         this.error.set('');
@@ -115,6 +120,7 @@ export class DashboardPage implements ViewWillEnter {
         done?.();
       },
       error: err => {
+        this.freshness.invalidate();
         this.error.set(errorMessage(err, 'Could not load the dashboard.'));
         done?.();
       }

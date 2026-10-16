@@ -19,8 +19,8 @@
         <!-- Title, author and the "more options" button -->
         <div class="title-row">
           <div class="title-text">
-            <h1 [class.marathi]="isMarathi(book.category)">{{ book.title }}</h1>
-            <p class="author" [class.marathi]="isMarathi(book.category)">{{ book.author }}</p>
+            <h1 [class.marathi]="book.category | marathi">{{ book.title }}</h1>
+            <p class="author" [class.marathi]="book.category | marathi">{{ book.author }}</p>
           </div>
           <button class="more" aria-label="More book options" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
             <ion-icon name="ellipsis-vertical" aria-hidden="true"></ion-icon>
@@ -35,7 +35,7 @@
         </span>
 
         @if (book.description) {
-          <p class="description" [class.marathi]="isMarathi(book.category)">{{ book.description }}</p>
+          <p class="description" [class.marathi]="book.category | marathi">{{ book.description }}</p>
         }
 
         @switch (section()) {
@@ -49,7 +49,7 @@
                 <div><dt>Year</dt><dd>{{ book.publicationYear ?? '-' }}</dd></div>
                 <div><dt>Pages</dt><dd>{{ book.pageCount ?? '-' }}</dd></div>
                 @if (auth.isStaff()) {
-                  <div><dt>Added on</dt><dd>{{ formatDate(book.date) }}</dd></div>
+                  <div><dt>Added on</dt><dd>{{ book.date | shortDate }}</dd></div>
                   <div><dt>Seller</dt><dd class="marathi">{{ book.seller || '-' }}</dd></div>
                   <div><dt>Receipt no.</dt><dd>{{ book.receiptNumber || '-' }}</dd></div>
                   <div><dt>Price</dt><dd>{{ book.price !== null && book.price !== undefined ? '₹' + book.price : '-' }}</dd></div>
@@ -65,9 +65,9 @@
                   <div class="record">
                     <div class="record-head">
                       <span class="borrower">{{ issue.studentName }}</span>
-                      <ion-badge class="chip" [color]="statusColor(issue)">{{ statusLabel(issue) }}</ion-badge>
+                      <ion-badge class="chip" [color]="issue | statusColor">{{ issue | statusLabel }}</ion-badge>
                     </div>
-                    <p>Issued {{ formatDate(issue.issueDate) }} · {{ dueText(issue) }}</p>
+                    <p>Issued {{ issue.issueDate | shortDate }} · {{ issue | dueText }}</p>
                   </div>
                 } @empty {
                   <p class="muted">Not issued to anyone yet.</p>
@@ -80,66 +80,112 @@
           @case ('edit') {
             <form class="expanded edit" (ngSubmit)="saveEdit()">
               <h2>Edit book</h2>
-              <label class="field">
-                <span>Title</span>
-                <input class="big" [class.marathi]="isMarathi(book.category)" name="title" [(ngModel)]="form.title" />
+              <label class="form-field">
+                <span class="form-label">Title</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
+                  <input [class.marathi]="book.category | marathi" name="title" [(ngModel)]="form.title" />
+                </span>
               </label>
-              <label class="field">
-                <span>Author</span>
-                <input class="author-input" [class.marathi]="isMarathi(book.category)" name="author" [(ngModel)]="form.author" />
+              <label class="form-field">
+                <span class="form-label">Author</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/field-user.svg)" aria-hidden="true"></span>
+                  <input [class.marathi]="book.category | marathi" name="author" [(ngModel)]="form.author" />
+                </span>
               </label>
-              <label class="field">
-                <span>Description</span>
-                <textarea rows="3" [class.marathi]="isMarathi(book.category)" name="description" [(ngModel)]="form.description"></textarea>
+              <label class="form-field">
+                <span class="form-label">Description</span>
+                <span class="form-box tall">
+                  <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+                  <textarea rows="3" [class.marathi]="book.category | marathi" name="description" [(ngModel)]="form.description"></textarea>
+                </span>
               </label>
-              <label class="field">
-                <span>Total copies</span>
-                <input class="value" type="number" min="1" inputmode="numeric" name="totalCopies" [(ngModel)]="form.totalCopies" />
+              <label class="form-field">
+                <span class="form-label">Category</span>
+                <span class="form-box select">
+                  <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+                  <select class="marathi" name="categoryChoice" [(ngModel)]="form.categoryChoice">
+                    <option value="">No category</option>
+                    @for (c of categories.items(); track c.id) {
+                      <option [value]="'' + c.id">{{ c.categoryNumber }} · {{ c.name }}</option>
+                    }
+                    @if (oldCategory) {
+                      <option [value]="keepText">{{ oldCategory }} (not in master)</option>
+                    }
+                  </select>
+                  <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+                </span>
               </label>
-              <label class="field">
-                <span>Category</span>
-                <select class="value marathi" name="categoryChoice" [(ngModel)]="form.categoryChoice">
-                  <option value="">No category</option>
-                  @for (c of categories.items(); track c.id) {
-                    <option [value]="'' + c.id">{{ c.categoryNumber }} · {{ c.name }}</option>
-                  }
-                  @if (oldCategory) {
-                    <option [value]="keepText">{{ oldCategory }} (not in master)</option>
-                  }
-                </select>
+              <div class="form-pair">
+                <label class="form-field">
+                  <span class="form-label">Total copies</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/copies.svg)" aria-hidden="true"></span>
+                    <input type="number" min="1" inputmode="numeric" name="totalCopies" [(ngModel)]="form.totalCopies" />
+                  </span>
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Registration no.</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+                    <input name="registrationNumber" [(ngModel)]="form.registrationNumber" />
+                  </span>
+                </label>
+              </div>
+              <label class="form-field">
+                <span class="form-label">Publication</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/field-pin.svg)" aria-hidden="true"></span>
+                  <input class="marathi" name="publication" [(ngModel)]="form.publication" />
+                </span>
               </label>
-              <label class="field">
-                <span>Registration no.</span>
-                <input class="value" name="registrationNumber" [(ngModel)]="form.registrationNumber" />
+              <div class="form-pair">
+                <label class="form-field">
+                  <span class="form-label">Year</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+                    <input type="number" inputmode="numeric" name="publicationYear" [(ngModel)]="form.publicationYear" />
+                  </span>
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Pages</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+                    <input type="number" inputmode="numeric" name="pageCount" [(ngModel)]="form.pageCount" />
+                  </span>
+                </label>
+              </div>
+              <label class="form-field">
+                <span class="form-label">Added on</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+                  <input type="date" name="date" [(ngModel)]="form.date" />
+                </span>
               </label>
-              <label class="field">
-                <span>Publication</span>
-                <input class="value marathi" name="publication" [(ngModel)]="form.publication" />
+              <label class="form-field">
+                <span class="form-label">Seller</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/user.svg)" aria-hidden="true"></span>
+                  <input class="marathi" name="seller" [(ngModel)]="form.seller" />
+                </span>
               </label>
-              <label class="field">
-                <span>Year</span>
-                <input class="value" type="number" inputmode="numeric" name="publicationYear" [(ngModel)]="form.publicationYear" />
-              </label>
-              <label class="field">
-                <span>Pages</span>
-                <input class="value" type="number" inputmode="numeric" name="pageCount" [(ngModel)]="form.pageCount" />
-              </label>
-              <label class="field">
-                <span>Added on</span>
-                <input class="value" type="date" name="date" [(ngModel)]="form.date" />
-              </label>
-              <label class="field">
-                <span>Seller</span>
-                <input class="value marathi" name="seller" [(ngModel)]="form.seller" />
-              </label>
-              <label class="field">
-                <span>Receipt no.</span>
-                <input class="value" name="receiptNumber" [(ngModel)]="form.receiptNumber" />
-              </label>
-              <label class="field">
-                <span>Price (₹)</span>
-                <input class="value" type="number" step="0.01" inputmode="decimal" name="price" [(ngModel)]="form.price" />
-              </label>
+              <div class="form-pair">
+                <label class="form-field">
+                  <span class="form-label">Receipt no.</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+                    <input name="receiptNumber" [(ngModel)]="form.receiptNumber" />
+                  </span>
+                </label>
+                <label class="form-field">
+                  <span class="form-label">Price (₹)</span>
+                  <span class="form-box">
+                    <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+                    <input type="number" step="0.01" inputmode="decimal" name="price" [(ngModel)]="form.price" />
+                  </span>
+                </label>
+              </div>
 
               @if (formError()) {
                 <p class="form-error" role="alert">{{ formError() }}</p>

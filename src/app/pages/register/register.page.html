@@ -11,34 +11,74 @@
   <form class="wrap" (ngSubmit)="submit()">
     <p class="lede">For students. The librarian can issue books to you once your account exists.</p>
 
-    <ion-list lines="none">
-      <h2 class="form-section">About you</h2>
-      <ion-input label="Full name" labelPlacement="floating" fill="outline" name="fullName"
-                 autocomplete="name" [(ngModel)]="form.fullName"></ion-input>
+    <h3 class="form-section">About you</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Full name</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-user.svg)" aria-hidden="true"></span>
+          <input name="fullName" autocomplete="name" [(ngModel)]="form.fullName" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Date of birth</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+          <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Address</span>
+        <span class="form-box tall">
+          <span class="icon" style="--icon: url(assets/icons/field-pin.svg)" aria-hidden="true"></span>
+          <textarea name="address" rows="2" autocomplete="street-address" [(ngModel)]="form.address"></textarea>
+        </span>
+      </label>
+    </div>
 
-      <ion-input label="Date of birth" labelPlacement="stacked" fill="outline" type="date" name="dateOfBirth"
-                 [max]="today" [(ngModel)]="form.dateOfBirth"></ion-input>
+    <h3 class="form-section">Contact</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Mobile number</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-phone.svg)" aria-hidden="true"></span>
+          <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"
+                 [(ngModel)]="form.phone" />
+        </span>
+        <span class="form-helper">10 digits, used for due-date reminders</span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Email</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-mail.svg)" aria-hidden="true"></span>
+          <input name="email" type="email" autocomplete="email" [(ngModel)]="form.email" />
+        </span>
+      </label>
+    </div>
 
-      <ion-textarea label="Address" labelPlacement="floating" fill="outline" name="address" rows="3"
-                    [(ngModel)]="form.address"></ion-textarea>
-
-      <h2 class="form-section">Contact</h2>
-      <ion-input label="Mobile number" labelPlacement="floating" fill="outline" type="tel" name="phone"
-                 inputmode="numeric" maxlength="10" helperText="10 digits, used for due-date reminders"
-                 [(ngModel)]="form.phone"></ion-input>
-
-      <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" name="email"
-                 autocomplete="email" [(ngModel)]="form.email"></ion-input>
-
-      <h2 class="form-section">Sign-in details</h2>
-      <ion-input label="Username" labelPlacement="floating" fill="outline" name="username"
-                 autocapitalize="off" autocomplete="username" [(ngModel)]="form.username"></ion-input>
-
-      <ion-input label="Password" labelPlacement="floating" fill="outline" type="password" name="password"
-                 autocomplete="new-password" helperText="At least 6 characters" [(ngModel)]="form.password">
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-    </ion-list>
+    <h3 class="form-section">Sign-in details</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Username</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+          <input name="username" autocapitalize="off" autocomplete="username" [(ngModel)]="form.username" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Password</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-lock.svg)" aria-hidden="true"></span>
+          <input name="password" [type]="showPassword() ? 'text' : 'password'" autocomplete="new-password"
+                 [(ngModel)]="form.password" />
+          <button type="button" class="form-box-action" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                  (click)="showPassword.set(!showPassword())">
+            <ion-icon [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'" aria-hidden="true"></ion-icon>
+          </button>
+        </span>
+        <span class="form-helper">At least 6 characters</span>
+      </label>
+    </div>
 
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>

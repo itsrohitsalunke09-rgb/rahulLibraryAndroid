@@ -10,10 +10,10 @@ import { addIcons } from 'ionicons';
 import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
 import { clearLinkFilters } from '../../core/link-filters';
-import { BookIssue, IssueCounts, Page, isMarathi } from '../../core/models';
+import { BookIssue, IssueCounts, Page } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
+import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService } from '../../core/ui.service';
 
 /**
@@ -30,7 +30,8 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL', 'YEAR'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions, IonItemOption,
-    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonSelect, IonSelectOption
+    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonSelect, IonSelectOption,
+    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -49,13 +50,7 @@ export class IssuesPage implements ViewWillEnter {
   readonly query = signal('');
   readonly counts = signal<IssueCounts | null>(null);
   readonly returning = signal<number | null>(null);
-  readonly issues = new PagedList<BookIssue>(page => this.fetch(page), 'Could not load issues.');
-
-  protected readonly dueText = dueText;
-  protected readonly formatDate = formatDate;
-  protected readonly statusColor = statusColor;
-  protected readonly statusLabel = statusLabel;
-  protected readonly isMarathi = isMarathi;
+  readonly issues = new PagedList<BookIssue>((page, size) => this.fetch(page, size), 'Could not load issues.');
 
   constructor() {
     addIcons({ returnDownBackOutline, swapHorizontalOutline });
@@ -85,9 +80,11 @@ export class IssuesPage implements ViewWillEnter {
   }
 
   ionViewWillEnter() {
-    this.issues.reset();
-    this.loadCounts();
-    this.loadYears();
+    // The tab counts and years go stale with the list, so they reload together.
+    if (this.issues.revisit()) {
+      this.loadCounts();
+      this.loadYears();
+    }
   }
 
   setFilter(value: unknown) {
@@ -204,19 +201,19 @@ export class IssuesPage implements ViewWillEnter {
     });
   }
 
-  private fetch(page: number): Observable<Page<BookIssue>> {
+  private fetch(page: number, size: number): Observable<Page<BookIssue>> {
     const q = this.query();
     if (q) {
-      return this.api.issues(page, 20, undefined, q);
+      return this.api.issues(page, size, undefined, q);
     }
     // A chosen year narrows every tab to issues made in that year.
     const year = this.year();
     switch (this.filter()) {
-      case 'OUT': return this.api.issuesOut(page, 20, year);
-      case 'OVERDUE': return year ? this.api.issuesInYear(year, page, 20, 'OVERDUE') : this.api.issues(page, 20, 'OVERDUE');
-      case 'RETURNED': return year ? this.api.issuesInYear(year, page, 20, 'RETURNED') : this.api.issues(page, 20, 'RETURNED');
-      case 'YEAR': return year ? this.api.issuesInYear(year, page) : this.api.issuesOut(page);
-      default: return year ? this.api.issuesInYear(year, page) : this.api.issues(page);
+      case 'OUT': return this.api.issuesOut(page, size, year);
+      case 'OVERDUE': return year ? this.api.issuesInYear(year, page, size, 'OVERDUE') : this.api.issues(page, size, 'OVERDUE');
+      case 'RETURNED': return year ? this.api.issuesInYear(year, page, size, 'RETURNED') : this.api.issues(page, size, 'RETURNED');
+      case 'YEAR': return year ? this.api.issuesInYear(year, page, size) : this.api.issuesOut(page, size);
+      default: return year ? this.api.issuesInYear(year, page, size) : this.api.issues(page, size);
     }
   }
 

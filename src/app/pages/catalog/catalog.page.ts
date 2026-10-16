@@ -6,8 +6,9 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { Book, isMarathi } from '../../core/models';
+import { Book } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
+import { MarathiPipe } from '../../core/pipes';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
 import { ImportBooksModal } from './import-books.modal';
@@ -18,7 +19,7 @@ import { ImportBooksModal } from './import-books.modal';
   styleUrls: ['catalog.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
+    IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, MarathiPipe
   ],
 })
 export class CatalogPage implements ViewWillEnter {
@@ -27,11 +28,11 @@ export class CatalogPage implements ViewWillEnter {
   protected auth = inject(AuthService);
 
   readonly query = signal('');
-  readonly books = new PagedList<Book>(page => this.api.books(this.query(), page), 'Could not load books.');
+  readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
 
   ionViewWillEnter() {
-    // Refresh each visit so availability is current after issues/returns elsewhere.
-    this.books.reset();
+    // Reload only when stale, so availability is current without refetching on every tab switch.
+    this.books.revisit();
   }
 
   search(value: string | null | undefined) {
@@ -66,9 +67,5 @@ export class CatalogPage implements ViewWillEnter {
     if (role === 'imported') {
       this.books.reset();
     }
-  }
-
-  isMarathi(book: Book) {
-    return isMarathi(book.category);
   }
 }

@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonInput, IonList, IonSelect, IonSelectOption, IonSpinner,
-  IonTextarea, IonTitle, IonToolbar, ModalController
+  IonButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { CategoriesStore } from '../../core/categories.store';
@@ -13,10 +12,7 @@ import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinke
 @Component({
   selector: 'app-book-form',
   templateUrl: 'book-form.modal.html',
-  imports: [
-    FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList,
-    IonInput, IonTextarea, IonSpinner, IonSelect, IonSelectOption
-  ],
+  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSpinner],
   styles: [`.form { padding: 0 0 24px; max-width: 520px; margin: 0 auto; }`],
 })
 export class BookFormModal implements OnInit {

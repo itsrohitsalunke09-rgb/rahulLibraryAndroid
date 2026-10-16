@@ -79,69 +79,7 @@
   background: var(--app-surface);
 }
 
-.field {
-  display: grid;
-  gap: 6px;
-
-  .label {
-    font-size: 12px;
-    color: var(--app-muted);
-  }
-
-  .helper {
-    font-size: 11px;
-    color: var(--app-muted);
-  }
-}
-
-.box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--app-rule);
-  border-radius: 14px;
-  background: var(--app-paper);
-  color: var(--app-muted);
-
-  &.tall {
-    align-items: flex-start;
-    min-height: 76px;
-    padding-top: 12px;
-  }
-
-  &:focus-within {
-    border-color: var(--app-ink);
-  }
-
-  .icon {
-    --icon-size: 18px;
-  }
-
-  input,
-  textarea {
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--app-ink);
-    font: inherit;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  input {
-    height: 42px;
-  }
-
-  textarea {
-    resize: none;
-    line-height: 1.4;
-  }
-}
+/* Edit form fields use the shared .form-* styles in global.scss. */
 
 /* Read-only rows (view mode and the Account card). */
 .rows {

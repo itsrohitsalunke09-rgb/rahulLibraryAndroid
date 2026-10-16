@@ -10,8 +10,8 @@ import {
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { CategoriesStore } from '../../core/categories.store';
-import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
-import { Book, BookIssue, isMarathi } from '../../core/models';
+import { Book, BookIssue } from '../../core/models';
+import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
 import { IssueBookModal } from './issue-book.modal';
@@ -27,7 +27,10 @@ type Section = 'none' | 'details' | 'history' | 'edit';
   selector: 'app-book-detail',
   templateUrl: 'book-detail.modal.html',
   styleUrls: ['book-detail.modal.scss'],
-  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonBadge, IonIcon, IonSpinner],
+  imports: [
+    FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonBadge, IonIcon, IonSpinner,
+    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe
+  ],
 })
 export class BookDetailModal implements OnInit {
   @Input({ required: true }) book!: Book;
@@ -56,12 +59,6 @@ export class BookDetailModal implements OnInit {
   readonly borrowers = computed(() =>
     (this.history() ?? []).filter(i => i.status !== 'RETURNED').map(i => i.studentName)
   );
-
-  protected readonly formatDate = formatDate;
-  protected readonly dueText = dueText;
-  protected readonly statusColor = statusColor;
-  protected readonly statusLabel = statusLabel;
-  protected readonly isMarathi = isMarathi;
 
   constructor() {
     addIcons({ ellipsisVertical, pencilOutline, trashOutline, informationCircleOutline, timeOutline });

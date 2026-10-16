@@ -13,11 +13,7 @@ import { CategoriesStore } from '../../core/categories.store';
 export class ConfigPage implements ViewWillEnter {
   protected categories = inject(CategoriesStore);
 
-  constructor() {
-    this.categories.load();
-  }
-
   ionViewWillEnter() {
-    this.categories.load(true);
+    this.categories.revisit();
   }
 }
