@@ -56,6 +56,56 @@ button {
   cursor: pointer;
 }
 
+/* Year filter above the tiles. */
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filter-text {
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+.year-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-control);
+  background: var(--app-surface);
+  color: var(--app-ink);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &.active {
+    border-color: var(--app-ink);
+    background: var(--app-ink);
+    color: var(--app-on-ink);
+  }
+
+  .icon {
+    --icon-size: 14px;
+  }
+}
+
+/* The year list is opened from the chip; the select itself stays out of sight. */
+.year-select {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Overdue and out-with-students tiles. */
 .circulation {
   display: grid;

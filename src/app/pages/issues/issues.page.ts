@@ -90,11 +90,10 @@ export class IssuesPage implements ViewWillEnter {
 
   /** Opens the year dropdown (also when the Year tab is tapped again to change the year). */
   async openYears() {
-    if (!this.years().length) {
-      await this.loadYears();
-      // Let the new year options render before the dropdown reads them.
-      await new Promise(resolve => setTimeout(resolve));
-    }
+    // Fetch the years fresh each time so new issues (or a newly deployed server) show up.
+    await this.loadYears();
+    // Let the year options render before the dropdown reads them.
+    await new Promise(resolve => setTimeout(resolve));
     await this.yearSelect()?.open();
   }
 
@@ -118,7 +117,13 @@ export class IssuesPage implements ViewWillEnter {
   private loadYears(): Promise<void> {
     return new Promise(resolve => this.api.issueYears().subscribe({
       next: years => { this.years.set(years); resolve(); },
-      error: () => { this.years.set([new Date().getFullYear()]); resolve(); }
+      // Keep the last list we had; offer the current year only if there was none.
+      error: () => {
+        if (!this.years().length) {
+          this.years.set([new Date().getFullYear()]);
+        }
+        resolve();
+      }
     }));
   }
 
@@ -129,6 +134,7 @@ export class IssuesPage implements ViewWillEnter {
 
   refresh(event: Parameters<PagedList<BookIssue>['refresh']>[0]) {
     this.loadCounts();
+    this.loadYears();
     this.issues.refresh(event);
   }
 

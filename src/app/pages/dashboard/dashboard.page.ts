@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  IonContent, IonHeader, IonRefresher, IonRefresherContent, IonSkeletonText, IonTitle, IonToolbar,
-  RefresherCustomEvent, ViewWillEnter
+  IonContent, IonHeader, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSkeletonText, IonTitle,
+  IonToolbar, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Dashboard } from '../../core/models';
@@ -25,7 +26,10 @@ interface Tile {
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText],
+  imports: [
+    IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText, IonSelect,
+    IonSelectOption
+  ],
 })
 export class DashboardPage implements ViewWillEnter {
   private api = inject(ApiService);
@@ -47,6 +51,11 @@ export class DashboardPage implements ViewWillEnter {
   });
   readonly today = signal(todayText());
   readonly error = signal('');
+  /** Year for the issue numbers; null = all years. */
+  readonly year = signal<number | null>(null);
+  readonly years = signal<number[]>([]);
+  private readonly yearSelect = viewChild<IonSelect>('yearSelect');
+  private request?: Subscription;
 
   ionViewWillEnter() {
     // Tab pages stay alive in the background, so refresh the date on every visit.
@@ -58,6 +67,35 @@ export class DashboardPage implements ViewWillEnter {
     this.load(() => event.target.complete());
   }
 
+  /** Opens the year list, fetched fresh so it matches the issues on the server. */
+  async openYears() {
+    await this.loadYears();
+    // Let the year options render before the dropdown reads them.
+    await new Promise(resolve => setTimeout(resolve));
+    await this.yearSelect()?.open();
+  }
+
+  setYear(value: unknown) {
+    const year = Number(value) || null;
+    if (year === this.year()) {
+      return;
+    }
+    this.year.set(year);
+    this.load();
+  }
+
+  private loadYears(): Promise<void> {
+    return new Promise(resolve => this.api.issueYears().subscribe({
+      next: years => { this.years.set(years); resolve(); },
+      error: () => {
+        if (!this.years().length) {
+          this.years.set([new Date().getFullYear()]);
+        }
+        resolve();
+      }
+    }));
+  }
+
   open(tile: Tile) {
     if (tile.link) {
       this.router.navigate([tile.link], { queryParams: tile.query });
@@ -65,7 +103,9 @@ export class DashboardPage implements ViewWillEnter {
   }
 
   private load(done?: () => void) {
-    this.api.dashboard().subscribe({
+    // Drop an older request so a quick year change never shows stale numbers.
+    this.request?.unsubscribe();
+    this.request = this.api.dashboard(this.year()).subscribe({
       next: stats => {
         this.error.set('');
         this.stats.set(stats);

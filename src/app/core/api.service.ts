@@ -13,8 +13,10 @@ export class ApiService {
   private base = environment.apiUrl;
 
   // ---- Dashboard ----
-  dashboard() {
-    return this.http.get<Dashboard>(`${this.base}/dashboard`);
+  /** With a year, the out / overdue numbers count only issues made in that year. */
+  dashboard(year?: number | null) {
+    const params = year ? new HttpParams().set('year', year) : undefined;
+    return this.http.get<Dashboard>(`${this.base}/dashboard`, { params });
   }
 
   // ---- Books ----

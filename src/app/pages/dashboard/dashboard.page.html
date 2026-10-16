@@ -14,6 +14,16 @@
 </ion-header>
 
 <ion-content>
+  <!-- Opened by the year chip; kept out of the header so focusing it never scrolls anything. -->
+  <ion-select #yearSelect class="year-select" interface="alert" aria-label="Dashboard year"
+              [interfaceOptions]="{ header: 'Issues from' }" [value]="year() ?? 0"
+              (ionChange)="setYear($event.detail.value)">
+    <ion-select-option [value]="0">All years</ion-select-option>
+    @for (y of years(); track y) {
+      <ion-select-option [value]="y">{{ y }}</ion-select-option>
+    }
+  </ion-select>
+
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -23,6 +33,15 @@
   }
 
   <div class="overview">
+    <!-- Year filter: applies to the issue numbers (overdue, out with students). -->
+    <div class="filter-row">
+      <span class="filter-text">{{ year() ? 'Issues made in ' + year() : 'Issues from all years' }}</span>
+      <button type="button" class="year-chip" [class.active]="year()" (click)="openYears()" aria-label="Choose year">
+        {{ year() ?? 'All years' }}
+        <span class="icon" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+      </button>
+    </div>
+
     @if (stats(); as s) {
       <div class="circulation">
         @for (tile of attention(); track tile.label) {
