@@ -1,0 +1,78 @@
+@use 'paper';
+
+@include paper.tokens;
+@include paper.figure;
+@include paper.body-text;
+
+.sheet {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: calc(var(--ion-safe-area-top, 0px) + 8px) 20px calc(var(--ion-safe-area-bottom, 0px) + 32px);
+  color: var(--paper-ink);
+}
+
+/* Running head: the paper's name and the close button above a thin rule. */
+.folio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--paper-rule);
+}
+
+.nameplate {
+  font-family: paper.$serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--paper-muted);
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-inline-end: -10px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--paper-ink);
+  cursor: pointer;
+}
+
+article {
+  padding-top: 20px;
+}
+
+.kicker {
+  @include paper.kicker;
+  margin-bottom: 8px;
+}
+
+.headline {
+  @include paper.headline;
+  font-size: clamp(27px, 7.6vw, 38px);
+  letter-spacing: -0.01em;
+}
+
+.byline {
+  margin: 12px 0 0;
+  padding: 8px 0;
+  border-block: 1px solid var(--paper-rule);
+  font-family: paper.$serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--paper-muted);
+}
+
+.text {
+  margin-top: 18px;
+}
+
+.end {
+  margin: 4px 0 0;
+  font-size: 10px;
+  text-align: right;
+  color: var(--paper-muted);
+}

@@ -1,0 +1,188 @@
+@use 'paper';
+
+@include paper.tokens;
+@include paper.figure;
+@include paper.body-text;
+
+.sheet {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: calc(var(--ion-safe-area-top, 0px) + 18px) 18px 24px;
+  color: var(--paper-ink);
+}
+
+/* ---- Masthead: nameplate between double rules, dateline beneath ---- */
+.masthead {
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.nameplate {
+  margin: 0;
+  padding: 12px 0 10px;
+  border-block: 4px double var(--paper-ink);
+  font-family: paper.$serif;
+  font-size: clamp(26px, 8.4vw, 52px);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--paper-ink);
+}
+
+.dateline {
+  @include paper.kicker;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--paper-rule);
+}
+
+/* ---- Stories ---- */
+article {
+  cursor: pointer;
+}
+
+.kicker {
+  @include paper.kicker;
+}
+
+.headline {
+  @include paper.headline;
+}
+
+.lead {
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--paper-ink);
+
+  .kicker {
+    margin-bottom: 6px;
+  }
+
+  .headline {
+    font-size: clamp(27px, 7.6vw, 40px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  .text {
+    margin-top: 14px;
+  }
+}
+
+.more {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-family: paper.$sans;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--paper-accent);
+  cursor: pointer;
+}
+
+.stories {
+  margin-top: 4px;
+}
+
+.story {
+  display: flow-root; // contains the floated thumbnail
+  padding: 16px 0;
+  border-bottom: 1px solid var(--paper-rule);
+
+  .headline {
+    font-size: 20px;
+  }
+
+  .kicker {
+    margin: 6px 0 8px;
+  }
+
+  .excerpt {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    margin: 0 0 4px;
+    font-family: paper.$serif;
+    font-size: 16px;
+    line-height: 1.55;
+    text-align: justify;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Small photo set into the text, grey while it loads or if it fails. */
+.thumb {
+  float: right;
+  width: 30%;
+  max-width: 120px;
+  aspect-ratio: 4 / 3.4;
+  margin: 2px 0 6px 12px;
+  object-fit: cover;
+  background: var(--paper-blank);
+  filter: grayscale(0.15);
+
+  &.failed {
+    color: transparent;
+  }
+}
+
+.empty {
+  margin: 48px 12px;
+  font-family: paper.$serif;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--paper-muted);
+}
+
+.page-error {
+  margin: 0 0 16px;
+}
+
+/* ---- Loading: grey blocks in the shape of a lead story ---- */
+.skeleton {
+  display: grid;
+  gap: 10px;
+
+  span {
+    display: block;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--paper-blank);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  .short { width: 38%; height: 10px; }
+  .title { height: 30px; width: 88%; }
+  .block { aspect-ratio: 3 / 2; height: auto; margin: 6px 0; }
+}
+
+@keyframes pulse {
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton span { animation: none; }
+}
+
+/* ---- Tablets: stories flow in two columns with a rule between ---- */
+@media (min-width: 768px) {
+  .sheet {
+    padding-inline: 32px;
+  }
+
+  .stories {
+    columns: 2;
+    column-gap: 36px;
+    column-rule: 1px solid var(--paper-rule);
+  }
+
+  .story {
+    break-inside: avoid;
+  }
+}

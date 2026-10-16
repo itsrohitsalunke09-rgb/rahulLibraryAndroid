@@ -1,0 +1,30 @@
+<ion-content>
+  <div class="sheet">
+    <div class="folio">
+      <span class="nameplate">राहुल सार्वजनिक वाचनालय</span>
+      <button type="button" class="close" aria-label="Close story" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <article>
+      <p class="kicker">{{ story.eventDate | shortDate }}</p>
+      <h1 class="headline">{{ story.headline }}</h1>
+      <p class="byline">By {{ story.createdByName }}</p>
+      @if (story.hasPhoto) {
+        <figure>
+          <img class="photo" [appStoryPhoto]="story" alt="" />
+          @if (story.photoCaption) {
+            <figcaption>{{ story.photoCaption }}</figcaption>
+          }
+        </figure>
+      }
+      <div class="text">
+        @for (p of paragraphs(); track $index) {
+          <p>{{ p }}</p>
+        }
+      </div>
+      <p class="end" aria-hidden="true">■</p>
+    </article>
+  </div>
+</ion-content>

@@ -1,0 +1,109 @@
+// Shared newsprint look for the News tab and the story modal.
+// Tokens live on the component host; dark mode switches the same way as src/theme/variables.scss.
+
+$serif: "Noto Serif", "Noto Serif Devanagari", Georgia, serif;
+$sans: Roboto, "Noto Sans Devanagari", system-ui, sans-serif;
+
+@mixin tokens {
+  :host {
+    --paper: #f6f1e7;
+    --paper-ink: #1b1b1b;
+    --paper-muted: #5f5a52;
+    --paper-rule: rgba(27, 27, 27, 0.18);
+    --paper-blank: #e3ddd0;
+    --paper-accent: #8a2c1d;
+  }
+
+  // The "evening paper": charcoal sheet, warm off-white ink.
+  @media (prefers-color-scheme: dark) {
+    :host {
+      --paper: #161514;
+      --paper-ink: #ece6da;
+      --paper-muted: #a49d91;
+      --paper-rule: rgba(236, 230, 218, 0.2);
+      --paper-blank: #2a2826;
+      --paper-accent: #e0937f;
+    }
+  }
+
+  ion-content {
+    --background: var(--paper);
+    --color: var(--paper-ink);
+  }
+}
+
+// Small letter-spaced capitals for dates and datelines.
+@mixin kicker {
+  margin: 0;
+  font-family: $sans;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+
+@mixin headline {
+  margin: 0;
+  font-family: $serif;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--paper-ink);
+  overflow-wrap: anywhere;
+}
+
+// Full-width photo with a grey block of the same shape while loading or when it fails.
+@mixin figure {
+  figure {
+    margin: 16px 0;
+  }
+
+  .photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    background: var(--paper-blank);
+    filter: grayscale(0.15) contrast(1.02);
+  }
+
+  .photo.failed {
+    color: transparent; // hides any broken-image glyph; the grey block stays
+  }
+
+  figcaption {
+    margin-top: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--paper-rule);
+    font-family: $serif;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--paper-muted);
+  }
+}
+
+// Body copy, justified like a column of print, with a three-line drop cap.
+@mixin body-text {
+  .text p {
+    margin: 0 0 0.9em;
+    font-family: $serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--paper-ink);
+    text-align: justify;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+
+  .text p:first-of-type::first-letter {
+    float: left;
+    margin: 0.08em 0.08em 0 0;
+    font-family: $serif;
+    font-size: 5.2em; // cap spans three lines of 1.6 line-height
+    font-weight: 700;
+    line-height: 0.8;
+    color: var(--paper-ink);
+  }
+}
