@@ -51,7 +51,26 @@
         }
       </div>
     }
-  } @else if (!store.error()) {
+  }
+
+  @if (store.loaded() && unlinked().length && !query()) {
+    <h2 class="section-title">Used on books, not in this list</h2>
+    <p class="intro">Tap one to add it with a number. Its books are linked as soon as it is saved.</p>
+    <ion-list inset="true" lines="full">
+      @for (u of unlinked(); track u.name) {
+        <ion-item button detail="false" (click)="edit(undefined, u.name)">
+          <span slot="start" class="number missing">?</span>
+          <ion-label>
+            <h2 class="marathi">{{ u.name }}</h2>
+            <p>{{ u.books }} book{{ u.books === 1 ? '' : 's' }}</p>
+          </ion-label>
+          <span slot="end" class="icon add" style="--icon: url(assets/icons/plus.svg); --icon-size: 18px" aria-hidden="true"></span>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (!store.loaded() && !store.error()) {
     <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3, 4]; track i) {
         <ion-item>

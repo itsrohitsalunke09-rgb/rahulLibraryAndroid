@@ -98,13 +98,13 @@
               </label>
               <label class="field">
                 <span>Category</span>
-                <select class="value marathi" name="category" [(ngModel)]="form.category">
+                <select class="value marathi" name="categoryChoice" [(ngModel)]="form.categoryChoice">
                   <option value="">No category</option>
                   @for (c of categories.items(); track c.id) {
-                    <option [value]="c.name">{{ c.categoryNumber }} · {{ c.name }}</option>
+                    <option [value]="'' + c.id">{{ c.categoryNumber }} · {{ c.name }}</option>
                   }
-                  @if (unlistedCategory()) {
-                    <option [value]="form.category">{{ form.category }} (not in master)</option>
+                  @if (oldCategory) {
+                    <option [value]="keepText">{{ oldCategory }} (not in master)</option>
                   }
                 </select>
               </label>

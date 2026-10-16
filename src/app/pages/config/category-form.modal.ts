@@ -27,6 +27,8 @@ import { UiService, errorMessage } from '../../core/ui.service';
 export class CategoryFormModal implements OnInit {
   /** Category to edit; leave empty to add a new one. */
   @Input() category?: BookCategory;
+  /** Name to start a new category with (from a category already used on books). */
+  @Input() presetName?: string;
 
   private store = inject(CategoriesStore);
   private modals = inject(ModalController);
@@ -40,6 +42,8 @@ export class CategoryFormModal implements OnInit {
   ngOnInit() {
     if (this.category) {
       this.form = { categoryNumber: this.category.categoryNumber, name: this.category.name };
+    } else if (this.presetName) {
+      this.form = { categoryNumber: '', name: this.presetName };
     }
   }
 

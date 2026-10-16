@@ -183,7 +183,8 @@
   }
 }
 
-.errors {
+.errors,
+.warnings {
   display: grid;
   gap: 8px;
   max-height: 280px;
@@ -199,4 +200,12 @@
   font-size: 13px;
   color: var(--app-muted);
   text-align: center;
+}
+
+.warnings {
+  color: var(--app-ink);
+}
+
+.hint strong {
+  color: var(--app-ink);
 }

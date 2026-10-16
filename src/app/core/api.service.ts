@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import {
   Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, Page,
-  ProfileUpdate, Role, UserAccount, UserRequest
+  ProfileUpdate, Role, UnlinkedCategory, UserAccount, UserRequest
 } from './models';
 
 /** Thin wrapper over the Spring Boot API (same endpoints the website uses). */
@@ -44,6 +44,11 @@ export class ApiService {
   /** Book category master, sorted by category number. */
   categories() {
     return this.http.get<BookCategory[]>(`${this.base}/categories`);
+  }
+
+  /** Categories typed on books that match no master category yet, with book counts. */
+  unlinkedCategories() {
+    return this.http.get<UnlinkedCategory[]>(`${this.base}/categories/unlinked`);
   }
 
   saveCategory(category: BookCategoryRequest, id?: number) {

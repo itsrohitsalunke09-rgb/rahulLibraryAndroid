@@ -13,7 +13,7 @@ import { CategoriesStore } from '../../core/categories.store';
 import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
 import { Book, BookIssue, isMarathi } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
-import { BookFormModel, bookFormFrom, toBookRequest } from './book-request';
+import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
 import { IssueBookModal } from './issue-book.modal';
 
 /** What the book card shows below the description (Figma: Details / Issue history / Edit expanded). */
@@ -47,6 +47,9 @@ export class BookDetailModal implements OnInit {
   readonly saving = signal(false);
   readonly formError = signal('');
   form: BookFormModel = bookFormFrom();
+  /** Old text category of this book that is not in the master; kept selectable while editing. */
+  oldCategory = '';
+  protected readonly keepText = KEEP_TEXT_CATEGORY;
   private changed = false;
 
   /** Students who currently have this book; named in the delete warning. */
@@ -86,6 +89,7 @@ export class BookDetailModal implements OnInit {
     this.menuOpen.set(false);
     if (section === 'edit') {
       this.form = bookFormFrom(this.current()!);
+      this.oldCategory = unlinkedCategory(this.current()!);
       this.categories.load(true);
       this.formError.set('');
     }
@@ -95,12 +99,6 @@ export class BookDetailModal implements OnInit {
   askDelete() {
     this.menuOpen.set(false);
     this.confirmingDelete.set(true);
-  }
-
-  /** An older free-text category that is not in the master, kept selectable so editing does not lose it. */
-  unlistedCategory() {
-    const current = this.form.category?.trim();
-    return !!current && !this.categories.items().some(c => c.name === current);
   }
 
   cancelEdit() {

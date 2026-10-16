@@ -3,8 +3,9 @@ import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar, ModalController, RefresherCustomEvent
 } from '@ionic/angular';
+import { ApiService } from '../../core/api.service';
 import { CategoriesStore } from '../../core/categories.store';
-import { BookCategory } from '../../core/models';
+import { BookCategory, UnlinkedCategory } from '../../core/models';
 import { CategoryFormModal } from './category-form.modal';
 
 /** Book category master: list, search, add, edit and delete. */
@@ -19,9 +20,12 @@ import { CategoryFormModal } from './category-form.modal';
 })
 export class CategoriesPage {
   private modals = inject(ModalController);
+  private api = inject(ApiService);
   protected store = inject(CategoriesStore);
 
   readonly query = signal('');
+  /** Categories typed on books that match no master name; adding one links those books. */
+  readonly unlinked = signal<UnlinkedCategory[]>([]);
   readonly shown = computed(() => {
     const q = this.query().toLowerCase();
     return this.store.items().filter(c => !q || c.name.toLowerCase().includes(q) || c.categoryNumber.toLowerCase().includes(q));
@@ -29,6 +33,11 @@ export class CategoriesPage {
 
   constructor() {
     this.store.load(true);
+    this.loadUnlinked();
+  }
+
+  loadUnlinked() {
+    this.api.unlinkedCategories().subscribe({ next: list => this.unlinked.set(list), error: () => this.unlinked.set([]) });
   }
 
   search(value: string | null | undefined) {
@@ -37,11 +46,16 @@ export class CategoriesPage {
 
   refresh(event: RefresherCustomEvent) {
     this.store.load(true);
+    this.loadUnlinked();
     setTimeout(() => event.target.complete(), 400);
   }
 
-  async edit(category?: BookCategory) {
-    const modal = await this.modals.create({ component: CategoryFormModal, componentProps: { category } });
+  async edit(category?: BookCategory, presetName?: string) {
+    const modal = await this.modals.create({ component: CategoryFormModal, componentProps: { category, presetName } });
     await modal.present();
+    const { role } = await modal.onWillDismiss();
+    if (role !== 'cancel') {
+      this.loadUnlinked();
+    }
   }
 }

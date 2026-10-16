@@ -26,6 +26,15 @@
         </div>
       </section>
 
+      @if (r.warnings?.length) {
+        <h3 class="heading">Added without a category</h3>
+        <ul class="card warnings">
+          @for (w of r.warnings; track $index) {
+            <li>{{ w }}</li>
+          }
+        </ul>
+      }
+
       @if (r.errors.length) {
         <h3 class="heading">Rows that were not added</h3>
         <ul class="card errors">
@@ -33,7 +42,7 @@
             <li>{{ e }}</li>
           }
         </ul>
-      } @else if (r.successful) {
+      } @else if (r.successful && !r.warnings?.length) {
         <p class="note">All rows were added to the catalog.</p>
       }
 
@@ -46,6 +55,10 @@
         <p class="hint">
           Use the first row for headings and put one book on each row after it, with the columns in this order.
           Fields marked * are required.
+        </p>
+        <p class="hint">
+          <strong>Category No.</strong> is the number from Config → Book categories, e.g. 456 or 456.83.
+          The book shows that category's name. A number that is not in the list adds the book without a category.
         </p>
         <ol class="columns">
           @for (c of columns; track c.name) {

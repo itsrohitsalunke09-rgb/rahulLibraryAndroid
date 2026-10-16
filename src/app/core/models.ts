@@ -54,7 +54,11 @@ export interface Book {
   id: number;
   title: string;
   author: string;
+  /** Category name; comes from the book category master when the book is linked to it. */
   category?: string;
+  /** Linked master category (null for none or an old text-only category). */
+  categoryId?: number | null;
+  categoryNumber?: string | null;
   description?: string;
   totalCopies: number;
   availableCopies: number;
@@ -68,7 +72,7 @@ export interface Book {
   price?: number;
 }
 
-export type BookRequest = Omit<Book, 'id' | 'availableCopies'>;
+export type BookRequest = Omit<Book, 'id' | 'availableCopies' | 'categoryNumber'>;
 
 export interface BookIssue {
   id: number;
@@ -102,7 +106,7 @@ export interface IssueCounts {
   returned: number;
 }
 
-/** Book category master (Configuration). Books store the category name. */
+/** Book category master (Configuration). Books link to a category and show its name. */
 export interface BookCategory {
   id: number;
   categoryNumber: string;
@@ -117,6 +121,14 @@ export interface BookImportResult {
   successful: number;
   failed: number;
   errors: string[];
+  /** Rows added with a note, e.g. a category number that is not in the master. */
+  warnings?: string[];
+}
+
+/** A category typed on books before the master existed that matches no master name. */
+export interface UnlinkedCategory {
+  name: string;
+  books: number;
 }
 
 export interface Page<T> {

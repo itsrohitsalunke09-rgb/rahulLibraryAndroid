@@ -8,7 +8,7 @@ import { ApiService } from '../../core/api.service';
 import { CategoriesStore } from '../../core/categories.store';
 import { Book } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
-import { BookFormModel, bookFormFrom, toBookRequest } from './book-request';
+import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
 
 @Component({
   selector: 'app-book-form',
@@ -29,19 +29,18 @@ export class BookFormModal implements OnInit {
   protected categories = inject(CategoriesStore);
 
   form: BookFormModel = bookFormFrom();
+  /** Old text category of the book being edited that is not in the master; kept selectable. */
+  oldCategory = '';
+  protected readonly keepText = KEEP_TEXT_CATEGORY;
   readonly saving = signal(false);
   readonly error = signal('');
 
   ngOnInit() {
     this.form = bookFormFrom(this.book);
+    this.oldCategory = unlinkedCategory(this.book);
     this.categories.load(true);
   }
 
-  /** An older free-text category that is not in the master, kept selectable so editing does not lose it. */
-  unlistedCategory() {
-    const current = this.form.category?.trim();
-    return !!current && !this.categories.items().some(c => c.name === current);
-  }
 
   cancel() {
     this.modals.dismiss(null, 'cancel');

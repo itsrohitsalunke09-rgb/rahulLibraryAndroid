@@ -38,3 +38,24 @@ ion-item {
   --icon-size: 32px;
   color: var(--app-ink);
 }
+
+.number.missing {
+  background: var(--app-rust-soft);
+  color: var(--app-rust);
+}
+
+.add {
+  color: var(--app-ink);
+}
+
+.intro {
+  margin: 4px 24px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+
+ion-item ion-label p {
+  margin-top: 2px;
+  font-size: 12px;
+}
