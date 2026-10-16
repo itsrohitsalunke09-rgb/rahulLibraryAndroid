@@ -53,6 +53,10 @@
     }
   }
 
+  <ion-infinite-scroll [disabled]="stories.finished()" (ionInfinite)="stories.more($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
   @if (!stories.loaded() && !stories.error()) {
     <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3, 4]; track i) {

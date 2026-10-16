@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-  IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
+  IonBackButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
@@ -17,7 +17,7 @@ import { NewsFormModal } from './news-form.modal';
   styleUrls: ['news.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher,
-    IonRefresherContent, IonList, IonItem, IonLabel, IonSkeletonText, ShortDatePipe, StoryPhotoDirective
+    IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonItem, IonLabel, IonSkeletonText, ShortDatePipe, StoryPhotoDirective
   ],
 })
 export class NewsPage implements ViewWillEnter {
