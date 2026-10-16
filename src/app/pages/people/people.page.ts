@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBadge, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonInfiniteScroll,
   IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonSearchbar,
@@ -10,6 +10,7 @@ import { personAdd, peopleOutline } from 'ionicons/icons';
 import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { clearLinkFilters } from '../../core/link-filters';
 import { Page, Role, UserAccount, roleLabel } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { UiService } from '../../core/ui.service';
@@ -33,6 +34,7 @@ export class PeoplePage implements ViewWillEnter {
   private modals = inject(ModalController);
   private ui = inject(UiService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   protected auth = inject(AuthService);
 
   readonly filter = signal<Filter>('ALL');
@@ -43,11 +45,15 @@ export class PeoplePage implements ViewWillEnter {
     addIcons({ personAdd, peopleOutline });
     // Dashboard tiles link here with ?role=STUDENT / LIBRARIAN.
     this.route.queryParamMap.subscribe(params => {
+      if (!params.has('role')) {
+        return;
+      }
       const role = params.get('role') as Filter | null;
       if (role && FILTERS.includes(role) && role !== this.filter()) {
         this.filter.set(role);
         this.people.reset();
       }
+      clearLinkFilters(this.router, this.route);
     });
   }
 

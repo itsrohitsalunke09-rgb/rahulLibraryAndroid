@@ -1,5 +1,5 @@
 import { Component, inject, signal, viewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRefresher,
@@ -11,6 +11,7 @@ import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
+import { clearLinkFilters } from '../../core/link-filters';
 import { BookIssue, IssueCounts, Page, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { UiService } from '../../core/ui.service';
@@ -36,6 +37,7 @@ export class IssuesPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   readonly filter = signal<Filter>('OUT');
   /** Year for the YEAR filter; null until one is picked. */
@@ -78,6 +80,7 @@ export class IssuesPage implements ViewWillEnter {
         this.issues.reset();
         this.loadCounts();
       }
+      clearLinkFilters(this.router, this.route);
     });
   }
 
