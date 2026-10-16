@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>{{ story ? 'Edit story' : 'Add story' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving() || deleting()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form class="form" (ngSubmit)="save()">
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <h3 class="form-section">Story</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Headline *</span>
+        <span class="form-box">
+          <input class="marathi" name="headline" maxlength="150" [(ngModel)]="form.headline" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Event date *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+          <input name="eventDate" type="date" [(ngModel)]="form.eventDate" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Story *</span>
+        <span class="form-box tall body">
+          <textarea class="marathi" name="body" rows="6" [(ngModel)]="form.body"></textarea>
+        </span>
+        <span class="form-helper">A blank line starts a new paragraph.</span>
+      </label>
+    </div>
+
+    <h3 class="form-section">Photo</h3>
+    <div class="form-card">
+      <input #file class="photo-input" type="file" accept="image/*" (change)="onFilePicked(file)" />
+      <div class="form-field">
+        @if (hasPhoto()) {
+          @if (previewUrl()) {
+            <img class="preview" [src]="previewUrl()" alt="Chosen photo" />
+          } @else if (story) {
+            <img class="preview" [appStoryPhoto]="story" alt="Current photo" />
+          }
+          <div class="photo-actions">
+            <button type="button" (click)="file.click()">Replace</button>
+            <button type="button" class="remove" (click)="removePhoto()">Remove</button>
+          </div>
+        } @else {
+          <button type="button" class="form-box choose" (click)="file.click()">
+            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+            Choose photo
+          </button>
+        }
+      </div>
+      @if (hasPhoto()) {
+        <label class="form-field">
+          <span class="form-label">Caption</span>
+          <span class="form-box">
+            <input class="marathi" name="photoCaption" maxlength="200" [(ngModel)]="form.photoCaption" />
+          </span>
+        </label>
+      }
+    </div>
+
+    @if (story) {
+      <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">
+        @if (deleting()) { <ion-spinner name="crescent"></ion-spinner> } @else {
+          <span class="icon" style="--icon: url(assets/icons/trash.svg)" aria-hidden="true"></span>
+          Delete story
+        }
+      </button>
+    }
+  </form>
+</ion-content>

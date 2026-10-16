@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>News &amp; events</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="with-actions">
+    <ion-searchbar placeholder="Search headline" [debounce]="200"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+    <div slot="end" class="search-actions">
+      <button class="heading-action" aria-label="Add story" (click)="edit()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="stories.refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (stories.error()) {
+    <p class="page-error" role="alert">{{ stories.error() }}</p>
+  }
+
+  @if (stories.loaded()) {
+    @if (shown().length) {
+      <ion-list inset="true" lines="full">
+        @for (s of shown(); track s.id) {
+          <ion-item button detail="false" (click)="edit(s)">
+            <img slot="start" class="thumb" [appStoryPhoto]="s" alt="" />
+            <ion-label>
+              <h2 class="marathi">{{ s.headline }}</h2>
+              <p>{{ s.eventDate | shortDate }}</p>
+            </ion-label>
+            <span slot="end" class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!stories.error()) {
+      <div class="empty-state">
+        <span class="icon empty-icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+        @if (query()) {
+          <h2>No story matches "{{ query() }}"</h2>
+          <p>Search by part of the headline.</p>
+        } @else {
+          <h2>No stories yet</h2>
+          <p>Add the first one with the + button. Stories appear in the News tab.</p>
+        }
+      </div>
+    }
+  }
+
+  @if (!stories.loaded() && !stories.error()) {
+    <ion-list inset="true" lines="full">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <ion-item>
+          <ion-label><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

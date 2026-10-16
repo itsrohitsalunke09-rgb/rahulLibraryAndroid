@@ -1,0 +1,47 @@
+ion-back-button {
+  --color: var(--app-ink);
+  --icon-font-size: 22px;
+}
+
+ion-item {
+  --min-height: 64px;
+  --padding-start: 14px;
+  --inner-padding-end: 14px;
+
+  ion-label h2 {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: normal;
+  }
+
+  ion-label p {
+    margin-top: 2px;
+    font-size: 12px;
+  }
+}
+
+/* Square story thumbnail; grey until the photo loads, box kept when there is none. */
+.thumb {
+  width: 48px;
+  height: 48px;
+  margin-inline-end: 12px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--app-rule);
+}
+
+/* alt="" keeps a broken-image icon from showing, so the grey box alone remains. */
+.thumb.failed {
+  color: transparent;
+}
+
+.chevron {
+  color: var(--app-muted);
+}
+
+.empty-icon {
+  display: block;
+  margin: 0 auto 16px;
+  --icon-size: 32px;
+  color: var(--app-ink);
+}

@@ -44,6 +44,11 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/categories.page').then(m => m.CategoriesPage),
       },
       {
+        path: 'config/news',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/news.page').then(m => m.NewsPage),
+      },
+      {
         path: 'my-books',
         canMatch: [roleGuard(['STUDENT'])],
         data: { preload: ['STUDENT'] satisfies PreloadFor },
