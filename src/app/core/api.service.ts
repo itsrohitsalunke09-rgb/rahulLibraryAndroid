@@ -18,9 +18,10 @@ export class ApiService {
   }
 
   // ---- Books ----
+  /** Catalog page in registration-number order (1, 2, 10…); books without one come last. */
   books(q: string, page: number, size = 20) {
     let params = new HttpParams()
-      .set('page', page).set('size', size).set('sort', 'title').set('direction', 'asc');
+      .set('page', page).set('size', size).set('sort', 'registrationNumber').set('direction', 'asc');
     if (q) {
       params = params.set('q', q);
     }
