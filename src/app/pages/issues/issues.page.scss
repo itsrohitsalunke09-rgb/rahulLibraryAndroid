@@ -29,3 +29,20 @@ ion-label h2,
 ion-label p {
   white-space: normal;
 }
+
+/* Year tab: a caret shows it opens a list. */
+.year-caret {
+  --icon-size: 14px;
+  margin-inline-start: 4px;
+  vertical-align: -2px;
+}
+
+/* The year list is opened from the Year tab; the select itself stays out of sight. */
+.year-select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

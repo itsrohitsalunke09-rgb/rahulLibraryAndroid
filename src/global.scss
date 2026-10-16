@@ -158,6 +158,31 @@ ion-searchbar.md.sc-ion-searchbar-md-h {
   }
 }
 
+/* Round buttons on the search row, right of the search box (import, add). */
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  margin-inline-end: 20px;
+
+  .heading-action {
+    width: 40px;
+    height: 40px;
+    margin-inline-end: 0;
+  }
+
+  .heading-action.secondary {
+    background: var(--app-surface);
+    color: var(--app-ink);
+  }
+}
+
+/* The search box gives up its right margin when buttons follow it. */
+ion-toolbar.with-actions ion-searchbar.md.sc-ion-searchbar-md-h {
+  padding-inline-end: 10px;
+}
+
 /* Filter segments look like chips. */
 ion-segment {
   --background: transparent;

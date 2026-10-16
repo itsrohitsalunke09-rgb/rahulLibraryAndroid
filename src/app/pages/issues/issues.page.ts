@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSkeletonText, IonTitle,
-  IonToolbar, ViewWillEnter
+  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSkeletonText,
+  IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
@@ -15,9 +15,12 @@ import { BookIssue, IssueCounts, Page, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { UiService } from '../../core/ui.service';
 
-/** OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number. */
-type Filter = 'OUT' | 'OVERDUE' | 'RETURNED' | 'ALL';
-const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL'];
+/**
+ * OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number.
+ * YEAR = every issue made in the chosen year (by issued date), any status.
+ */
+type Filter = 'OUT' | 'OVERDUE' | 'RETURNED' | 'ALL' | 'YEAR';
+const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL', 'YEAR'];
 
 @Component({
   selector: 'app-issues',
@@ -26,7 +29,7 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions, IonItemOption,
-    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
+    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonSelect, IonSelectOption
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -35,6 +38,12 @@ export class IssuesPage implements ViewWillEnter {
   private route = inject(ActivatedRoute);
 
   readonly filter = signal<Filter>('OUT');
+  /** Year for the YEAR filter; null until one is picked. */
+  readonly year = signal<number | null>(null);
+  readonly years = signal<number[]>([]);
+  private readonly yearSelect = viewChild<IonSelect>('yearSelect');
+  /** Tab to go back to if the year list is closed without picking a year. */
+  private beforeYear: Filter = 'OUT';
   readonly query = signal('');
   readonly counts = signal<IssueCounts | null>(null);
   readonly returning = signal<number | null>(null);
@@ -48,6 +57,7 @@ export class IssuesPage implements ViewWillEnter {
 
   constructor() {
     addIcons({ returnDownBackOutline, swapHorizontalOutline });
+    this.loadYears();
     // Dashboard tiles link here with ?status=OUT / OVERDUE.
     this.route.queryParamMap.subscribe(params => {
       const status = params.get('status') as Filter | null;
@@ -61,13 +71,55 @@ export class IssuesPage implements ViewWillEnter {
   ionViewWillEnter() {
     this.issues.reset();
     this.loadCounts();
+    this.loadYears();
   }
 
   setFilter(value: unknown) {
-    if (FILTERS.includes(value as Filter)) {
-      this.filter.set(value as Filter);
-      this.issues.reset();
+    if (!FILTERS.includes(value as Filter) || value === this.filter()) {
+      return;
     }
+    if (value === 'YEAR') {
+      // The tab's click opens the year dropdown; the list changes once a year is picked.
+      this.beforeYear = this.filter();
+      this.filter.set('YEAR');
+      return;
+    }
+    this.filter.set(value as Filter);
+    this.issues.reset();
+  }
+
+  /** Opens the year dropdown (also when the Year tab is tapped again to change the year). */
+  async openYears() {
+    if (!this.years().length) {
+      await this.loadYears();
+      // Let the new year options render before the dropdown reads them.
+      await new Promise(resolve => setTimeout(resolve));
+    }
+    await this.yearSelect()?.open();
+  }
+
+  setYear(value: unknown) {
+    const year = Number(value);
+    if (!Number.isInteger(year)) {
+      return;
+    }
+    this.year.set(year);
+    this.filter.set('YEAR');
+    this.issues.reset();
+  }
+
+  yearCancelled() {
+    // Closed without a choice: stay on the year already shown, or go back to the previous tab.
+    if (this.year() == null) {
+      this.filter.set(this.beforeYear);
+    }
+  }
+
+  private loadYears(): Promise<void> {
+    return new Promise(resolve => this.api.issueYears().subscribe({
+      next: years => { this.years.set(years); resolve(); },
+      error: () => { this.years.set([new Date().getFullYear()]); resolve(); }
+    }));
   }
 
   search(value: string | null | undefined) {
@@ -128,6 +180,7 @@ export class IssuesPage implements ViewWillEnter {
       case 'OUT': return this.api.issuesOut(page);
       case 'OVERDUE': return this.api.issues(page, 20, 'OVERDUE');
       case 'RETURNED': return this.api.issues(page, 20, 'RETURNED');
+      case 'YEAR': return this.year() != null ? this.api.issuesInYear(this.year()!, page) : this.api.issuesOut(page);
       default: return this.api.issues(page);
     }
   }

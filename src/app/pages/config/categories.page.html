@@ -4,13 +4,15 @@
       <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Book categories</ion-title>
-    <button slot="end" class="heading-action" aria-label="Add category" (click)="edit()">
-      <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
-    </button>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar class="with-actions">
     <ion-searchbar placeholder="Search number or name" [debounce]="200"
                    (ionInput)="search($event.detail.value)"></ion-searchbar>
+    <div slot="end" class="search-actions">
+      <button class="heading-action" aria-label="Add category" (click)="edit()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    </div>
   </ion-toolbar>
 </ion-header>
 

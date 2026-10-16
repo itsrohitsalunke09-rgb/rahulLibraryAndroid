@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonSkeletonText, IonSpinner } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { formatDate } from '../../core/dates';
 import { ProfileUpdate, roleLabel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -20,23 +21,44 @@ export class ProfilePage {
   /** Stored at sign-in; no API call needed to show it. */
   readonly profile = inject(AuthService).profile;
   readonly saving = signal(false);
+  /** The page opens read-only; Edit profile switches to the form. */
+  readonly editing = signal(false);
   readonly error = signal('');
   readonly today = new Date().toISOString().slice(0, 10);
   readonly roleLabel = computed(() => roleLabel(this.auth.role()));
 
   form: ProfileUpdate = { fullName: '' };
+  protected readonly formatDate = formatDate;
 
   constructor() {
     // Fill the form from the stored profile now, and again whenever it is saved.
     effect(() => {
-      const p = this.profile();
-      if (p) {
-        this.form = {
-          fullName: p.fullName, email: p.email ?? '', phone: p.phone ?? '',
-          dateOfBirth: p.dateOfBirth ?? '', address: p.address ?? ''
-        };
+      if (this.profile()) {
+        this.resetForm();
       }
     });
+  }
+
+  startEdit() {
+    this.resetForm();
+    this.error.set('');
+    this.editing.set(true);
+  }
+
+  cancelEdit() {
+    this.resetForm();
+    this.error.set('');
+    this.editing.set(false);
+  }
+
+  private resetForm() {
+    const p = this.profile();
+    if (p) {
+      this.form = {
+        fullName: p.fullName, email: p.email ?? '', phone: p.phone ?? '',
+        dateOfBirth: p.dateOfBirth ?? '', address: p.address ?? ''
+      };
+    }
   }
 
   initials() {
@@ -60,6 +82,7 @@ export class ProfilePage {
       next: p => {
         this.saving.set(false);
         this.auth.updateProfile(p);
+        this.editing.set(false);
         this.ui.toast('Profile updated.');
       },
       error: err => {

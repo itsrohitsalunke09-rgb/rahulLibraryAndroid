@@ -143,8 +143,8 @@
   }
 }
 
-/* Read-only rows. */
-.account {
+/* Read-only rows (view mode and the Account card). */
+.rows {
   gap: 0;
   padding-block: 4px;
 
@@ -170,9 +170,21 @@
   }
 
   .value {
+    max-width: 60%;
     font-size: 14px;
     font-weight: 500;
     color: var(--app-ink);
+    text-align: end;
+    overflow-wrap: anywhere;
+
+    &.empty {
+      font-weight: 400;
+      color: var(--app-muted);
+    }
+  }
+
+  .row {
+    padding-block: 10px;
   }
 }
 
@@ -190,6 +202,7 @@
 }
 
 .save,
+.cancel,
 .logout {
   display: flex;
   align-items: center;
@@ -215,11 +228,25 @@
     opacity: 0.7;
   }
 
+  .icon {
+    --icon-size: 17px;
+  }
+
   ion-spinner {
     --color: var(--app-on-ink);
     width: 22px;
     height: 22px;
   }
+}
+
+.cancel {
+  height: 44px;
+  margin-top: 12px;
+  border: 1px solid var(--app-ink);
+  background: transparent;
+  color: var(--app-ink);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .logout {

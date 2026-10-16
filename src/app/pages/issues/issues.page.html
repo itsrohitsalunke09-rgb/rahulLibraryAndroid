@@ -13,7 +13,19 @@
         <ion-segment-button value="OVERDUE">Overdue{{ count('OVERDUE') !== null ? ' (' + count('OVERDUE') + ')' : '' }}</ion-segment-button>
         <ion-segment-button value="RETURNED">Returned</ion-segment-button>
         <ion-segment-button value="ALL">All</ion-segment-button>
+        <ion-segment-button value="YEAR" (click)="openYears()">
+          {{ filter() === 'YEAR' && year() ? year() : 'Year' }}
+          <span class="icon year-caret" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+        </ion-segment-button>
       </ion-segment>
+      <!-- Opened by the Year tab; picks which year's issues (by issued date) to show. -->
+      <ion-select #yearSelect class="year-select" interface="alert" aria-label="Issue year"
+                  [interfaceOptions]="{ header: 'Issued in year' }" [value]="year()"
+                  (ionChange)="setYear($event.detail.value)" (ionCancel)="yearCancelled()">
+        @for (y of years(); track y) {
+          <ion-select-option [value]="y">{{ y }}</ion-select-option>
+        }
+      </ion-select>
     </ion-toolbar>
   }
 </ion-header>

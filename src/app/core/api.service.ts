@@ -89,6 +89,17 @@ export class ApiService {
     return this.http.get<Page<BookIssue>>(`${this.base}/issues`, { params });
   }
 
+  /** Every issue made in the given year (by issued date), any status, newest first. */
+  issuesInYear(year: number, page: number, size = 20) {
+    const params = new HttpParams().set('page', page).set('size', size).set('year', year);
+    return this.http.get<Page<BookIssue>>(`${this.base}/issues`, { params });
+  }
+
+  /** Years that have issues, latest first, for the Issues year filter. */
+  issueYears() {
+    return this.http.get<number[]>(`${this.base}/issues/years`);
+  }
+
   /** Every copy currently out (not returned), overdue ones included. */
   issuesOut(page: number, size = 20) {
     const params = new HttpParams().set('page', page).set('size', size);

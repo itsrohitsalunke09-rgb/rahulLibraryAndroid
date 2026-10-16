@@ -7,8 +7,17 @@
         <span class="count">{{ books.total() }} {{ query() ? 'found' : 'book' + (books.total() === 1 ? '' : 's') }}</span>
       }
     </ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="search-bar" [class.with-actions]="auth.isStaff()">
+    <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
+    <ion-searchbar
+      placeholder="Title, author, reg. no."
+      searchIcon=""
+      [debounce]="350"
+      (ionInput)="search($event.detail.value)">
+    </ion-searchbar>
     @if (auth.isStaff()) {
-      <div slot="end" class="heading-actions">
+      <div slot="end" class="search-actions">
         <button class="heading-action secondary" aria-label="Import books from Excel" (click)="importExcel()">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
         </button>
@@ -17,15 +26,6 @@
         </button>
       </div>
     }
-  </ion-toolbar>
-  <ion-toolbar class="search-bar">
-    <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
-    <ion-searchbar
-      placeholder="Title, author, category, reg. no."
-      searchIcon=""
-      [debounce]="350"
-      (ionInput)="search($event.detail.value)">
-    </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 

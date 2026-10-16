@@ -1,7 +1,7 @@
 <ion-content>
   <!-- Cyan band with the title; it scrolls with the page so the avatar can sit across its edge. -->
   <header class="band">
-    <h1>Profile</h1>
+    <h1>{{ editing() ? 'Edit profile' : 'Profile' }}</h1>
   </header>
 
   <div class="wrap">
@@ -12,59 +12,104 @@
       <span class="role">{{ roleLabel() }}</span>
     </section>
 
-    @if (profile()) {
-      <form (ngSubmit)="save()">
+    @if (profile(); as p) {
+      @if (editing()) {
+        <form (ngSubmit)="save()">
+          <h3 class="heading">Personal details</h3>
+          <div class="card">
+            <label class="field">
+              <span class="label">Full name</span>
+              <span class="box">
+                <span class="icon" style="--icon: url(assets/icons/field-user.svg)"></span>
+                <input name="fullName" autocomplete="name" [(ngModel)]="form.fullName" />
+              </span>
+            </label>
+            <label class="field">
+              <span class="label">Date of birth</span>
+              <span class="box">
+                <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)"></span>
+                <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
+              </span>
+            </label>
+            <label class="field">
+              <span class="label">Address</span>
+              <span class="box tall">
+                <span class="icon" style="--icon: url(assets/icons/field-pin.svg)"></span>
+                <textarea name="address" rows="2" autocomplete="street-address" [(ngModel)]="form.address"></textarea>
+              </span>
+            </label>
+          </div>
+
+          <h3 class="heading">Contact</h3>
+          <div class="card">
+            <label class="field">
+              <span class="label">Mobile number</span>
+              <span class="box">
+                <span class="icon" style="--icon: url(assets/icons/field-phone.svg)"></span>
+                <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"
+                       [(ngModel)]="form.phone" />
+              </span>
+              <span class="helper">Due-date reminders are sent to this number</span>
+            </label>
+            <label class="field">
+              <span class="label">Email</span>
+              <span class="box">
+                <span class="icon" style="--icon: url(assets/icons/field-mail.svg)"></span>
+                <input name="email" type="email" autocomplete="email" [(ngModel)]="form.email" />
+              </span>
+            </label>
+          </div>
+
+          @if (error()) {
+            <p class="form-error" role="alert">{{ error() }}</p>
+          }
+
+          <button type="submit" class="save" [disabled]="saving()">
+            @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
+          </button>
+          <button type="button" class="cancel" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+        </form>
+      } @else {
+        <!-- Read-only view; Edit profile switches to the form. -->
         <h3 class="heading">Personal details</h3>
-        <div class="card">
-          <label class="field">
+        <div class="card rows">
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-user.svg)"></span>
             <span class="label">Full name</span>
-            <span class="box">
-              <span class="icon" style="--icon: url(assets/icons/field-user.svg)"></span>
-              <input name="fullName" autocomplete="name" [(ngModel)]="form.fullName" />
-            </span>
-          </label>
-          <label class="field">
+            <span class="value">{{ p.fullName }}</span>
+          </div>
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)"></span>
             <span class="label">Date of birth</span>
-            <span class="box">
-              <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)"></span>
-              <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
-            </span>
-          </label>
-          <label class="field">
+            <span class="value" [class.empty]="!p.dateOfBirth">{{ p.dateOfBirth ? formatDate(p.dateOfBirth) : 'Not added' }}</span>
+          </div>
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-pin.svg)"></span>
             <span class="label">Address</span>
-            <span class="box tall">
-              <span class="icon" style="--icon: url(assets/icons/field-pin.svg)"></span>
-              <textarea name="address" rows="2" autocomplete="street-address" [(ngModel)]="form.address"></textarea>
-            </span>
-          </label>
+            <span class="value" [class.empty]="!p.address">{{ p.address || 'Not added' }}</span>
+          </div>
         </div>
 
         <h3 class="heading">Contact</h3>
-        <div class="card">
-          <label class="field">
+        <div class="card rows">
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-phone.svg)"></span>
             <span class="label">Mobile number</span>
-            <span class="box">
-              <span class="icon" style="--icon: url(assets/icons/field-phone.svg)"></span>
-              <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"
-                     [(ngModel)]="form.phone" />
-            </span>
-            <span class="helper">Due-date reminders are sent to this number</span>
-          </label>
-          <label class="field">
+            <span class="value" [class.empty]="!p.phone">{{ p.phone || 'Not added' }}</span>
+          </div>
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-mail.svg)"></span>
             <span class="label">Email</span>
-            <span class="box">
-              <span class="icon" style="--icon: url(assets/icons/field-mail.svg)"></span>
-              <input name="email" type="email" autocomplete="email" [(ngModel)]="form.email" />
-            </span>
-          </label>
+            <span class="value" [class.empty]="!p.email">{{ p.email || 'Not added' }}</span>
+          </div>
         </div>
 
         <h3 class="heading">Account</h3>
-        <div class="card account">
+        <div class="card rows">
           <div class="row">
             <span class="icon" style="--icon: url(assets/icons/field-at.svg)"></span>
             <span class="label">Username</span>
-            <span class="value">{{ profile()?.username }}</span>
+            <span class="value">{{ p.username }}</span>
           </div>
           <div class="row">
             <span class="icon" style="--icon: url(assets/icons/field-shield.svg)"></span>
@@ -77,14 +122,11 @@
           Username and role are managed by the librarian.
         </p>
 
-        @if (error()) {
-          <p class="form-error" role="alert">{{ error() }}</p>
-        }
-
-        <button type="submit" class="save" [disabled]="saving()">
-          @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
+        <button type="button" class="save" (click)="startEdit()">
+          <span class="icon" style="--icon: url(assets/icons/edit.svg)"></span>
+          Edit profile
         </button>
-      </form>
+      }
     } @else if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     } @else {
@@ -93,9 +135,11 @@
       }
     }
 
-    <button type="button" class="logout" (click)="logout()">
-      <span class="icon" style="--icon: url(assets/icons/logout.svg)"></span>
-      Sign out
-    </button>
+    @if (!editing()) {
+      <button type="button" class="logout" (click)="logout()">
+        <span class="icon" style="--icon: url(assets/icons/logout.svg)"></span>
+        Sign out
+      </button>
+    }
   </div>
 </ion-content>
