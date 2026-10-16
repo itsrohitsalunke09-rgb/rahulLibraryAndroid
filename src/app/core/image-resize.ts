@@ -10,7 +10,13 @@ export function fitWithin(width: number, height: number, maxSide = 1280): { widt
 export async function resizePhoto(file: Blob, maxSide = 1280, quality = 0.8): Promise<Blob> {
   let bitmap: ImageBitmap;
   try {
-    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    try {
+      bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    } catch (e) {
+      // Older WebViews reject the options argument; retry plain before giving up.
+      if (!(e instanceof TypeError)) throw e;
+      bitmap = await createImageBitmap(file);
+    }
   } catch {
     throw new Error(PHOTO_DECODE_ERROR);
   }

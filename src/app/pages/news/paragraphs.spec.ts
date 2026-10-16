@@ -1,4 +1,4 @@
-import { paragraphs } from './paragraphs';
+import { hasDropCap, paragraphs } from './paragraphs';
 
 describe('paragraphs', () => {
   it('splitsOnBlankLinesTrimsAndDropsEmpties', () => {
@@ -7,5 +7,13 @@ describe('paragraphs', () => {
 
   it('keepsSingleLineBreaksInsideAParagraph', () => {
     expect(paragraphs('one\ntwo')).toEqual(['one\ntwo']);
+  });
+});
+
+describe('hasDropCap', () => {
+  it('isTrueOnlyForALatinOpeningLetter', () => {
+    expect(hasDropCap('  The fair opened')).toBe(true);
+    expect(hasDropCap('डॉ. आंबेडकर जयंती')).toBe(false);
+    expect(hasDropCap('"Quoted"')).toBe(false);
   });
 });

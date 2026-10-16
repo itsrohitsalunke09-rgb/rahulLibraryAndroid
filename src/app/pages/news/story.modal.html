@@ -21,7 +21,7 @@
       }
       <div class="text">
         @for (p of paragraphs(); track $index) {
-          <p>{{ p }}</p>
+          <p [class.cap]="$first && hasDropCap(p)">{{ p }}</p>
         }
       </div>
       <p class="end" aria-hidden="true">■</p>

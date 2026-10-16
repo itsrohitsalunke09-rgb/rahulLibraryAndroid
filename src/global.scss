@@ -244,6 +244,23 @@ ion-tab-button {
     }
   }
 
+  ion-label {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Seven staff tabs: shrink the pill and label so every label fits on one line down to 360px. */
+  @media (max-width: 380px) {
+    font-size: 9px;
+
+    .tab-symbol {
+      width: 100%;
+      max-width: 48px;
+    }
+  }
+
   &.tab-selected {
     font-weight: 600;
 

@@ -69,6 +69,23 @@ describe('StoryPhotoDirective', () => {
     expect(img.getAttribute('src')).toBeNull();
   });
 
+  it('keepsThePhotoWhenANewObjectHasTheSameIdVersionAndFlag', () => {
+    const { fixture, img } = setup(of(new Blob(['x'])));
+    fixture.componentInstance.story.set(story());
+    fixture.detectChanges();
+    expect(storyPhoto).toHaveBeenCalledTimes(1);
+    expect(img.src.endsWith('blob:1')).toBe(true);
+    expect(img.classList.contains('loaded')).toBe(true);
+  });
+
+  it('marksFailedAndDropsSrcWhenTheImageCannotBeDecoded', () => {
+    const { img } = setup(of(new Blob(['x'])));
+    img.dispatchEvent(new Event('error'));
+    expect(img.classList.contains('failed')).toBe(true);
+    expect(img.classList.contains('loaded')).toBe(false);
+    expect(img.getAttribute('src')).toBeNull();
+  });
+
   it('revokesOnDestroy', () => {
     const { fixture } = setup(of(new Blob(['x'])));
     fixture.destroy();

@@ -83,7 +83,7 @@ $sans: Roboto, "Noto Sans Devanagari", system-ui, sans-serif;
   }
 }
 
-// Body copy, justified like a column of print, with a three-line drop cap.
+// Body copy, justified like a column of print, Latin-script openings get a three-line drop cap.
 @mixin body-text {
   .text p {
     margin: 0 0 0.9em;
@@ -97,7 +97,7 @@ $sans: Roboto, "Noto Sans Devanagari", system-ui, sans-serif;
     white-space: pre-line;
   }
 
-  .text p:first-of-type::first-letter {
+  .text p.cap::first-letter {
     float: left;
     margin: 0.08em 0.08em 0 0;
     font-family: $serif;

@@ -8,7 +8,7 @@ import { NewsStory } from './models';
  * (a plain <img src> cannot send headers). The `loaded` class marks success; `failed`
  * marks a missing or unloadable photo so CSS can show the placeholder instead.
  */
-@Directive({ selector: 'img[appStoryPhoto]' })
+@Directive({ selector: 'img[appStoryPhoto]', host: { '(error)': 'onImageError()' } })
 export class StoryPhotoDirective implements OnChanges, OnDestroy {
   @Input({ required: true }) appStoryPhoto!: NewsStory;
 
@@ -16,10 +16,17 @@ export class StoryPhotoDirective implements OnChanges, OnDestroy {
   private readonly img = inject<ElementRef<HTMLImageElement>>(ElementRef).nativeElement;
   private request?: Subscription;
   private objectUrl?: string;
+  private shown?: { id: number; photoVersion: number; hasPhoto: boolean };
 
   ngOnChanges(): void {
-    this.reset();
     const story = this.appStoryPhoto;
+    // A reloaded list hands over new objects for the same photo; keep what is already shown.
+    if (this.shown && story && this.shown.id === story.id
+        && this.shown.photoVersion === story.photoVersion && this.shown.hasPhoto === story.hasPhoto) {
+      return;
+    }
+    this.shown = story ? { id: story.id, photoVersion: story.photoVersion, hasPhoto: story.hasPhoto } : undefined;
+    this.reset();
     if (!story?.hasPhoto) {
       this.img.classList.add('failed');
       return;
@@ -32,6 +39,13 @@ export class StoryPhotoDirective implements OnChanges, OnDestroy {
       },
       error: () => this.img.classList.add('failed'),
     });
+  }
+
+  /** The browser could not decode the blob: fall back to the placeholder. */
+  onImageError(): void {
+    this.img.removeAttribute('src');
+    this.img.classList.remove('loaded');
+    this.img.classList.add('failed');
   }
 
   ngOnDestroy(): void {

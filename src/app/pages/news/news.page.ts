@@ -7,7 +7,7 @@ import { NewsStory } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { ShortDatePipe } from '../../core/pipes';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
-import { paragraphs } from './paragraphs';
+import { hasDropCap, paragraphs } from './paragraphs';
 import { StoryModal } from './story.modal';
 
 /** The News tab: the library's stories laid out as a printed front page. */
@@ -33,6 +33,8 @@ export class NewspaperPage implements ViewWillEnter {
   }
 
   /** The opening paragraph, shown on the front page before "Continue reading". */
+  readonly hasDropCap = hasDropCap;
+
   firstParagraph(story: NewsStory): string {
     return paragraphs(story.body)[0] ?? '';
   }

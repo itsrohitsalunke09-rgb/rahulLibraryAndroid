@@ -3,7 +3,7 @@ import { IonContent, ModalController } from '@ionic/angular';
 import { NewsStory } from '../../core/models';
 import { ShortDatePipe } from '../../core/pipes';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
-import { paragraphs } from './paragraphs';
+import { hasDropCap, paragraphs } from './paragraphs';
 
 /** One story in full, set like a newspaper article page. */
 @Component({
@@ -24,6 +24,8 @@ export class StoryModal {
   }
 
   readonly paragraphs = computed(() => paragraphs(this.current()?.body ?? ''));
+
+  readonly hasDropCap = hasDropCap;
 
   close() {
     this.modals.dismiss();

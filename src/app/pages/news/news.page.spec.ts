@@ -38,6 +38,13 @@ describe('NewspaperPage', () => {
     expect(el.querySelectorAll('.story').length).toBe(2);
   });
 
+  it('addsDropCapOnlyToALatinLead', () => {
+    const marathi = { ...story(1), body: 'डॉ. आंबेडकर जयंती साजरी झाली.' };
+    expect(render(of(page([marathi]))).querySelector('.lead .text p')?.classList.contains('cap')).toBe(false);
+    TestBed.resetTestingModule();
+    expect(render(of(page([story(1)]))).querySelector('.lead .text p')?.classList.contains('cap')).toBe(true);
+  });
+
   it('showsEmptyState', () => {
     const el = render(of(page([])));
     expect(el.textContent).toContain("No news yet — the librarian's stories will appear here.");

@@ -27,7 +27,7 @@
               }
             </figure>
           }
-          <div class="text"><p>{{ firstParagraph(s) }}</p></div>
+          <div class="text"><p [class.cap]="hasDropCap(firstParagraph(s))">{{ firstParagraph(s) }}</p></div>
           <button type="button" class="more" [attr.aria-label]="'Continue reading: ' + s.headline">Continue reading →</button>
         </article>
       } @else if (!stories.error()) {

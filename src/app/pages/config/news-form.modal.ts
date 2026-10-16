@@ -115,6 +115,9 @@ export class NewsFormModal implements OnInit, OnDestroy {
   }
 
   save() {
+    if (this.saving() || this.deleting()) {
+      return;
+    }
     const request: NewsStoryRequest = {
       headline: this.form.headline.trim(),
       body: this.form.body.trim(),
@@ -142,6 +145,9 @@ export class NewsFormModal implements OnInit, OnDestroy {
   }
 
   async remove() {
+    if (this.saving() || this.deleting()) {
+      return;
+    }
     const story = this.story;
     if (!story) {
       return;
