@@ -4,7 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { markDataChanged } from './freshness';
 import {
-  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, Page,
+  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, NewsStory, NewsStoryRequest, Page,
   ProfileUpdate, Role, UnlinkedCategory, UserAccount, UserRequest
 } from './models';
 
@@ -161,6 +161,32 @@ export class ApiService {
 
   updateProfile(profile: ProfileUpdate) {
     return changes(this.http.put<UserAccount>(`${this.base}/users/profile`, profile));
+  }
+
+  // ---- News ----
+  news(page: number, size = 10) {
+    return this.http.get<Page<NewsStory>>(`${this.base}/news`, { params: new HttpParams().set('page', page).set('size', size) });
+  }
+
+  /** Creates a story, or updates it when id is given; photo is the already-shrunk image, if changed. */
+  saveStory(story: NewsStoryRequest, photo?: Blob | null, id?: number) {
+    const form = new FormData();
+    form.append('story', new Blob([JSON.stringify(story)], { type: 'application/json' }));
+    if (photo) {
+      form.append('photo', photo, 'photo.jpg');
+    }
+    return changes(id
+      ? this.http.put<NewsStory>(`${this.base}/news/${id}`, form)
+      : this.http.post<NewsStory>(`${this.base}/news`, form));
+  }
+
+  deleteStory(id: number) {
+    return changes(this.http.delete<void>(`${this.base}/news/${id}`));
+  }
+
+  /** The version in the URL keeps a replaced photo from being served stale from cache. */
+  storyPhoto(id: number, version: number) {
+    return this.http.get(`${this.base}/news/${id}/photo?v=${version}`, { responseType: 'blob' });
   }
 }
 

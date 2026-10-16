@@ -131,6 +131,29 @@ export interface UnlinkedCategory {
   books: number;
 }
 
+export interface NewsStory {
+  id: number;
+  headline: string;
+  body: string;
+  /** ISO date (YYYY-MM-DD) the event happened. */
+  eventDate: string;
+  photoCaption?: string | null;
+  hasPhoto: boolean;
+  /** Bumps whenever the photo changes, so cached images refresh. */
+  photoVersion: number;
+  createdByName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NewsStoryRequest {
+  headline: string;
+  body: string;
+  eventDate: string;
+  photoCaption?: string | null;
+  removePhoto: boolean;
+}
+
 export interface Page<T> {
   content: T[];
   totalElements: number;
