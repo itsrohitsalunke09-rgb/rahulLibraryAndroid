@@ -102,6 +102,23 @@ export interface IssueCounts {
   returned: number;
 }
 
+/** Book category master (Configuration). Books store the category name. */
+export interface BookCategory {
+  id: number;
+  categoryNumber: string;
+  name: string;
+}
+
+export type BookCategoryRequest = Omit<BookCategory, 'id'>;
+
+/** Result of POST /books/import (Excel bulk import). */
+export interface BookImportResult {
+  totalRows: number;
+  successful: number;
+  failed: number;
+  errors: string[];
+}
+
 export interface Page<T> {
   content: T[];
   totalElements: number;

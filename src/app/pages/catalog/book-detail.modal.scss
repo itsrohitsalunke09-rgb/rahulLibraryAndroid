@@ -213,6 +213,7 @@ button {
   }
 
   input,
+  select,
   textarea {
     width: 100%;
     padding: 13px;
@@ -251,6 +252,14 @@ button {
 
   input.value {
     text-align: right;
+  }
+
+  select.value {
+    text-align: right;
+    text-align-last: right;
+    appearance: none;
+    padding-inline-end: 34px;
+    background: var(--app-surface) url("/assets/icons/chevron-down.svg") no-repeat right 12px center / 14px;
   }
 }
 

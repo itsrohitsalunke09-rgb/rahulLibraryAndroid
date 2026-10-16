@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Book categories</ion-title>
+    <button slot="end" class="heading-action" aria-label="Add category" (click)="edit()">
+      <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+    </button>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search number or name" [debounce]="200"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (store.error()) {
+    <p class="page-error" role="alert">{{ store.error() }}</p>
+  }
+
+  @if (store.loaded()) {
+    @if (shown().length) {
+      <p class="list-count">
+        {{ shown().length }} categor{{ shown().length === 1 ? 'y' : 'ies' }}{{ query() ? ' matching "' + query() + '"' : '' }}
+      </p>
+      <ion-list inset="true" lines="full">
+        @for (c of shown(); track c.id) {
+          <ion-item button detail="false" (click)="edit(c)">
+            <span slot="start" class="number">{{ c.categoryNumber }}</span>
+            <ion-label>
+              <h2 class="marathi">{{ c.name }}</h2>
+            </ion-label>
+            <span slot="end" class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <div class="empty-state">
+        <span class="icon empty-icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+        @if (query()) {
+          <h2>No category matches "{{ query() }}"</h2>
+          <p>Search by category number or part of the name.</p>
+        } @else {
+          <h2>No book categories yet</h2>
+          <p>Add the first one with the + button. Books pick their category from this list.</p>
+        }
+      </div>
+    }
+  } @else if (!store.error()) {
+    <ion-list inset="true" lines="full">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <ion-item>
+          <ion-label><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

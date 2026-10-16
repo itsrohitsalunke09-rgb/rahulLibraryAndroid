@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Import books</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">{{ result() ? 'Done' : 'Cancel' }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="content">
+    @if (result(); as r) {
+      <!-- Outcome of the upload. -->
+      <section class="card summary">
+        <div class="stat">
+          <span class="number">{{ r.totalRows }}</span>
+          <span class="label">Rows read</span>
+        </div>
+        <div class="stat ok">
+          <span class="number">{{ r.successful }}</span>
+          <span class="label">Added</span>
+        </div>
+        <div class="stat bad">
+          <span class="number">{{ r.failed }}</span>
+          <span class="label">Failed</span>
+        </div>
+      </section>
+
+      @if (r.errors.length) {
+        <h3 class="heading">Rows that were not added</h3>
+        <ul class="card errors">
+          @for (e of r.errors; track $index) {
+            <li>{{ e }}</li>
+          }
+        </ul>
+      } @else if (r.successful) {
+        <p class="note">All rows were added to the catalog.</p>
+      }
+
+      <button type="button" class="primary" (click)="close()">Done</button>
+      <button type="button" class="secondary" (click)="result.set(null)">Import another file</button>
+    } @else {
+      <!-- How to prepare the sheet. -->
+      <section class="card">
+        <h3 class="heading first">Prepare the sheet</h3>
+        <p class="hint">
+          Use the first row for headings and put one book on each row after it, with the columns in this order.
+          Fields marked * are required.
+        </p>
+        <ol class="columns">
+          @for (c of columns; track c.name) {
+            <li [class.required]="c.required">{{ c.name }}{{ c.required ? ' *' : '' }}</li>
+          }
+        </ol>
+      </section>
+
+      <!-- File picker. -->
+      <label class="picker" [class.chosen]="file()">
+        <input type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+               (change)="pick($event)" />
+        <span class="icon picker-icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+        @if (file(); as f) {
+          <span class="picker-text">
+            <strong>{{ f.name }}</strong>
+            <small>{{ fileSize(f) }} · tap to choose a different file</small>
+          </span>
+        } @else {
+          <span class="picker-text">
+            <strong>Choose Excel file</strong>
+            <small>.xlsx only</small>
+          </span>
+        }
+      </label>
+
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+
+      <button type="button" class="primary" [disabled]="!file() || importing()" (click)="upload()">
+        @if (importing()) { <ion-spinner name="crescent"></ion-spinner> Importing… } @else { Import books }
+      </button>
+    }
+  </div>
+</ion-content>

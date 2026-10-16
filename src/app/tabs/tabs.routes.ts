@@ -30,6 +30,16 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/people/people.page').then(m => m.PeoplePage),
       },
       {
+        path: 'config',
+        canMatch: [roleGuard(STAFF_ROLES)],
+        loadComponent: () => import('../pages/config/config.page').then(m => m.ConfigPage),
+      },
+      {
+        path: 'config/categories',
+        canMatch: [roleGuard(STAFF_ROLES)],
+        loadComponent: () => import('../pages/config/categories.page').then(m => m.CategoriesPage),
+      },
+      {
         path: 'my-books',
         canMatch: [roleGuard(['STUDENT'])],
         loadComponent: () => import('../pages/my-books/my-books.page').then(m => m.MyBooksPage),

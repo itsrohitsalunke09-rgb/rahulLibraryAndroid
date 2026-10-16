@@ -9,6 +9,7 @@ import {
 } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { CategoriesStore } from '../../core/categories.store';
 import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
 import { Book, BookIssue, isMarathi } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -35,6 +36,7 @@ export class BookDetailModal implements OnInit {
   private modals = inject(ModalController);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
+  protected categories = inject(CategoriesStore);
 
   readonly current = signal<Book | null>(null);
   readonly history = signal<BookIssue[] | null>(null);
@@ -84,6 +86,7 @@ export class BookDetailModal implements OnInit {
     this.menuOpen.set(false);
     if (section === 'edit') {
       this.form = bookFormFrom(this.current()!);
+      this.categories.load(true);
       this.formError.set('');
     }
     this.section.set(this.section() === section ? 'none' : section);
@@ -92,6 +95,12 @@ export class BookDetailModal implements OnInit {
   askDelete() {
     this.menuOpen.set(false);
     this.confirmingDelete.set(true);
+  }
+
+  /** An older free-text category that is not in the master, kept selectable so editing does not lose it. */
+  unlistedCategory() {
+    const current = this.form.category?.trim();
+    return !!current && !this.categories.items().some(c => c.name === current);
   }
 
   cancelEdit() {

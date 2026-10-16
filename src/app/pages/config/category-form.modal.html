@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>{{ category ? 'Edit category' : 'Add category' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving() || deleting()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (error()) {
+    <p class="form-error" role="alert">{{ error() }}</p>
+  }
+
+  <form class="form" (ngSubmit)="save()">
+    <ion-list lines="none">
+      <h2 class="form-section">Book category</h2>
+      <ion-input label="Category number *" labelPlacement="floating" fill="outline" name="categoryNumber"
+                 maxlength="20" [(ngModel)]="form.categoryNumber"></ion-input>
+      <ion-input class="marathi" label="Category name *" labelPlacement="floating" fill="outline" name="name"
+                 maxlength="100" [(ngModel)]="form.name"></ion-input>
+      <p class="hint">
+        Numbers and names must be unique. Renaming a category also renames it on every book that uses it.
+      </p>
+    </ion-list>
+
+    @if (category) {
+      <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">
+        @if (deleting()) { <ion-spinner name="crescent"></ion-spinner> } @else {
+          <span class="icon" style="--icon: url(assets/icons/trash.svg)" aria-hidden="true"></span>
+          Delete category
+        }
+      </button>
+    }
+  </form>
+</ion-content>

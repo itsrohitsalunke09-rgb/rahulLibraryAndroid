@@ -1,0 +1,40 @@
+ion-back-button {
+  --color: var(--app-ink);
+  --icon-font-size: 22px;
+}
+
+ion-item {
+  --min-height: 56px;
+  --padding-start: 14px;
+  --inner-padding-end: 14px;
+
+  ion-label h2 {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: normal;
+  }
+}
+
+/* Category number in a soft pill before the name. */
+.number {
+  min-width: 44px;
+  margin-inline-end: 12px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: var(--app-mint-soft);
+  color: var(--app-ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.chevron {
+  color: var(--app-muted);
+}
+
+.empty-icon {
+  display: block;
+  margin: 0 auto 16px;
+  --icon-size: 32px;
+  color: var(--app-ink);
+}

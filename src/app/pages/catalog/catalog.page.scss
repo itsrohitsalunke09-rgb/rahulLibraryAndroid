@@ -8,6 +8,22 @@
   color: var(--app-muted);
 }
 
+/* Import (light) and add (teal) buttons at the end of the heading. */
+.heading-actions {
+  display: flex;
+  gap: 8px;
+  margin-inline-end: 12px;
+
+  .heading-action {
+    margin-inline-end: 0;
+  }
+
+  .secondary {
+    background: var(--app-surface);
+    color: var(--app-ink);
+  }
+}
+
 /* Pill search field with the design's search icon. */
 .search-bar {
   position: relative;

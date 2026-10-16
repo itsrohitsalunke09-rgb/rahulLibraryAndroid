@@ -10,6 +10,7 @@ import { Book, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
+import { ImportBooksModal } from './import-books.modal';
 
 @Component({
   selector: 'app-catalog',
@@ -54,6 +55,15 @@ export class CatalogPage implements ViewWillEnter {
     await modal.present();
     const { role } = await modal.onWillDismiss<Book>();
     if (role === 'saved') {
+      this.books.reset();
+    }
+  }
+
+  async importExcel() {
+    const modal = await this.modals.create({ component: ImportBooksModal });
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+    if (role === 'imported') {
       this.books.reset();
     }
   }

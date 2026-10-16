@@ -21,7 +21,17 @@
     <h2 class="form-section">Book</h2>
     <ion-input label="Title *" labelPlacement="floating" fill="outline" [(ngModel)]="form.title"></ion-input>
     <ion-input label="Author *" labelPlacement="floating" fill="outline" [(ngModel)]="form.author"></ion-input>
-    <ion-input label="Category" labelPlacement="floating" fill="outline" [(ngModel)]="form.category"></ion-input>
+    <ion-select label="Category" labelPlacement="floating" fill="outline" interface="alert"
+                [interfaceOptions]="{ header: 'Book category' }" [(ngModel)]="form.category"
+                [helperText]="categories.loaded() && !categories.items().length ? 'No categories yet. Add them in Config → Book categories.' : ''">
+      <ion-select-option value="">No category</ion-select-option>
+      @for (c of categories.items(); track c.id) {
+        <ion-select-option [value]="c.name">{{ c.categoryNumber }} · {{ c.name }}</ion-select-option>
+      }
+      @if (unlistedCategory()) {
+        <ion-select-option [value]="form.category">{{ form.category }} (not in master)</ion-select-option>
+      }
+    </ion-select>
     <ion-input label="Total copies *" labelPlacement="floating" fill="outline" type="number" min="1"
                inputmode="numeric" [(ngModel)]="form.totalCopies"></ion-input>
     <ion-textarea label="Description" labelPlacement="floating" fill="outline" rows="3" [autoGrow]="true"

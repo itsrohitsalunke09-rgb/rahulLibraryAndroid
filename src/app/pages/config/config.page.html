@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Configuration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <h2 class="section-title">Masters</h2>
+  <p class="intro">Lists the rest of the app picks from. Changes apply everywhere straight away.</p>
+
+  <ion-list inset="true" lines="full">
+    <ion-item button detail="false" routerLink="/tabs/config/categories">
+      <span slot="start" class="master-icon" aria-hidden="true">
+        <span class="icon" style="--icon: url(assets/icons/tag.svg); --icon-size: 20px"></span>
+      </span>
+      <ion-label>
+        <h2>Book categories</h2>
+        <p>Category number and name, used by the book form's Category dropdown</p>
+      </ion-label>
+      <div slot="end" class="end">
+        @if (categories.loaded()) {
+          <span class="count">{{ categories.items().length }}</span>
+        }
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,10 +1,11 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonInput, IonList, IonSpinner,
+  IonButton, IonButtons, IonContent, IonHeader, IonInput, IonList, IonSelect, IonSelectOption, IonSpinner,
   IonTextarea, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
+import { CategoriesStore } from '../../core/categories.store';
 import { Book } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { BookFormModel, bookFormFrom, toBookRequest } from './book-request';
@@ -14,7 +15,7 @@ import { BookFormModel, bookFormFrom, toBookRequest } from './book-request';
   templateUrl: 'book-form.modal.html',
   imports: [
     FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList,
-    IonInput, IonTextarea, IonSpinner
+    IonInput, IonTextarea, IonSpinner, IonSelect, IonSelectOption
   ],
   styles: [`.form { padding: 0 0 24px; max-width: 520px; margin: 0 auto; }`],
 })
@@ -25,6 +26,7 @@ export class BookFormModal implements OnInit {
   private api = inject(ApiService);
   private modals = inject(ModalController);
   private ui = inject(UiService);
+  protected categories = inject(CategoriesStore);
 
   form: BookFormModel = bookFormFrom();
   readonly saving = signal(false);
@@ -32,6 +34,13 @@ export class BookFormModal implements OnInit {
 
   ngOnInit() {
     this.form = bookFormFrom(this.book);
+    this.categories.load(true);
+  }
+
+  /** An older free-text category that is not in the master, kept selectable so editing does not lose it. */
+  unlistedCategory() {
+    const current = this.form.category?.trim();
+    return !!current && !this.categories.items().some(c => c.name === current);
   }
 
   cancel() {

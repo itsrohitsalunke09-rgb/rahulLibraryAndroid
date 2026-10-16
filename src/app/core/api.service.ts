@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import {
-  Book, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, Page,
+  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, Page,
   ProfileUpdate, Role, UserAccount, UserRequest
 } from './models';
 
@@ -39,6 +39,28 @@ export class ApiService {
 
   deleteBook(id: number) {
     return this.http.delete<void>(`${this.base}/books/${id}`);
+  }
+
+  /** Book category master, sorted by category number. */
+  categories() {
+    return this.http.get<BookCategory[]>(`${this.base}/categories`);
+  }
+
+  saveCategory(category: BookCategoryRequest, id?: number) {
+    return id
+      ? this.http.put<BookCategory>(`${this.base}/categories/${id}`, category)
+      : this.http.post<BookCategory>(`${this.base}/categories`, category);
+  }
+
+  deleteCategory(id: number) {
+    return this.http.delete<void>(`${this.base}/categories/${id}`);
+  }
+
+  /** Bulk-add books from an .xlsx sheet (admin and librarian only). */
+  importBooks(file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<BookImportResult>(`${this.base}/books/import`, form);
   }
 
   bookIssues(bookId: number) {
