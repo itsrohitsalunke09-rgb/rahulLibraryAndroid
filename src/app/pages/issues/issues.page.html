@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>Issues &amp; returns</ion-title>
   </ion-toolbar>
   <ion-toolbar>
@@ -24,31 +24,30 @@
   </ion-refresher>
 
   @if (issues.error()) {
-    <ion-text color="danger"><p class="ion-padding-horizontal">{{ issues.error() }}</p></ion-text>
+    <p class="page-error" role="alert">{{ issues.error() }}</p>
   }
 
   @if (issues.loaded()) {
     @if (issues.items().length) {
-      <p class="count">
+      <p class="list-count">
         {{ issues.total() }} record{{ issues.total() === 1 ? '' : 's' }}{{ query() ? ' matching "' + query() + '"' : '' }}
       </p>
-      <ion-list>
+      <ion-list inset="true" lines="full">
         @for (issue of issues.items(); track issue.id) {
           <ion-item-sliding #sliding [disabled]="issue.status === 'RETURNED'">
-            <ion-item>
+            <ion-item class="spine" [class]="'spine-' + statusColor(issue)">
               <ion-label>
-                <h2 [class.marathi]="issue.category === 'Marathi Literature'">{{ issue.bookTitle }}</h2>
+                <h2 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h2>
                 <p>{{ issue.studentName }}</p>
-                <p class="item-meta">
-                  Issued {{ formatDate(issue.issueDate) }} by {{ issue.issuedByName }} · {{ dueText(issue) }}
-                </p>
+                <p class="due" [class]="'due-' + statusColor(issue)">{{ dueText(issue) }}</p>
+                <p class="item-meta">Issued {{ formatDate(issue.issueDate) }} by {{ issue.issuedByName }}</p>
               </ion-label>
               <div slot="end" class="end">
-                <ion-badge [color]="statusColor(issue)">{{ issue.status }}</ion-badge>
+                <ion-badge class="stamp" [color]="statusColor(issue)">{{ statusLabel(issue) }}</ion-badge>
                 @if (issue.status !== 'RETURNED') {
-                  <ion-button size="small" fill="clear" [disabled]="returning() === issue.id"
+                  <ion-button size="small" fill="outline" class="return" [disabled]="returning() === issue.id"
                               (click)="markReturned(issue)">
-                    Return
+                    Mark returned
                   </ion-button>
                 }
               </div>
@@ -65,23 +64,25 @@
     } @else if (!issues.error()) {
       <div class="empty-state">
         <ion-icon name="swap-horizontal-outline" aria-hidden="true"></ion-icon>
-        <p>
-          @if (query()) {
-            Nothing matches "{{ query() }}".
-          } @else if (filter() === 'OVERDUE') {
-            No overdue books. 🎉
-          } @else if (filter() === 'OUT') {
-            No books are out right now.
-          } @else {
-            No records yet.
-          }
-        </p>
+        @if (query()) {
+          <h2>Nothing matches "{{ query() }}"</h2>
+          <p>Search by book title or the student's name.</p>
+        } @else if (filter() === 'OVERDUE') {
+          <h2>No overdue books</h2>
+          <p>Every book that's out is still within its loan period.</p>
+        } @else if (filter() === 'OUT') {
+          <h2>No books are out right now</h2>
+          <p>Issue a book from its page in the Catalog.</p>
+        } @else {
+          <h2>No records yet</h2>
+          <p>Books you issue and their returns will be listed here.</p>
+        }
       </div>
     }
   } @else {
-    <ion-list>
+    <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3, 4, 5]; track i) {
-        <ion-item>
+        <ion-item class="spine">
           <ion-label>
             <h2><ion-skeleton-text [animated]="true" style="width: 65%"></ion-skeleton-text></h2>
             <p><ion-skeleton-text [animated]="true" style="width: 45%"></ion-skeleton-text></p>

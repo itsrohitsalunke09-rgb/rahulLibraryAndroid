@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="cancel()">Cancel</ion-button>
     </ion-buttons>
@@ -14,10 +14,11 @@
 
 <ion-content class="ion-padding">
   @if (error()) {
-    <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    <p class="form-error" role="alert">{{ error() }}</p>
   }
 
-  <ion-list lines="none">
+  <ion-list lines="none" class="form">
+    <h2 class="form-section">Person</h2>
     <ion-input label="Full name *" labelPlacement="floating" fill="outline" [(ngModel)]="form.fullName"></ion-input>
     <ion-input label="Username *" labelPlacement="floating" fill="outline" autocapitalize="off"
                [(ngModel)]="form.username"></ion-input>
@@ -25,6 +26,7 @@
     <ion-input label="Phone" labelPlacement="floating" fill="outline" type="tel" inputmode="numeric" maxlength="10"
                helperText="10 digits, used for WhatsApp reminders" [(ngModel)]="form.phone"></ion-input>
 
+    <h2 class="form-section">Access</h2>
     <ion-select label="Role" labelPlacement="floating" fill="outline" interface="popover"
                 [disabled]="isSelf" [(ngModel)]="form.role">
       @for (role of roles; track role) {
@@ -37,9 +39,11 @@
       <ion-input-password-toggle slot="end"></ion-input-password-toggle>
     </ion-input>
 
-    <ion-item lines="none">
-      <ion-toggle [disabled]="isSelf" [(ngModel)]="form.active">Active (can sign in)</ion-toggle>
-    </ion-item>
+    <div class="form-panel">
+      <ion-item lines="none">
+        <ion-toggle [disabled]="isSelf" [(ngModel)]="form.active">Active (can sign in)</ion-toggle>
+      </ion-item>
+    </div>
   </ion-list>
 
   @if (user && auth.isAdmin() && !isSelf) {

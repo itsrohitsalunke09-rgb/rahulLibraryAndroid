@@ -2,35 +2,36 @@
   <ion-tab-bar slot="bottom">
     @if (auth.isStaff()) {
       <ion-tab-button tab="dashboard" href="/tabs/dashboard">
-        <ion-icon aria-hidden="true" name="grid-outline"></ion-icon>
+        <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-dashboard.svg)" aria-hidden="true"></span></span>
         <ion-label>Dashboard</ion-label>
       </ion-tab-button>
     }
 
     <ion-tab-button tab="catalog" href="/tabs/catalog">
-      <ion-icon aria-hidden="true" name="library-outline"></ion-icon>
+      <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span></span>
       <ion-label>Catalog</ion-label>
     </ion-tab-button>
 
     @if (auth.isStaff()) {
       <ion-tab-button tab="issues" href="/tabs/issues">
-        <ion-icon aria-hidden="true" name="swap-horizontal-outline"></ion-icon>
+        <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-issues.svg)" aria-hidden="true"></span></span>
         <ion-label>Issues</ion-label>
       </ion-tab-button>
 
       <ion-tab-button tab="people" href="/tabs/people">
-        <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
+        <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-people.svg)" aria-hidden="true"></span></span>
         <ion-label>People</ion-label>
       </ion-tab-button>
     } @else {
       <ion-tab-button tab="my-books" href="/tabs/my-books">
-        <ion-icon aria-hidden="true" name="bookmarks"></ion-icon>
+        <!-- No My books icon in the design; Ionicons' outline matches its stroke style. -->
+        <span class="tab-symbol"><ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon></span>
         <ion-label>My books</ion-label>
       </ion-tab-button>
     }
 
     <ion-tab-button tab="profile" href="/tabs/profile">
-      <ion-icon aria-hidden="true" name="person-circle-outline"></ion-icon>
+      <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-profile.svg)" aria-hidden="true"></span></span>
       <ion-label>Profile</ion-label>
     </ion-tab-button>
   </ion-tab-bar>

@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>People</ion-title>
   </ion-toolbar>
   <ion-toolbar>
@@ -24,18 +24,18 @@
   </ion-refresher>
 
   @if (people.error()) {
-    <ion-text color="danger"><p class="ion-padding-horizontal">{{ people.error() }}</p></ion-text>
+    <p class="page-error" role="alert">{{ people.error() }}</p>
   }
 
   @if (people.loaded()) {
     @if (people.items().length) {
-      <p class="count">
+      <p class="list-count">
         {{ people.total() }} {{ query() ? 'active student' : 'account' }}{{ people.total() === 1 ? '' : 's' }}
       </p>
-      <ion-list>
+      <ion-list inset="true" lines="full">
         @for (user of people.items(); track user.id) {
           <ion-item [button]="canEdit(user)" detail="false" (click)="open(user)">
-            <div slot="start" class="avatar" [class.inactive]="!user.active">{{ initials(user.fullName) }}</div>
+            <div slot="start" class="avatar" [class]="'role-' + user.role.toLowerCase()" [class.inactive]="!user.active" aria-hidden="true">{{ initials(user.fullName) }}</div>
             <ion-label>
               <h2>{{ user.fullName }}</h2>
               <p>{{ user.username }}{{ user.phone ? ' · ' + user.phone : '' }}</p>
@@ -44,9 +44,9 @@
               }
             </ion-label>
             <div slot="end" class="end">
-              <ion-badge [color]="roleColor(user.role)">{{ user.role }}</ion-badge>
+              <ion-badge class="chip" [color]="roleColor(user.role)">{{ roleLabel(user.role) }}</ion-badge>
               @if (!user.active) {
-                <ion-badge color="light">Inactive</ion-badge>
+                <ion-badge class="chip" color="medium">Inactive</ion-badge>
               }
             </div>
           </ion-item>
@@ -55,13 +55,20 @@
     } @else if (!people.error()) {
       <div class="empty-state">
         <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
-        <p>{{ query() ? 'No active student matches "' + query() + '".' : 'No accounts here yet.' }}</p>
+        @if (query()) {
+          <h2>No active student matches "{{ query() }}"</h2>
+          <p>Search uses the start of the name, username, email or phone number.</p>
+        } @else {
+          <h2>No accounts here yet</h2>
+          <p>Add one with the button below.</p>
+        }
       </div>
     }
   } @else {
-    <ion-list>
+    <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3, 4, 5]; track i) {
         <ion-item>
+          <ion-skeleton-text slot="start" [animated]="true" class="avatar-skeleton"></ion-skeleton-text>
           <ion-label>
             <h2><ion-skeleton-text [animated]="true" style="width: 50%"></ion-skeleton-text></h2>
             <p><ion-skeleton-text [animated]="true" style="width: 30%"></ion-skeleton-text></p>

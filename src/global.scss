@@ -36,27 +36,485 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-/* ---- App-wide styles ---- */
+/* =====================================================================
+ * App design system — shared component styles.
+ * Tokens live in theme/variables.scss.
+ * ===================================================================== */
+
+/* ---- Type ---- */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+.marathi {
+  font-family: "Noto Sans Devanagari", var(--ion-font-family);
+}
+
+/* ---- Icons: design SVGs used as masks so they take the text colour ---- */
+.icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: var(--icon-size, 21px);
+  height: var(--icon-size, 21px);
+  background-color: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+}
+
+/* ---- Header band: compact cyan band, square corners, 22px teal title ---- */
+ion-header {
+  background: var(--app-band);
+  overflow: hidden;
+}
+
+ion-header.header-md {
+  box-shadow: none;
+}
+
+ion-header ion-toolbar {
+  --background: transparent;
+  --color: var(--app-ink);
+  --border-width: 0;
+  --min-height: 48px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+ion-header ion-toolbar ion-title {
+  /* With the toolbar's 8px this puts titles 20px from the edge, like the design. */
+  padding-inline: 12px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--app-ink);
+}
+
+/* The last toolbar in a header carries the band's bottom padding. */
+ion-header ion-toolbar:last-of-type {
+  padding-bottom: 10px;
+}
+
+/* The Dashboard keeps the larger band with rounded bottom corners. */
+ion-header.band-rounded {
+  border-radius: 0 0 var(--app-radius-band) var(--app-radius-band);
+
+  ion-toolbar {
+    --min-height: 62px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+
+  ion-toolbar ion-title {
+    font-size: 27px;
+  }
+
+  ion-toolbar:last-of-type {
+    padding-bottom: 12px;
+  }
+}
+
+ion-toolbar ion-button {
+  --border-radius: var(--app-radius-control);
+  --color: var(--app-ink);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+/* The confirming action in a modal's toolbar (Save). */
+ion-toolbar ion-button.button-strong {
+  font-weight: 700;
+}
+
+/* Round 34px button at the end of a page heading (add book). */
+.heading-action {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-inline-end: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--app-ink);
+  color: var(--app-on-ink);
+  cursor: pointer;
+}
+
+/* Ionic's scoped .sc-ion-searchbar-md-h sets its own padding; match its specificity to win. */
+ion-searchbar.md.sc-ion-searchbar-md-h {
+  --background: var(--app-surface);
+  --border-radius: var(--app-radius-control);
+  --box-shadow: none;
+  --color: var(--app-ink);
+  --placeholder-color: var(--app-muted);
+  --placeholder-opacity: 1;
+  --icon-color: var(--app-ink);
+  padding: 0 20px 4px;
+  min-height: 42px;
+
+  .searchbar-input {
+    font-size: 13px;
+  }
+}
+
+/* Filter segments look like chips. */
+ion-segment {
+  --background: transparent;
+  padding: 0 20px 8px;
+  gap: 8px;
+}
+
+ion-segment-button {
+  --background: var(--app-surface);
+  --background-checked: var(--app-ink);
+  --background-hover: transparent;
+  --color: var(--app-ink);
+  --color-checked: var(--app-on-ink);
+  --indicator-height: 0;
+  --indicator-color: transparent;
+  --border-radius: 999px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  min-height: 34px;
+  min-width: auto;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+/* ---- Bottom tab bar: cyan pill behind the active icon ---- */
+ion-tab-bar {
+  --background: var(--app-surface);
+  --border: 1px solid var(--app-rule);
+  /* Ionic adds the bottom safe area as padding (content-box), so this is the bar itself. */
+  height: 64px;
+}
+
+ion-tab-button {
+  --color: var(--app-muted);
+  --color-selected: var(--app-ink);
+  --ripple-color: transparent;
+  --padding-start: 2px;
+  --padding-end: 2px;
+  min-width: 0;
+  font-size: 10px;
+  letter-spacing: 0;
+
+  .tab-symbol {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 30px;
+    margin-bottom: 4px;
+    border-radius: 100px;
+    transition: background-color 200ms ease;
+
+    ion-icon {
+      font-size: 21px;
+    }
+  }
+
+  &.tab-selected {
+    font-weight: 600;
+
+    .tab-symbol {
+      background: var(--app-band);
+    }
+  }
+
+  ion-label {
+    margin: 0;
+  }
+}
+
+/* ---- Content cards and lists ---- */
+ion-list,
+ion-list.list-md {
+  background: transparent;
+}
+
+ion-list.list-inset.list-md,
+ion-list[inset="true"] {
+  margin: 12px 24px 16px;
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-surface);
+  border: 1px solid var(--app-rule);
+  overflow: hidden;
+}
+
+ion-list-header {
+  --color: var(--app-ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  min-height: 40px;
+}
+
+/* Heading above a card or list ("Details", "Issue history"). */
+.section-title {
+  margin: 20px 24px 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--app-ink);
+}
+
+ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --min-height: 56px;
+  --background: var(--app-surface);
+  --border-color: var(--app-rule);
+  --color: var(--app-ink);
+  --background-activated: var(--app-mint-soft);
+  --background-activated-opacity: 1;
+
+  ion-label {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  ion-label h2,
+  ion-label h3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    color: var(--app-ink);
+  }
+
+  ion-label p {
+    color: var(--app-muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .item-meta,
+  ion-label p.item-meta {
+    font-size: 11px;
+    color: var(--app-muted);
+  }
+}
+
+ion-list.list-inset ion-item:last-of-type,
+ion-list[inset="true"] ion-item:last-of-type,
+ion-list.list-inset ion-item-sliding:last-of-type ion-item,
+ion-list[inset="true"] ion-item-sliding:last-of-type ion-item {
+  --border-width: 0;
+  --inner-border-width: 0;
+}
+
+/* Leading icon in a list row (icons with their own colour keep it). */
+ion-item > ion-icon[slot="start"]:not([color]) {
+  color: var(--app-ink);
+  margin-inline-end: 12px;
+}
+
+/* Count line above a list ("211 books"). */
+.list-count {
+  margin: 16px 24px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-ink);
+}
+
+/* ---- Status badges: soft pills ---- */
+ion-badge {
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  border-radius: 100px;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+/* Status pill: soft tint of the status colour (teal on mint, rust on peach). */
+ion-badge.stamp,
+ion-badge.chip {
+  background: rgba(var(--ion-color-base-rgb, var(--ion-color-medium-rgb)), 0.12);
+  color: var(--ion-color-base, var(--ion-color-medium));
+  white-space: nowrap;
+}
+
+ion-badge.stamp.ion-color-success,
+ion-badge.chip.ion-color-success {
+  background: var(--app-mint-soft);
+}
+
+ion-badge.stamp.ion-color-warning,
+ion-badge.chip.ion-color-warning {
+  background: var(--app-rust-soft);
+}
+
+/* ---- Form controls ---- */
+ion-input.input-fill-outline,
+ion-textarea.textarea-fill-outline,
+ion-select.select-fill-outline {
+  --background: var(--app-surface);
+  --border-color: var(--app-rule-strong);
+  --border-radius: 16px;
+  --highlight-color-focused: var(--ion-color-primary);
+  margin-bottom: 14px;
+}
+
+ion-input.input-fill-outline {
+  min-height: 56px;
+}
+
+/* Section heading inside a form. */
+.form-section {
+  margin: 22px 2px 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ion-color-medium);
+}
+
+.form-section:first-child {
+  margin-top: 4px;
+}
+
+/* Inline error shown above a form's submit button. */
+.form-error {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  color: var(--ion-color-danger);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Grouped panel used inside forms (e.g. a toggle row). */
+.form-panel {
+  border-radius: 16px;
+  border: 1px solid var(--app-rule-strong);
+  background: var(--app-surface);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+/* ---- Buttons ---- */
+ion-button {
+  --border-radius: var(--app-radius-control);
+  --box-shadow: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+ion-button[expand="block"] {
+  height: 48px;
+  font-size: 1rem;
+}
+
+ion-fab-button {
+  --border-radius: 18px;
+  --box-shadow: 0 4px 14px rgba(var(--ion-color-primary-rgb), 0.35);
+  width: 60px;
+  height: 60px;
+}
+
+/* ---- Empty and loading states ---- */
+.empty-state {
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--ion-color-medium);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+
+  ion-icon {
+    display: block;
+    margin: 0 auto 16px;
+    box-sizing: content-box;
+    width: 32px;
+    height: 32px;
+    padding: 20px;
+    border-radius: 50%;
+    background: rgba(var(--ion-color-primary-rgb), 0.08);
+    color: var(--app-ink);
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--ion-text-color);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+/* Error line at the top of a list page. */
+.page-error {
+  margin: 12px 24px 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  color: var(--ion-color-danger);
+  font-size: 0.875rem;
+}
+
+ion-skeleton-text {
+  --border-radius: 6px;
+  --background-rgb: var(--ion-text-color-rgb);
+  --background: rgba(var(--ion-text-color-rgb), 0.07);
+}
+
+/* ---- Dialogs, toasts, modals ---- */
+ion-alert.md .alert-wrapper {
+  border-radius: 24px;
+  background: var(--app-surface);
+}
+
+ion-alert.md .alert-title {
+  font-weight: 700;
+}
+
+ion-alert.md .alert-button {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  border-radius: var(--app-radius-control);
+}
+
 .alert-danger {
   color: var(--ion-color-danger) !important;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--ion-color-medium);
+ion-toast {
+  --border-radius: 14px;
+  --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-weight: 500;
+}
 
-  ion-icon {
-    font-size: 56px;
-    margin-bottom: 8px;
+ion-popover {
+  --border-radius: 14px;
+}
+
+/* ---- Focus and motion ---- */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-}
-
-.marathi {
-  font-family: "Noto Sans Devanagari", "Mukta", sans-serif;
-}
-
-ion-item .item-meta {
-  font-size: 0.8rem;
-  color: var(--ion-color-medium);
 }

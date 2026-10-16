@@ -1,14 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  IonContent, IonHeader, IonIcon, IonRefresher, IonRefresherContent, IonSkeletonText, IonText,
-  IonTitle, IonToolbar, RefresherCustomEvent, ViewWillEnter
+  IonContent, IonHeader, IonRefresher, IonRefresherContent, IonSkeletonText, IonTitle, IonToolbar,
+  RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import {
-  alertCircleOutline, bookOutline, checkmarkCircleOutline, chevronForward, copyOutline,
-  peopleOutline, personOutline, swapHorizontalOutline
-} from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Dashboard } from '../../core/models';
@@ -17,8 +12,11 @@ import { errorMessage } from '../../core/ui.service';
 interface Tile {
   label: string;
   value: number;
-  icon: string;
+  /** Icon file from the Figma design (assets/icons). */
+  symbol: string;
   tone: 'primary' | 'success' | 'warning' | 'danger' | 'medium';
+  /** attention = the two big numbers; shelf = the stock bar; more = the list underneath. */
+  group: 'attention' | 'shelf' | 'more';
   link?: string;
   query?: Record<string, string>;
 }
@@ -27,24 +25,32 @@ interface Tile {
   selector: 'app-dashboard',
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSkeletonText, IonText],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText],
 })
 export class DashboardPage implements ViewWillEnter {
   private api = inject(ApiService);
   private router = inject(Router);
   protected auth = inject(AuthService);
 
-  readonly tiles = signal<Tile[] | null>(null);
+  readonly stats = signal<Dashboard | null>(null);
+  private readonly tiles = computed(() => {
+    const s = this.stats();
+    return s ? toTiles(s) : [];
+  });
+  readonly attention = computed(() => this.tiles().filter(t => t.group === 'attention'));
+  readonly shelf = computed(() => this.tiles().find(t => t.group === 'shelf'));
+  readonly more = computed(() => this.tiles().filter(t => t.group === 'more'));
+  /** Share of copies on the shelf, for the stock bar. */
+  readonly shelfPercent = computed(() => {
+    const s = this.stats();
+    return s && s.totalCopies ? Math.round((s.availableCopies / s.totalCopies) * 100) : 0;
+  });
+  readonly today = signal(todayText());
   readonly error = signal('');
 
-  constructor() {
-    addIcons({
-      bookOutline, copyOutline, checkmarkCircleOutline, swapHorizontalOutline, alertCircleOutline,
-      peopleOutline, personOutline, chevronForward
-    });
-  }
-
   ionViewWillEnter() {
+    // Tab pages stay alive in the background, so refresh the date on every visit.
+    this.today.set(todayText());
     this.load();
   }
 
@@ -62,7 +68,7 @@ export class DashboardPage implements ViewWillEnter {
     this.api.dashboard().subscribe({
       next: stats => {
         this.error.set('');
-        this.tiles.set(toTiles(stats));
+        this.stats.set(stats);
         done?.();
       },
       error: err => {
@@ -75,12 +81,16 @@ export class DashboardPage implements ViewWillEnter {
 
 function toTiles(s: Dashboard): Tile[] {
   return [
-    { label: 'Book titles', value: s.totalBooks, icon: 'book-outline', tone: 'primary', link: '/tabs/catalog' },
-    { label: 'Total copies', value: s.totalCopies, icon: 'copy-outline', tone: 'medium', link: '/tabs/catalog' },
-    { label: 'Available', value: s.availableCopies, icon: 'checkmark-circle-outline', tone: 'success', link: '/tabs/catalog' },
-    { label: 'Issued', value: s.issuedCopies, icon: 'swap-horizontal-outline', tone: 'warning', link: '/tabs/issues', query: { status: 'OUT' } },
-    { label: 'Overdue', value: s.overdueCopies, icon: 'alert-circle-outline', tone: 'danger', link: '/tabs/issues', query: { status: 'OVERDUE' } },
-    { label: 'Students', value: s.students, icon: 'people-outline', tone: 'primary', link: '/tabs/people', query: { role: 'STUDENT' } },
-    { label: 'Librarians', value: s.librarians, icon: 'person-outline', tone: 'medium', link: '/tabs/people', query: { role: 'LIBRARIAN' } },
+    { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/issues', query: { status: 'OVERDUE' } },
+    { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/issues', query: { status: 'OUT' } },
+    { label: 'On the shelf', value: s.availableCopies, symbol: 'assets/icons/book.svg', tone: 'success', group: 'shelf', link: '/tabs/catalog' },
+    { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/catalog' },
+    { label: 'Total copies', value: s.totalCopies, symbol: 'assets/icons/copies.svg', tone: 'medium', group: 'more', link: '/tabs/catalog' },
+    { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/people', query: { role: 'STUDENT' } },
+    { label: 'Librarians', value: s.librarians, symbol: 'assets/icons/user.svg', tone: 'medium', group: 'more', link: '/tabs/people', query: { role: 'LIBRARIAN' } },
   ];
+}
+
+function todayText(): string {
+  return new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
 }

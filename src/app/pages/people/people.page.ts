@@ -3,14 +3,14 @@ import { ActivatedRoute } from '@angular/router';
 import {
   IonBadge, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonInfiniteScroll,
   IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonSearchbar,
-  IonSegment, IonSegmentButton, IonSkeletonText, IonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
+  IonSegment, IonSegmentButton, IonSkeletonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { personAdd, peopleOutline } from 'ionicons/icons';
 import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { Page, Role, UserAccount } from '../../core/models';
+import { Page, Role, UserAccount, roleLabel } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { UiService } from '../../core/ui.service';
 import { UserFormModal } from './user-form.modal';
@@ -25,7 +25,7 @@ const FILTERS: Filter[] = ['ALL', 'STUDENT', 'LIBRARIAN', 'ADMIN'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonFab, IonFabButton, IonIcon,
-    IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonText
+    IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
   ],
 })
 export class PeoplePage implements ViewWillEnter {
@@ -91,8 +91,10 @@ export class PeoplePage implements ViewWillEnter {
   }
 
   roleColor(role: Role) {
-    return role === 'ADMIN' ? 'danger' : role === 'LIBRARIAN' ? 'primary' : 'medium';
+    return role === 'ADMIN' ? 'primary' : role === 'LIBRARIAN' ? 'warning' : 'medium';
   }
+
+  protected readonly roleLabel = roleLabel;
 
   initials(name: string) {
     return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');

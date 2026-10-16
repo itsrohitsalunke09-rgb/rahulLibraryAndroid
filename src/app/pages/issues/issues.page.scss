@@ -1,12 +1,31 @@
-.count {
-  margin: 12px 16px 0;
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
-}
-
 .end {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 8px;
+  margin-inline-start: 8px;
+}
+
+.return {
+  --border-radius: 999px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  height: 32px;
+  font-size: 0.8125rem;
+}
+
+/* Due line in the status colour, so the urgent ones stand out. */
+ion-label p.due {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  margin-top: 4px;
+}
+
+ion-label p.due-danger { color: var(--ion-color-danger); }
+ion-label p.due-warning { color: var(--ion-color-warning); }
+ion-label p.due-success { color: var(--ion-color-success); }
+
+ion-label h2,
+ion-label p {
+  white-space: normal;
 }

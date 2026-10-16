@@ -1,17 +1,25 @@
 .wrap {
   max-width: 480px;
   margin: 0 auto;
+  padding-bottom: calc(16px + var(--ion-safe-area-bottom, 0px));
 }
 
-ion-input,
-ion-textarea {
-  margin-bottom: 14px;
-}
-
-.error {
-  margin: 0 0 12px;
+.lede {
+  margin: 4px 2px 8px;
+  color: var(--ion-color-medium);
+  font-size: 0.9375rem;
+  line-height: 1.45;
 }
 
 ion-list {
-  background: transparent;
+  padding: 0;
+}
+
+/* Helper text sits under the field, so leave room for it. */
+ion-input[helperText] {
+  margin-bottom: 20px;
+}
+
+ion-button[type="submit"] {
+  margin-top: 8px;
 }

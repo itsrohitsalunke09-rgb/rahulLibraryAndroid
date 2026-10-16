@@ -1,26 +1,405 @@
-.hero {
+/* Values from Figma "rahul-library" › Book details (15:1072) and its menu / expanded / delete states. */
+
+.close {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  margin-inline-end: 12px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--app-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.content {
+  padding: 20px 24px calc(24px + var(--ion-safe-area-bottom, 0px));
+}
+
+/* One card; the menu and the delete panel are positioned against it. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-surface);
+}
+
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.title-text {
+  flex: 1;
+  min-width: 0;
+
   h1 {
-    margin: 0 0 4px;
-    font-size: 1.35rem;
-    color: var(--app-brand-dark);
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--app-ink);
   }
 
   .author {
-    margin: 0 0 10px;
-    color: var(--ion-color-medium);
-  }
-
-  .description {
-    margin: 12px 0 0;
-    line-height: 1.45;
+    margin: 5px 0 0;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--app-muted);
   }
 }
 
-.actions .row {
-  display: flex;
-  gap: 8px;
+/* 40px round "more options" button. */
+.more {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--app-mint-soft);
+  color: var(--app-ink);
+  font-size: 20px;
+}
 
-  ion-button {
-    flex: 1;
+.availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 100px;
+  background: var(--app-mint-soft);
+  color: var(--app-ink);
+  font-size: 12px;
+  font-weight: 500;
+
+  &.none {
+    background: var(--app-rust-soft);
+    color: var(--app-rust);
   }
+}
+
+.description {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--app-ink);
+}
+
+/* Section opened from the menu (details, issue history, edit form). */
+.expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+    color: var(--app-ink);
+  }
+
+  .muted {
+    margin: 0;
+    font-size: 13px;
+    color: var(--app-muted);
+  }
+}
+
+.details {
+  margin: 0;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 46px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--app-rule);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  dt {
+    flex: 0 0 116px;
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+
+  dd {
+    flex: 1;
+    margin: 0;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--app-ink);
+  }
+}
+
+.record {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--app-mint-soft);
+
+  .record-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .borrower {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--app-ink);
+  }
+
+  ion-badge {
+    font-size: 11px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    --padding-top: 5px;
+    --padding-bottom: 5px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+}
+
+/* Inline edit form. */
+.edit {
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  > span {
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--app-rule);
+    border-radius: 14px;
+    background: var(--app-surface);
+    color: var(--app-ink);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+
+    &:focus {
+      border-color: var(--app-ink);
+    }
+  }
+
+  input.big {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  input.author-input {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--app-muted);
+  }
+
+  textarea {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.65;
+    resize: vertical;
+  }
+
+  input.value {
+    text-align: right;
+  }
+}
+
+/* Two equal buttons (Cancel / Save changes, Cancel / Delete book). */
+.pair {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+
+  .solid {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    height: 44px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--app-ink);
+    color: var(--app-on-ink);
+    font-size: 14px;
+    font-weight: 600;
+
+    &.danger {
+      background: var(--app-rust);
+      color: #ffffff;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+
+    ion-spinner {
+      color: currentColor;
+    }
+  }
+}
+
+/* "No copies available to issue" + Issue button, under a divider. */
+.issue-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding-top: 12px;
+  border-top: 1px solid var(--app-rule);
+
+  .reason {
+    margin: 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--app-muted);
+  }
+}
+
+.issue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 100px;
+  background: var(--app-ink);
+  color: var(--app-on-ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
+  &:disabled {
+    background: var(--app-disabled);
+    color: var(--app-disabled-text);
+    cursor: default;
+  }
+}
+
+/* Floating panels: 6px under the "more options" button, over the card content. */
+.menu,
+.confirm {
+  position: absolute;
+  top: 66px;
+  right: 20px;
+  z-index: 10;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  width: 205px;
+  padding: 7px;
+  border: 1px solid var(--app-rule);
+  border-radius: 14px;
+  background: var(--app-surface);
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--app-ink);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+
+    &:active {
+      background: var(--app-mint-soft);
+    }
+
+    &.danger {
+      color: var(--app-rust);
+    }
+
+    ion-icon {
+      font-size: 19px;
+    }
+  }
+}
+
+.confirm {
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--app-rust-soft);
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--app-rust);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--app-ink);
+  }
+}
+
+/* Transparent layer behind the menu; a tap anywhere else closes it. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
 }

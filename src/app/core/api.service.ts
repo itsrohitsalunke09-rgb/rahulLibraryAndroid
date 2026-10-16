@@ -108,10 +108,6 @@ export class ApiService {
     return this.http.delete<void>(`${this.base}/users/${id}`);
   }
 
-  profile() {
-    return this.http.get<UserAccount>(`${this.base}/users/profile`);
-  }
-
   updateProfile(profile: ProfileUpdate) {
     return this.http.put<UserAccount>(`${this.base}/users/profile`, profile);
   }

@@ -1,84 +1,215 @@
+<!--
+  Built from Figma "rahul-library" › Book details (15:1072) and its states:
+  Menu open (26:24), Details expanded, Issue history expanded, Edit (26:98), Delete confirmation (26:172).
+-->
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>Book details</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()">Close</ion-button>
-    </ion-buttons>
+    <button slot="end" class="close" (click)="close()">
+      Close
+      <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 16px" aria-hidden="true"></span>
+    </button>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   @if (current(); as book) {
-    <div class="hero ion-padding">
-      <h1 [class.marathi]="book.category === 'Marathi Literature'">{{ book.title }}</h1>
-      <p class="author" [class.marathi]="book.category === 'Marathi Literature'">{{ book.author }}</p>
-      <ion-badge [color]="book.availableCopies > 0 ? 'success' : 'medium'">
-        {{ book.availableCopies }} of {{ book.totalCopies }} available
-      </ion-badge>
-      @if (book.description) {
-        <p class="description">{{ book.description }}</p>
-      }
+    <div class="content">
+      <section class="card">
+        <!-- Title, author and the "more options" button -->
+        <div class="title-row">
+          <div class="title-text">
+            <h1 [class.marathi]="isMarathi(book.category)">{{ book.title }}</h1>
+            <p class="author" [class.marathi]="isMarathi(book.category)">{{ book.author }}</p>
+          </div>
+          <button class="more" aria-label="More book options" [attr.aria-expanded]="menuOpen()" (click)="toggleMenu()">
+            <ion-icon name="ellipsis-vertical" aria-hidden="true"></ion-icon>
+          </button>
+        </div>
+
+        <span class="availability" [class.none]="book.availableCopies < 1">
+          @if (book.availableCopies < 1) {
+            <span class="icon" style="--icon: url(assets/icons/clock.svg); --icon-size: 14px" aria-hidden="true"></span>
+          }
+          {{ book.availableCopies }} of {{ book.totalCopies }} available
+        </span>
+
+        @if (book.description) {
+          <p class="description" [class.marathi]="isMarathi(book.category)">{{ book.description }}</p>
+        }
+
+        @switch (section()) {
+          @case ('details') {
+            <div class="expanded">
+              <h2>Details</h2>
+              <dl class="details">
+                <div><dt>Category</dt><dd class="marathi">{{ book.category || '-' }}</dd></div>
+                <div><dt>Registration no.</dt><dd>{{ book.registrationNumber || '-' }}</dd></div>
+                <div><dt>Publication</dt><dd class="marathi">{{ book.publication || '-' }}</dd></div>
+                <div><dt>Year</dt><dd>{{ book.publicationYear ?? '-' }}</dd></div>
+                <div><dt>Pages</dt><dd>{{ book.pageCount ?? '-' }}</dd></div>
+                @if (auth.isStaff()) {
+                  <div><dt>Added on</dt><dd>{{ formatDate(book.date) }}</dd></div>
+                  <div><dt>Seller</dt><dd class="marathi">{{ book.seller || '-' }}</dd></div>
+                  <div><dt>Receipt no.</dt><dd>{{ book.receiptNumber || '-' }}</dd></div>
+                  <div><dt>Price</dt><dd>{{ book.price !== null && book.price !== undefined ? '₹' + book.price : '-' }}</dd></div>
+                }
+              </dl>
+            </div>
+          }
+          @case ('history') {
+            <div class="expanded">
+              <h2>Issue history</h2>
+              @if (history(); as history) {
+                @for (issue of history; track issue.id) {
+                  <div class="record">
+                    <div class="record-head">
+                      <span class="borrower">{{ issue.studentName }}</span>
+                      <ion-badge class="chip" [color]="statusColor(issue)">{{ statusLabel(issue) }}</ion-badge>
+                    </div>
+                    <p>Issued {{ formatDate(issue.issueDate) }} · {{ dueText(issue) }}</p>
+                  </div>
+                } @empty {
+                  <p class="muted">Not issued to anyone yet.</p>
+                }
+              } @else {
+                <ion-spinner name="dots" aria-label="Loading history"></ion-spinner>
+              }
+            </div>
+          }
+          @case ('edit') {
+            <form class="expanded edit" (ngSubmit)="saveEdit()">
+              <h2>Edit book</h2>
+              <label class="field">
+                <span>Title</span>
+                <input class="big" [class.marathi]="isMarathi(book.category)" name="title" [(ngModel)]="form.title" />
+              </label>
+              <label class="field">
+                <span>Author</span>
+                <input class="author-input" [class.marathi]="isMarathi(book.category)" name="author" [(ngModel)]="form.author" />
+              </label>
+              <label class="field">
+                <span>Description</span>
+                <textarea rows="3" [class.marathi]="isMarathi(book.category)" name="description" [(ngModel)]="form.description"></textarea>
+              </label>
+              <label class="field">
+                <span>Total copies</span>
+                <input class="value" type="number" min="1" inputmode="numeric" name="totalCopies" [(ngModel)]="form.totalCopies" />
+              </label>
+              <label class="field">
+                <span>Category</span>
+                <input class="value marathi" name="category" [(ngModel)]="form.category" />
+              </label>
+              <label class="field">
+                <span>Registration no.</span>
+                <input class="value" name="registrationNumber" [(ngModel)]="form.registrationNumber" />
+              </label>
+              <label class="field">
+                <span>Publication</span>
+                <input class="value marathi" name="publication" [(ngModel)]="form.publication" />
+              </label>
+              <label class="field">
+                <span>Year</span>
+                <input class="value" type="number" inputmode="numeric" name="publicationYear" [(ngModel)]="form.publicationYear" />
+              </label>
+              <label class="field">
+                <span>Pages</span>
+                <input class="value" type="number" inputmode="numeric" name="pageCount" [(ngModel)]="form.pageCount" />
+              </label>
+              <label class="field">
+                <span>Added on</span>
+                <input class="value" type="date" name="date" [(ngModel)]="form.date" />
+              </label>
+              <label class="field">
+                <span>Seller</span>
+                <input class="value marathi" name="seller" [(ngModel)]="form.seller" />
+              </label>
+              <label class="field">
+                <span>Receipt no.</span>
+                <input class="value" name="receiptNumber" [(ngModel)]="form.receiptNumber" />
+              </label>
+              <label class="field">
+                <span>Price (₹)</span>
+                <input class="value" type="number" step="0.01" inputmode="decimal" name="price" [(ngModel)]="form.price" />
+              </label>
+
+              @if (formError()) {
+                <p class="form-error" role="alert">{{ formError() }}</p>
+              }
+
+              <div class="pair">
+                <button type="button" class="solid" [disabled]="saving()" (click)="cancelEdit()">Cancel</button>
+                <button type="submit" class="solid" [disabled]="saving()">
+                  @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
+                </button>
+              </div>
+            </form>
+          }
+        }
+
+        <!-- Issue section; hidden while editing, as in the Edit frame. -->
+        @if (auth.isStaff() && section() !== 'edit') {
+          <div class="issue-area">
+            @if (book.availableCopies < 1) {
+              <p class="reason">No copies available to issue</p>
+            }
+            <button class="issue" [disabled]="book.availableCopies < 1 || busy()" (click)="issue()">
+              <span class="icon" style="--icon: url(assets/icons/send.svg); --icon-size: 19px" aria-hidden="true"></span>
+              Issue to a student
+            </button>
+          </div>
+        }
+
+        <!-- Menu: floats over the card under the "more options" button. -->
+        @if (menuOpen()) {
+          <div class="menu" role="menu">
+            @if (auth.isStaff()) {
+              <button role="menuitem" (click)="show('edit')">
+                <ion-icon name="pencil-outline" aria-hidden="true"></ion-icon> Edit
+              </button>
+            }
+            @if (auth.isAdmin()) {
+              <button role="menuitem" class="danger" (click)="askDelete()">
+                <ion-icon name="trash-outline" aria-hidden="true"></ion-icon> Delete
+              </button>
+            }
+            <button role="menuitem" (click)="show('details')">
+              <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon> Details
+            </button>
+            @if (auth.isStaff()) {
+              <button role="menuitem" (click)="show('history')">
+                <ion-icon name="time-outline" aria-hidden="true"></ion-icon> Issue history
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Delete confirmation: floats over the card in the same place. -->
+        @if (confirmingDelete()) {
+          <div class="confirm" role="alertdialog" aria-labelledby="delete-title">
+            <h2 id="delete-title">Delete this book?</h2>
+            <p>
+              This will permanently remove this book record.
+              @if (borrowers().length) {
+                It is currently issued to {{ borrowers().join(', ') }}. Review the active issue before deleting.
+              } @else {
+                Its issue history will be deleted too.
+              }
+            </p>
+            <div class="pair">
+              <button class="solid" [disabled]="busy()" (click)="confirmingDelete.set(false)">Cancel</button>
+              <button class="solid danger" [disabled]="busy()" (click)="remove()">
+                @if (busy()) { <ion-spinner name="crescent"></ion-spinner> } @else { Delete book }
+              </button>
+            </div>
+          </div>
+        }
+      </section>
     </div>
 
-    @if (auth.isStaff()) {
-      <div class="actions ion-padding-horizontal">
-        <ion-button expand="block" [disabled]="book.availableCopies < 1 || busy()" (click)="issue()">
-          <ion-icon slot="start" name="send-outline"></ion-icon>
-          Issue to a student
-        </ion-button>
-        <div class="row">
-          <ion-button fill="outline" [disabled]="busy()" (click)="edit()">
-            <ion-icon slot="start" name="create-outline"></ion-icon>
-            Edit
-          </ion-button>
-          @if (auth.isAdmin()) {
-            <ion-button fill="outline" color="danger" [disabled]="busy()" (click)="remove()">
-              @if (busy()) {
-                <ion-spinner name="crescent"></ion-spinner>
-              } @else {
-                <ion-icon slot="start" name="trash-outline"></ion-icon>
-                Delete
-              }
-            </ion-button>
-          }
-        </div>
-      </div>
-    }
-
-    <ion-list>
-      <ion-list-header>Details</ion-list-header>
-      <ion-item><ion-label>Category</ion-label><ion-note slot="end">{{ book.category || '-' }}</ion-note></ion-item>
-      <ion-item><ion-label>Registration no.</ion-label><ion-note slot="end">{{ book.registrationNumber || '-' }}</ion-note></ion-item>
-      <ion-item><ion-label>Publication</ion-label><ion-note slot="end">{{ book.publication || '-' }}</ion-note></ion-item>
-      <ion-item><ion-label>Year</ion-label><ion-note slot="end">{{ book.publicationYear ?? '-' }}</ion-note></ion-item>
-      <ion-item><ion-label>Pages</ion-label><ion-note slot="end">{{ book.pageCount ?? '-' }}</ion-note></ion-item>
-      @if (auth.isStaff()) {
-        <ion-item><ion-label>Added on</ion-label><ion-note slot="end">{{ formatDate(book.date) }}</ion-note></ion-item>
-        <ion-item><ion-label>Seller</ion-label><ion-note slot="end">{{ book.seller || '-' }}</ion-note></ion-item>
-        <ion-item><ion-label>Receipt no.</ion-label><ion-note slot="end">{{ book.receiptNumber || '-' }}</ion-note></ion-item>
-        <ion-item><ion-label>Price</ion-label><ion-note slot="end">{{ book.price !== null && book.price !== undefined ? '₹' + book.price : '-' }}</ion-note></ion-item>
-      }
-    </ion-list>
-
-    @if (auth.isStaff()) {
-      <ion-list>
-        <ion-list-header>Issue history</ion-list-header>
-        @if (history(); as history) {
-          @for (issue of history; track issue.id) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ issue.studentName }}</h3>
-                <p>Issued {{ formatDate(issue.issueDate) }} · {{ dueText(issue) }}</p>
-              </ion-label>
-              <ion-badge slot="end" [color]="statusColor(issue)">{{ issue.status }}</ion-badge>
-            </ion-item>
-          } @empty {
-            <ion-item><ion-label color="medium">Never issued yet.</ion-label></ion-item>
-          }
-        } @else {
-          <ion-item><ion-spinner name="dots"></ion-spinner></ion-item>
-        }
-      </ion-list>
+    <!-- Tapping outside the menu closes it. -->
+    @if (menuOpen()) {
+      <div class="scrim" (click)="menuOpen.set(false)" aria-hidden="true"></div>
     }
   }
 </ion-content>

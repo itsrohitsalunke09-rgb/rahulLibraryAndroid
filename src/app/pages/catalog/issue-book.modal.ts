@@ -2,14 +2,14 @@ import { Component, Input, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList,
-  IonSearchbar, IonSpinner, IonText, IonTitle, IonToolbar, ModalController
+  IonSearchbar, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, ellipseOutline } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { formatDate } from '../../core/dates';
-import { Book, UserAccount } from '../../core/models';
+import { Book, UserAccount, isMarathi } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 @Component({
@@ -17,12 +17,24 @@ import { UiService, errorMessage } from '../../core/ui.service';
   templateUrl: 'issue-book.modal.html',
   imports: [
     FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSearchbar, IonList,
-    IonItem, IonLabel, IonIcon, IonInput, IonFooter, IonSpinner, IonText
+    IonItem, IonLabel, IonIcon, IonInput, IonFooter, IonSpinner
   ],
-  styles: [`.book { margin: 0 0 4px; font-weight: 600; } .hint { color: var(--ion-color-medium); margin: 0; }`],
+  styles: [`
+    .book-card {
+      margin: 16px 16px 0; padding: 14px 16px; border-radius: var(--app-radius-sheet);
+      border: 1px solid var(--app-rule); background: var(--app-surface);
+      box-shadow: inset 4px 0 0 var(--ion-color-success);
+    }
+    .book { margin: 0 0 2px; font-size: 1.0625rem; font-weight: 700; }
+    .hint { color: var(--ion-color-medium); margin: 0; font-size: 0.875rem; }
+    .issue-bar { background: var(--app-surface); padding: 20px 16px calc(12px + var(--ion-safe-area-bottom, 0px)); }
+    .issue-bar ion-input { margin-bottom: 18px; }
+    ion-footer { border-top: 1px solid var(--app-rule); box-shadow: none; }
+  `],
 })
 export class IssueBookModal {
   @Input({ required: true }) book!: Book;
+  protected readonly isMarathi = isMarathi;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);

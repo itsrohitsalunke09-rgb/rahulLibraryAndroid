@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-title>My books</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -10,29 +10,29 @@
   </ion-refresher>
 
   @if (issues.error()) {
-    <ion-text color="danger"><p class="ion-padding-horizontal">{{ issues.error() }}</p></ion-text>
+    <p class="page-error" role="alert">{{ issues.error() }}</p>
   }
 
   @if (issues.loaded()) {
     @if (overdueCount()) {
-      <div class="banner">
+      <div class="banner" role="alert">
         You have {{ overdueCount() }} overdue book{{ overdueCount() === 1 ? '' : 's' }}.
         Please return {{ overdueCount() === 1 ? 'it' : 'them' }} to the library as soon as possible.
       </div>
     }
 
     @if (issues.items().length) {
-      <ion-list>
-        <ion-list-header>With you now</ion-list-header>
+      <h2 class="section-title">With you now</h2>
+      <ion-list inset="true" lines="full">
         @for (issue of current(); track issue.id) {
-          <ion-item>
+          <ion-item class="spine" [class]="'spine-' + statusColor(issue)">
             <ion-label>
-              <h2 [class.marathi]="issue.category === 'Marathi Literature'">{{ issue.bookTitle }}</h2>
+              <h2 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h2>
               <p>{{ issue.author }}</p>
-              <p class="item-meta">Issued {{ formatDate(issue.issueDate) }} · Due {{ formatDate(issue.dueDate) }}</p>
+              <p class="item-meta">Due back {{ formatDate(issue.dueDate) }}</p>
             </ion-label>
             <div slot="end" class="end">
-              <ion-badge [color]="statusColor(issue)">{{ dueText(issue) }}</ion-badge>
+              <ion-badge class="stamp" [color]="statusColor(issue)">{{ dueText(issue) }}</ion-badge>
             </div>
           </ion-item>
         } @empty {
@@ -41,15 +41,15 @@
       </ion-list>
 
       @if (returned().length) {
-        <ion-list>
-          <ion-list-header>History</ion-list-header>
+        <h2 class="section-title">Returned</h2>
+        <ion-list inset="true" lines="full">
           @for (issue of returned(); track issue.id) {
             <ion-item>
               <ion-label>
-                <h3 [class.marathi]="issue.category === 'Marathi Literature'">{{ issue.bookTitle }}</h3>
+                <h3 [class.marathi]="isMarathi(issue.category)">{{ issue.bookTitle }}</h3>
                 <p class="item-meta">{{ formatDate(issue.issueDate) }} – {{ formatDate(issue.returnDate) }}</p>
               </ion-label>
-              <ion-badge slot="end" color="success">Returned</ion-badge>
+              <ion-badge slot="end" class="stamp" color="success">Returned</ion-badge>
             </ion-item>
           }
         </ion-list>
@@ -57,11 +57,12 @@
     } @else if (!issues.error()) {
       <div class="empty-state">
         <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
-        <p>You haven't borrowed any books yet.<br />Browse the Catalog and ask the librarian to issue one.</p>
+        <h2>No books borrowed yet</h2>
+        <p>Find a book in the Catalog and ask the librarian to issue it to you.</p>
       </div>
     }
   } @else {
-    <ion-list>
+    <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3]; track i) {
         <ion-item>
           <ion-label>

@@ -3,15 +3,15 @@ import { ActivatedRoute } from '@angular/router';
 import {
   IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSkeletonText, IonText, IonTitle,
+  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSkeletonText, IonTitle,
   IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { dueText, formatDate, statusColor } from '../../core/dates';
-import { BookIssue, IssueCounts, Page } from '../../core/models';
+import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
+import { BookIssue, IssueCounts, Page, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { UiService } from '../../core/ui.service';
 
@@ -26,7 +26,7 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions, IonItemOption,
-    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonText
+    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -43,6 +43,8 @@ export class IssuesPage implements ViewWillEnter {
   protected readonly dueText = dueText;
   protected readonly formatDate = formatDate;
   protected readonly statusColor = statusColor;
+  protected readonly statusLabel = statusLabel;
+  protected readonly isMarathi = isMarathi;
 
   constructor() {
     addIcons({ returnDownBackOutline, swapHorizontalOutline });

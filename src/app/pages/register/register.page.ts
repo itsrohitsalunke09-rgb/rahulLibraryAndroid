@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonInputPasswordToggle,
-  IonList, IonSpinner, IonText, IonTextarea, IonTitle, IonToolbar
+  IonList, IonSpinner, IonTextarea, IonTitle, IonToolbar
 } from '@ionic/angular';
 import { AuthService } from '../../core/auth.service';
 import { RegistrationRequest } from '../../core/models';
@@ -15,7 +15,7 @@ import { errorMessage } from '../../core/ui.service';
   styleUrls: ['register.page.scss'],
   imports: [
     FormsModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList,
-    IonInput, IonInputPasswordToggle, IonTextarea, IonButton, IonSpinner, IonText
+    IonInput, IonInputPasswordToggle, IonTextarea, IonButton, IonSpinner
   ],
 })
 export class RegisterPage {

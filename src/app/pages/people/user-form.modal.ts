@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonButton, IonButtons, IonContent, IonHeader, IonInput, IonInputPasswordToggle, IonItem, IonList,
-  IonSelect, IonSelectOption, IonSpinner, IonText, IonTitle, IonToggle, IonToolbar, ModalController
+  IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToggle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
@@ -14,9 +14,9 @@ import { UiService, errorMessage } from '../../core/ui.service';
   templateUrl: 'user-form.modal.html',
   imports: [
     FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput,
-    IonInputPasswordToggle, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonText
+    IonInputPasswordToggle, IonSelect, IonSelectOption, IonToggle, IonSpinner
   ],
-  styles: [`ion-input, ion-select { margin-bottom: 12px; } .danger-zone { margin-top: 32px; }`],
+  styles: [`.form { padding: 0; max-width: 520px; margin: 0 auto; } ion-input[helperText] { margin-bottom: 20px; } .danger-zone { max-width: 520px; margin: 32px auto 16px; }`],
 })
 export class UserFormModal implements OnInit {
   /** Account to edit; leave empty to create one. */

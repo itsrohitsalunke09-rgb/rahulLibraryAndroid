@@ -32,6 +32,14 @@ export function statusColor(issue: BookIssue): 'success' | 'warning' | 'danger' 
   return issue.status === 'OVERDUE' ? 'danger' : 'warning';
 }
 
+/** Word printed on an issue's status stamp. */
+export function statusLabel(issue: BookIssue): string {
+  if (issue.status === 'RETURNED') {
+    return 'Returned';
+  }
+  return issue.status === 'OVERDUE' ? 'Overdue' : 'Out';
+}
+
 export function formatDate(isoDate?: string): string {
   if (!isoDate) {
     return '-';

@@ -1,10 +1,23 @@
+<!-- Built from Figma "rahul-library" › Catalog - Mobile (node 15:952). -->
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Catalog</ion-title>
-  </ion-toolbar>
   <ion-toolbar>
+    <ion-title>
+      Catalog
+      @if (books.loaded() && !books.error()) {
+        <span class="count">{{ books.total() }} {{ query() ? 'found' : 'book' + (books.total() === 1 ? '' : 's') }}</span>
+      }
+    </ion-title>
+    @if (auth.isStaff()) {
+      <button slot="end" class="heading-action" aria-label="Add book" (click)="add()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    }
+  </ion-toolbar>
+  <ion-toolbar class="search-bar">
+    <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
     <ion-searchbar
       placeholder="Title, author, category, reg. no."
+      searchIcon=""
       [debounce]="350"
       (ionInput)="search($event.detail.value)">
     </ion-searchbar>
@@ -17,41 +30,46 @@
   </ion-refresher>
 
   @if (books.error()) {
-    <ion-text color="danger"><p class="ion-padding-horizontal">{{ books.error() }}</p></ion-text>
+    <p class="page-error" role="alert">{{ books.error() }}</p>
   }
 
   @if (books.loaded()) {
     @if (books.items().length) {
-      <p class="count">{{ books.total() }} book{{ books.total() === 1 ? '' : 's' }}</p>
-      <ion-list>
+      <ion-list inset="true" lines="full">
         @for (book of books.items(); track book.id) {
           <ion-item button detail="false" (click)="open(book)">
             <ion-label>
               <h2 [class.marathi]="isMarathi(book)">{{ book.title }}</h2>
-              <p [class.marathi]="isMarathi(book)">{{ book.author }}</p>
+              <p class="author" [class.marathi]="isMarathi(book)">{{ book.author }}</p>
               @if (book.category || book.registrationNumber) {
-                <p class="item-meta">
+                <p class="meta">
                   {{ book.category }}{{ book.category && book.registrationNumber ? ' · ' : '' }}{{ book.registrationNumber }}
                 </p>
               }
             </ion-label>
             <div slot="end" class="availability">
-              <ion-badge [color]="book.availableCopies > 0 ? 'success' : 'medium'">
+              <ion-badge class="chip" [color]="book.availableCopies > 0 ? 'success' : 'warning'">
                 {{ book.availableCopies > 0 ? 'Available' : 'All issued' }}
               </ion-badge>
-              <ion-note>{{ book.availableCopies }}/{{ book.totalCopies }} copies</ion-note>
+              <span class="copies">{{ book.availableCopies }} of {{ book.totalCopies }}</span>
             </div>
           </ion-item>
         }
       </ion-list>
     } @else if (!books.error()) {
       <div class="empty-state">
-        <ion-icon name="library-outline" aria-hidden="true"></ion-icon>
-        <p>{{ query() ? 'No books match "' + query() + '".' : 'No books in the catalog yet.' }}</p>
+        <span class="icon empty-icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span>
+        @if (query()) {
+          <h2>No books match "{{ query() }}"</h2>
+          <p>Try part of the title, the author's name or a registration number.</p>
+        } @else {
+          <h2>No books in the catalog yet</h2>
+          <p>{{ auth.isStaff() ? 'Add the first book with the + button.' : 'Check back once the librarian has added books.' }}</p>
+        }
       </div>
     }
   } @else {
-    <ion-list>
+    <ion-list inset="true" lines="full">
       @for (i of [1, 2, 3, 4, 5, 6]; track i) {
         <ion-item>
           <ion-label>
@@ -66,12 +84,4 @@
   <ion-infinite-scroll [disabled]="books.finished()" (ionInfinite)="books.more($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
-
-  @if (auth.isStaff()) {
-    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-      <ion-fab-button (click)="add()" aria-label="Add book">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-  }
 </ion-content>

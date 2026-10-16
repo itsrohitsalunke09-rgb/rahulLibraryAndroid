@@ -1,48 +1,222 @@
-.greeting {
-  margin: 0 0 16px;
-  color: var(--ion-color-medium);
+/* Values from Figma "rahul-library" › Dashboard - Mobile (9:280). */
+
+/* Book emblem: 38px circle at the end of the heading. */
+.emblem {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-inline-end: 12px;
+  border-radius: 50%;
+  background: var(--app-paper);
+  color: var(--app-ink);
 }
 
-.grid {
+/* The library name in Marathi is the page heading. */
+ion-header ion-toolbar ion-title.library-name {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Greeting inside the cyan band. */
+.greeting {
+  padding: 10px 24px 28px;
+  color: var(--app-ink);
+
+  .salutation {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  h2 {
+    margin: 5px 0 0;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .date {
+    margin: 5px 0 0;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+}
+
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 24px;
+}
+
+button {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Overdue and out-with-students tiles. */
+.circulation {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-.tile {
-  --tone: var(--ion-color-primary);
-  --tone-rgb: var(--ion-color-primary-rgb);
+.metric {
+  --tone: var(--app-ink);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  min-height: 112px;
-  padding: 14px;
+  gap: 13px;
+  height: 110px;
+  padding: 16px;
   border: 0;
-  border-radius: 14px;
-  background: rgba(var(--tone-rgb), 0.1);
-  color: var(--ion-text-color);
-  text-align: left;
-  font: inherit;
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-mint-soft);
+  color: var(--tone);
 
-  ion-icon {
-    font-size: 24px;
-    color: var(--tone);
+  &.tone-danger {
+    --tone: var(--app-rust);
+    background: var(--app-rust-soft);
+  }
+
+  .metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    --icon-size: 22px;
   }
 
   .value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--tone);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1;
   }
 
   .label {
-    font-size: 0.85rem;
-    color: var(--ion-color-medium);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &.skeleton ion-skeleton-text {
+    width: 40%;
+    height: 34px;
   }
 }
 
-.tone-success { --tone: var(--ion-color-success); --tone-rgb: var(--ion-color-success-rgb); }
-.tone-warning { --tone: var(--ion-color-warning-shade); --tone-rgb: var(--ion-color-warning-rgb); }
-.tone-danger { --tone: var(--ion-color-danger); --tone-rgb: var(--ion-color-danger-rgb); }
-.tone-medium { --tone: var(--ion-color-medium); --tone-rgb: var(--ion-color-medium-rgb); }
+/* Teal card with the share of copies on the shelf. */
+.shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  height: 90px;
+  padding: 18px;
+  border: 0;
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-ink);
+  color: var(--app-on-ink);
+}
+
+.shelf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+
+  strong {
+    font-weight: 600;
+  }
+
+  .percent {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--app-band);
+  }
+}
+
+.track {
+  display: block;
+  height: 8px;
+  border-radius: 100px;
+  background: var(--app-track);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 100px;
+    background: var(--app-band);
+  }
+}
+
+/* At night the inverted card would put a dark fill on a dark track; keep the bar readable. */
+@media (prefers-color-scheme: dark) {
+  .shelf {
+    background: var(--app-band);
+    color: var(--app-ink);
+  }
+
+  .shelf-head .percent {
+    color: var(--app-ink);
+  }
+
+  .track {
+    background: rgba(var(--app-ink-rgb), 0.18);
+
+    span {
+      background: var(--app-ink);
+    }
+  }
+}
+
+.shelf-skeleton {
+  height: 90px;
+  --border-radius: var(--app-radius-sheet);
+}
+
+/* Book titles / total copies / students / librarians. */
+.records {
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-surface);
+  overflow: hidden;
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 1px solid var(--app-rule);
+  background: transparent;
+  color: var(--app-ink);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:active {
+    background: var(--app-mint-soft);
+  }
+
+  .record-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .count {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .chevron {
+    --icon-size: 15px;
+    color: var(--app-muted);
+  }
+}

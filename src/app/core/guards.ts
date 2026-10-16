@@ -3,9 +3,10 @@ import { CanMatchFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { Role } from './models';
 
+/** Signed-in pages. Also signs out if the stored session or profile has been cleared. */
 export const authGuard: CanMatchFn = () => {
   const auth = inject(AuthService);
-  return auth.user() ? true : inject(Router).parseUrl('/login');
+  return auth.ensureSession(false) ? true : inject(Router).parseUrl('/login');
 };
 
 /** Login/register pages: send signed-in users straight to their home tab. */

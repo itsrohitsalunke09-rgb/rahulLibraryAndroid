@@ -1,50 +1,69 @@
-<ion-content class="ion-padding">
-  <div class="wrap">
-    <div class="brand">
-      <img src="assets/logo.svg" alt="" />
-      <h1 class="marathi">राहुल सार्वजनिक वाचनालय</h1>
-      <p>Rahul Library · Sign in to continue</p>
-    </div>
+<!-- Built from Figma "rahul-library" › Login Page - Mobile (node 1:118). -->
+<ion-content [fullscreen]="true">
+  <div class="page">
+    <div class="band" aria-hidden="true"></div>
 
-    <form (ngSubmit)="submit()">
-      <ion-list lines="none">
-        <ion-input
-          label="Username"
-          labelPlacement="floating"
-          fill="outline"
-          name="username"
-          autocomplete="username"
-          autocapitalize="off"
-          [(ngModel)]="username">
-        </ion-input>
+    <header class="hero">
+      <h1>Rahul Library</h1>
+      <img class="art" src="assets/login/student.png" width="642" height="456" alt="" />
+    </header>
 
-        <ion-input
-          label="Password"
-          labelPlacement="floating"
-          fill="outline"
-          type="password"
-          name="password"
-          autocomplete="current-password"
-          [(ngModel)]="password">
-          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-        </ion-input>
-      </ion-list>
+    <main class="form-area">
+      <form (ngSubmit)="submit()">
+        <label class="field">
+          <span class="field-label">Username</span>
+          <img src="assets/login/user.svg" width="20" height="20" alt="" />
+          <input
+            name="username"
+            placeholder="username"
+            autocomplete="username"
+            autocapitalize="off"
+            [(ngModel)]="username" />
+        </label>
 
-      @if (error()) {
-        <ion-text color="danger"><p class="error">{{ error() }}</p></ion-text>
-      }
+        <label class="field">
+          <span class="field-label">Password</span>
+          <img src="assets/login/lock.svg" width="20" height="20" alt="" />
+          <input
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            [(ngModel)]="password" />
+          <button
+            type="button"
+            class="eye"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            (click)="showPassword.set(!showPassword())">
+            @if (showPassword()) {
+              <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+            } @else {
+              <img src="assets/login/eye-off.svg" width="16" height="16" alt="" />
+            }
+          </button>
+        </label>
 
-      <ion-button type="submit" expand="block" [disabled]="loading()">
-        @if (loading()) {
-          <ion-spinner name="crescent"></ion-spinner>
-        } @else {
-          Sign in
+        <button type="button" class="text-link forgot" (click)="forgotPassword()">Forgot Password</button>
+
+        @if (error()) {
+          <p class="form-error" role="alert">{{ error() }}</p>
         }
-      </ion-button>
-    </form>
 
-    <p class="switch">
-      New student? <a routerLink="/register">Create an account</a>
-    </p>
+        <button type="submit" class="login" [disabled]="loading()">
+          @if (loading()) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            Login
+          }
+        </button>
+      </form>
+
+      <footer class="links">
+        <button type="button" class="text-link about" (click)="aboutUs()">About us</button>
+        <p class="switch">
+          <span>Don’t have an account?</span> <a routerLink="/register">Sign up</a>
+        </p>
+      </footer>
+    </main>
   </div>
 </ion-content>

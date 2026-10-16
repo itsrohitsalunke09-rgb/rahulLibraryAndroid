@@ -1,45 +1,260 @@
-.wrap {
-  max-width: 420px;
-  margin: 0 auto;
+/* Values from Figma "rahul-library" › Login Page - Mobile (393 × 852 frame).
+   Fonts use the phone's own (the design uses Rubik and Inter). */
+:host {
+  --login-page: #fef6ef;
+  --login-band: #ccfaff;
+  --login-teal: #1d6273;
+  --login-border: #757575;
+  --login-label: #757575;
+  --login-text: #616161;
+  --login-placeholder: #9e9e9e;
+}
+
+/* No dark version in the design; these keep the same feel at night. */
+@media (prefers-color-scheme: dark) {
+  :host {
+    --login-page: #0f1a1d;
+    --login-band: #15434b;
+    --login-teal: #9ff3fa;
+    --login-border: #8a9a9d;
+    --login-label: #a9b6b8;
+    --login-text: #dbe5e7;
+    --login-placeholder: #7f8d90;
+  }
+}
+
+ion-content {
+  --background: var(--login-page);
+}
+
+.page {
+  position: relative;
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  overflow: hidden;
+  font-family: var(--ion-font-family);
+  letter-spacing: 0.2px;
 }
 
-.brand {
-  text-align: center;
-  margin-bottom: 24px;
+/* Cyan band: 315px tall in the design, bottom corners rounded 200px. */
+.band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(315px + var(--ion-safe-area-top, 0px) - 59px);
+  min-height: 256px;
+  border-radius: 0 0 200px 200px;
+  background: var(--login-band);
+}
 
-  img {
-    width: 120px;
-  }
+.hero {
+  position: relative;
+  padding-top: calc(var(--ion-safe-area-top, 0px) + 26px);
+  text-align: center;
 
   h1 {
-    color: var(--app-brand-dark);
-    font-size: 1.4rem;
-    margin: 12px 0 4px;
-  }
-
-  p {
-    color: var(--ion-color-medium);
     margin: 0;
+    /* 70px with -6.25px tracking on a 393px-wide screen. */
+    font-size: min(17.8vw, 70px);
+    font-weight: 500;
+    line-height: 64px;
+    letter-spacing: -0.089em;
+    color: var(--login-teal);
+    white-space: nowrap;
   }
 }
 
-ion-input {
-  margin-bottom: 12px;
+/* 335px wide, 28px from the left edge, overlapping the bottom of the title. */
+.art {
+  display: block;
+  width: min(85.2%, 335px);
+  height: auto;
+  margin: -23px auto 0 7.1%;
 }
 
-.error {
-  margin: 0 0 12px;
+.form-area {
+  position: relative;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px calc(20px + var(--ion-safe-area-bottom, 0px));
+
+  > * {
+    width: 100%;
+    max-width: 345px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Outlined pill field with the label sitting in a gap in the border. */
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 24px 15px 32px;
+  border: 1px solid var(--login-border);
+  border-radius: 63px;
+  transition: border-color 150ms ease;
+
+  & + .field {
+    margin-top: 29px;
+  }
+
+  &:focus-within {
+    border-color: var(--login-teal);
+
+    .field-label {
+      color: var(--login-teal);
+    }
+  }
+
+  img {
+    flex: 0 0 auto;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--login-text);
+
+    &::placeholder {
+      color: var(--login-placeholder);
+      opacity: 1;
+    }
+  }
+}
+
+/* The username placeholder is darker than the password one in the design. */
+.field:first-of-type input::placeholder {
+  color: var(--login-text);
+}
+
+.field-label {
+  position: absolute;
+  top: -12px;
+  left: 37px;
+  padding: 0 12px;
+  background: var(--login-page);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--login-label);
+}
+
+.eye {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -8px -8px -8px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 17px;
+    color: var(--login-placeholder);
+  }
+}
+
+/* Plain text links with a full-size touch target. */
+.text-link {
+  min-height: 40px;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.forgot {
+  align-self: flex-end;
+  margin-top: -2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--login-text);
+}
+
+.form-error {
+  margin-top: 8px;
+}
+
+/* Right under "Forgot Password" in the updated design. */
+.login {
+  margin-top: 25px;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 53px;
+  padding: 14px 10px;
+  border: 0;
+  border-radius: 128px;
+  background: var(--login-band);
+  color: var(--login-teal);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+
+  ion-spinner {
+    color: var(--login-teal);
+  }
+}
+
+/* "About us" and "Sign up" sit at the bottom of the screen; keep at least 40px above them. */
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 40px;
+  color: var(--login-teal);
+}
+
+.about {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--login-teal);
+  opacity: 0.4;
 }
 
 .switch {
-  text-align: center;
-  color: var(--ion-color-medium);
-}
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
 
-ion-list {
-  background: transparent;
+  span {
+    opacity: 0.4;
+  }
+
+  a {
+    color: var(--login-teal);
+    font-weight: 600;
+    text-decoration: none;
+  }
 }

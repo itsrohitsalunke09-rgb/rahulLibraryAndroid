@@ -1,14 +1,14 @@
 import { Component, computed, inject } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
-  IonLabel, IonList, IonListHeader, IonRefresher, IonRefresherContent, IonSkeletonText, IonText,
+  IonLabel, IonList, IonRefresher, IonRefresherContent, IonSkeletonText,
   IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { bookmarksOutline } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
-import { dueText, formatDate, statusColor } from '../../core/dates';
-import { BookIssue } from '../../core/models';
+import { dueText, formatDate, statusColor, statusLabel } from '../../core/dates';
+import { BookIssue, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 
 @Component({
@@ -16,8 +16,8 @@ import { PagedList } from '../../core/paged-list';
   templateUrl: 'my-books.page.html',
   styleUrls: ['my-books.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList, IonListHeader,
-    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonText
+    IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
+    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
   ],
 })
 export class MyBooksPage implements ViewWillEnter {
@@ -34,6 +34,8 @@ export class MyBooksPage implements ViewWillEnter {
   protected readonly dueText = dueText;
   protected readonly formatDate = formatDate;
   protected readonly statusColor = statusColor;
+  protected readonly statusLabel = statusLabel;
+  protected readonly isMarathi = isMarathi;
 
   constructor() {
     addIcons({ bookmarksOutline });

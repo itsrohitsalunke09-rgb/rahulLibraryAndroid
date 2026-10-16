@@ -1,14 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import {
-  IonBadge, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonInfiniteScroll,
-  IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonNote, IonRefresher, IonRefresherContent,
-  IonSearchbar, IonSkeletonText, IonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
+  IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
+  IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar,
+  ModalController, ViewWillEnter
 } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { add, libraryOutline } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { Book } from '../../core/models';
+import { Book, isMarathi } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
@@ -19,8 +17,7 @@ import { BookFormModal } from './book-form.modal';
   styleUrls: ['catalog.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonItem, IonLabel, IonNote, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, IonFab, IonFabButton,
-    IonIcon, IonSkeletonText, IonText
+    IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText
   ],
 })
 export class CatalogPage implements ViewWillEnter {
@@ -30,10 +27,6 @@ export class CatalogPage implements ViewWillEnter {
 
   readonly query = signal('');
   readonly books = new PagedList<Book>(page => this.api.books(this.query(), page), 'Could not load books.');
-
-  constructor() {
-    addIcons({ add, libraryOutline });
-  }
 
   ionViewWillEnter() {
     // Refresh each visit so availability is current after issues/returns elsewhere.
@@ -66,6 +59,6 @@ export class CatalogPage implements ViewWillEnter {
   }
 
   isMarathi(book: Book) {
-    return book.category === 'Marathi Literature';
+    return isMarathi(book.category);
   }
 }

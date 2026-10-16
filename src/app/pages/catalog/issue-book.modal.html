@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="cancel()">Cancel</ion-button>
     </ion-buttons>
@@ -12,12 +12,13 @@
 </ion-header>
 
 <ion-content>
-  <div class="ion-padding">
-    <p class="book">{{ book.title }}</p>
-    <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} available</p>
+  <div class="book-card">
+    <p class="book" [class.marathi]="isMarathi(book.category)">{{ book.title }}</p>
+    <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} on the shelf</p>
   </div>
 
-  <ion-list>
+  <h2 class="section-title">Choose a student</h2>
+  <ion-list inset="true" lines="full">
     @for (student of students(); track student.id) {
       <ion-item button detail="false" (click)="selected.set(student)">
         <ion-icon slot="start" [name]="selected()?.id === student.id ? 'checkmark-circle' : 'ellipse-outline'"
@@ -44,12 +45,12 @@
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar class="ion-padding-horizontal">
+  <div class="issue-bar">
     @if (error()) {
-      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+      <p class="form-error" role="alert">{{ error() }}</p>
     }
-    <ion-input label="Loan period (days)" labelPlacement="start" type="number" min="1" inputmode="numeric"
-               [helperText]="'Due back ' + dueDate()" [(ngModel)]="days"></ion-input>
+    <ion-input label="Loan period (days)" labelPlacement="floating" fill="outline" type="number" min="1"
+               inputmode="numeric" [helperText]="'Due back ' + dueDate()" [(ngModel)]="days"></ion-input>
     <ion-button expand="block" [disabled]="!selected() || saving()" (click)="issue()">
       @if (saving()) {
         <ion-spinner name="crescent"></ion-spinner>
@@ -57,5 +58,5 @@
         Issue{{ selected() ? ' to ' + selected()!.fullName : '' }}
       }
     </ion-button>
-  </ion-toolbar>
+  </div>
 </ion-footer>

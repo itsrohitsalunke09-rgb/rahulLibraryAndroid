@@ -1,58 +1,46 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInput, IonInputPasswordToggle, IonList,
-  IonListHeader, IonSkeletonText, IonSpinner, IonText, IonTextarea, IonTitle, IonToolbar, ViewWillEnter
-} from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
+import { IonContent, IonSkeletonText, IonSpinner } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { ProfileUpdate, UserAccount } from '../../core/models';
+import { ProfileUpdate, roleLabel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
-  imports: [
-    FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonInput,
-    IonInputPasswordToggle, IonTextarea, IonButton, IonIcon, IonBadge, IonSpinner, IonSkeletonText, IonText
-  ],
+  imports: [FormsModule, IonContent, IonSpinner, IonSkeletonText],
 })
-export class ProfilePage implements ViewWillEnter {
+export class ProfilePage {
   private api = inject(ApiService);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
 
-  readonly profile = signal<UserAccount | null>(null);
+  /** Stored at sign-in; no API call needed to show it. */
+  readonly profile = inject(AuthService).profile;
   readonly saving = signal(false);
   readonly error = signal('');
   readonly today = new Date().toISOString().slice(0, 10);
+  readonly roleLabel = computed(() => roleLabel(this.auth.role()));
 
   form: ProfileUpdate = { fullName: '' };
-  newPassword = '';
-  confirmPassword = '';
 
   constructor() {
-    addIcons({ logOutOutline });
-  }
-
-  ionViewWillEnter() {
-    this.api.profile().subscribe({
-      next: p => {
+    // Fill the form from the stored profile now, and again whenever it is saved.
+    effect(() => {
+      const p = this.profile();
+      if (p) {
         this.form = {
           fullName: p.fullName, email: p.email ?? '', phone: p.phone ?? '',
           dateOfBirth: p.dateOfBirth ?? '', address: p.address ?? ''
         };
-        this.profile.set(p);
-      },
-      error: err => this.error.set(errorMessage(err, 'Could not load your profile.'))
+      }
     });
   }
 
   initials() {
-    const name = this.profile()?.fullName ?? this.auth.user()?.fullName ?? '';
+    const name = this.profile()?.fullName ?? '';
     return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 
@@ -65,31 +53,14 @@ export class ProfilePage implements ViewWillEnter {
       this.error.set('Phone must be a 10-digit mobile number.');
       return;
     }
-    if (this.newPassword || this.confirmPassword) {
-      if (this.newPassword.length < 6) {
-        this.error.set('New password must be at least 6 characters.');
-        return;
-      }
-      if (this.newPassword !== this.confirmPassword) {
-        this.error.set('The two passwords do not match.');
-        return;
-      }
-    }
-    const update: ProfileUpdate = {
-      ...this.form,
-      fullName: this.form.fullName.trim(),
-      password: this.newPassword || undefined,
-    };
+    const update: ProfileUpdate = { ...this.form, fullName: this.form.fullName.trim() };
     this.saving.set(true);
     this.error.set('');
     this.api.updateProfile(update).subscribe({
       next: p => {
         this.saving.set(false);
-        this.profile.set(p);
-        this.auth.updateName(p.fullName);
-        this.newPassword = '';
-        this.confirmPassword = '';
-        this.ui.toast(update.password ? 'Profile and password updated.' : 'Profile updated.');
+        this.auth.updateProfile(p);
+        this.ui.toast('Profile updated.');
       },
       error: err => {
         this.saving.set(false);

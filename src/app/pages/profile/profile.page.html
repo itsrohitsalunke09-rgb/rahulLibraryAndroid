@@ -1,60 +1,101 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>My profile</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <!-- Cyan band with the title; it scrolls with the page so the avatar can sit across its edge. -->
+  <header class="band">
+    <h1>Profile</h1>
+  </header>
 
-<ion-content class="ion-padding">
   <div class="wrap">
-    <div class="who">
-      <div class="avatar">{{ initials() }}</div>
-      <div>
-        <h2>{{ profile()?.fullName ?? auth.user()?.fullName }}</h2>
-        <p>{{ auth.user()?.username }}</p>
-        <ion-badge color="secondary">{{ auth.role() }}</ion-badge>
-      </div>
-    </div>
-
-    @if (error()) {
-      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
-    }
+    <section class="identity">
+      <div class="avatar" aria-hidden="true">{{ initials() }}</div>
+      <h2>{{ profile()?.fullName }}</h2>
+      <p class="username">&#64;{{ profile()?.username }}</p>
+      <span class="role">{{ roleLabel() }}</span>
+    </section>
 
     @if (profile()) {
-      <ion-list lines="none">
-        <ion-list-header>Details</ion-list-header>
-        <ion-input label="Full name" labelPlacement="floating" fill="outline" [(ngModel)]="form.fullName"></ion-input>
-        <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" [(ngModel)]="form.email"></ion-input>
-        <ion-input label="Phone" labelPlacement="floating" fill="outline" type="tel" inputmode="numeric" maxlength="10"
-                   helperText="Due-date reminders are sent to this number" [(ngModel)]="form.phone"></ion-input>
-        <ion-input label="Date of birth" labelPlacement="stacked" fill="outline" type="date" [max]="today"
-                   [(ngModel)]="form.dateOfBirth"></ion-input>
-        <ion-textarea label="Address" labelPlacement="floating" fill="outline" rows="2" [autoGrow]="true"
-                      [(ngModel)]="form.address"></ion-textarea>
+      <form (ngSubmit)="save()">
+        <h3 class="heading">Personal details</h3>
+        <div class="card">
+          <label class="field">
+            <span class="label">Full name</span>
+            <span class="box">
+              <span class="icon" style="--icon: url(assets/icons/field-user.svg)"></span>
+              <input name="fullName" autocomplete="name" [(ngModel)]="form.fullName" />
+            </span>
+          </label>
+          <label class="field">
+            <span class="label">Date of birth</span>
+            <span class="box">
+              <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)"></span>
+              <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
+            </span>
+          </label>
+          <label class="field">
+            <span class="label">Address</span>
+            <span class="box tall">
+              <span class="icon" style="--icon: url(assets/icons/field-pin.svg)"></span>
+              <textarea name="address" rows="2" autocomplete="street-address" [(ngModel)]="form.address"></textarea>
+            </span>
+          </label>
+        </div>
 
-        <ion-list-header>Change password</ion-list-header>
-        <ion-input label="New password" labelPlacement="floating" fill="outline" type="password"
-                   autocomplete="new-password" helperText="Leave blank to keep your current password"
-                   [(ngModel)]="newPassword">
-          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-        </ion-input>
-        <ion-input label="Confirm new password" labelPlacement="floating" fill="outline" type="password"
-                   autocomplete="new-password" [(ngModel)]="confirmPassword">
-          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-        </ion-input>
-      </ion-list>
+        <h3 class="heading">Contact</h3>
+        <div class="card">
+          <label class="field">
+            <span class="label">Mobile number</span>
+            <span class="box">
+              <span class="icon" style="--icon: url(assets/icons/field-phone.svg)"></span>
+              <input name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"
+                     [(ngModel)]="form.phone" />
+            </span>
+            <span class="helper">Due-date reminders are sent to this number</span>
+          </label>
+          <label class="field">
+            <span class="label">Email</span>
+            <span class="box">
+              <span class="icon" style="--icon: url(assets/icons/field-mail.svg)"></span>
+              <input name="email" type="email" autocomplete="email" [(ngModel)]="form.email" />
+            </span>
+          </label>
+        </div>
 
-      <ion-button expand="block" [disabled]="saving()" (click)="save()">
-        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
-      </ion-button>
-    } @else if (!error()) {
-      @for (i of [1, 2, 3, 4]; track i) {
+        <h3 class="heading">Account</h3>
+        <div class="card account">
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-at.svg)"></span>
+            <span class="label">Username</span>
+            <span class="value">{{ profile()?.username }}</span>
+          </div>
+          <div class="row">
+            <span class="icon" style="--icon: url(assets/icons/field-shield.svg)"></span>
+            <span class="label">Role</span>
+            <span class="value">{{ roleLabel() }}</span>
+          </div>
+        </div>
+        <p class="note">
+          <span class="icon" style="--icon: url(assets/icons/field-lock.svg)"></span>
+          Username and role are managed by the librarian.
+        </p>
+
+        @if (error()) {
+          <p class="form-error" role="alert">{{ error() }}</p>
+        }
+
+        <button type="submit" class="save" [disabled]="saving()">
+          @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save changes }
+        </button>
+      </form>
+    } @else if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    } @else {
+      @for (i of [1, 2, 3]; track i) {
         <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
       }
     }
 
-    <ion-button expand="block" fill="outline" color="medium" class="logout" (click)="logout()">
-      <ion-icon slot="start" name="log-out-outline"></ion-icon>
+    <button type="button" class="logout" (click)="logout()">
+      <span class="icon" style="--icon: url(assets/icons/logout.svg)"></span>
       Sign out
-    </ion-button>
+    </button>
   </div>
 </ion-content>

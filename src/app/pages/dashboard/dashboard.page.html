@@ -1,33 +1,73 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Dashboard</ion-title>
+<!-- Built from Figma "rahul-library" › Dashboard - Mobile (node 9:280). -->
+<ion-header class="band-rounded">
+  <ion-toolbar>
+    <ion-title class="library-name marathi" lang="mr">राहुल सार्वजनिक वाचनालय</ion-title>
+    <span slot="end" class="emblem" aria-hidden="true">
+      <span class="icon" style="--icon: url(assets/icons/book.svg)"></span>
+    </span>
   </ion-toolbar>
+  <div class="greeting">
+    <p class="salutation">Namaskar,</p>
+    <h2>{{ auth.profile()?.fullName }}</h2>
+    <p class="date">{{ today() }}</p>
+  </div>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <p class="greeting">Hello, <strong>{{ auth.user()?.fullName }}</strong></p>
-
   @if (error()) {
-    <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    <p class="page-error" role="alert">{{ error() }}</p>
   }
 
-  <div class="grid">
-    @if (tiles(); as tiles) {
-      @for (tile of tiles; track tile.label) {
-        <button class="tile" [class]="'tone-' + tile.tone" (click)="open(tile)">
-          <ion-icon [name]="tile.icon" aria-hidden="true"></ion-icon>
-          <span class="value">{{ tile.value }}</span>
-          <span class="label">{{ tile.label }}</span>
-        </button>
-      }
+  <div class="overview">
+    @if (stats(); as s) {
+      <div class="circulation">
+        @for (tile of attention(); track tile.label) {
+          <button class="metric" [class]="'tone-' + tile.tone" (click)="open(tile)">
+            <span class="metric-top">
+              <span class="value">{{ tile.value }}</span>
+              <span class="icon" [style.--icon]="'url(' + tile.symbol + ')'" aria-hidden="true"></span>
+            </span>
+            <span class="label">{{ tile.label }}</span>
+          </button>
+        }
+      </div>
+
+      <button class="shelf" (click)="open(shelf()!)">
+        <span class="shelf-head">
+          <span><strong>{{ s.availableCopies }}</strong> of <strong>{{ s.totalCopies }}</strong> copies on the shelf</span>
+          <span class="percent">{{ shelfPercent() }}%</span>
+        </span>
+        <span class="track" aria-hidden="true">
+          <span [style.width.%]="shelfPercent()"></span>
+        </span>
+      </button>
+
+      <div class="records">
+        @for (tile of more(); track tile.label) {
+          <button class="record" (click)="open(tile)">
+            <span class="icon" [style.--icon]="'url(' + tile.symbol + ')'" aria-hidden="true"></span>
+            <span class="record-label">{{ tile.label }}</span>
+            <span class="count">{{ tile.value }}</span>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+          </button>
+        }
+      </div>
     } @else if (!error()) {
-      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-        <div class="tile"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
-      }
+      <div class="circulation">
+        @for (i of [1, 2]; track i) {
+          <div class="metric skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
+        }
+      </div>
+      <ion-skeleton-text [animated]="true" class="shelf-skeleton"></ion-skeleton-text>
+      <div class="records">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="record"><ion-skeleton-text [animated]="true" style="width: 50%"></ion-skeleton-text></div>
+        }
+      </div>
     }
   </div>
 </ion-content>

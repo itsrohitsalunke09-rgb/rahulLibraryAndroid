@@ -1,52 +1,247 @@
+.band {
+  height: calc(92px + var(--ion-safe-area-top, 0px));
+  padding: calc(10px + var(--ion-safe-area-top, 0px)) 20px 0;
+  background: var(--app-band);
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--app-ink);
+  }
+}
+
 .wrap {
   max-width: 520px;
   margin: 0 auto;
+  padding: 0 24px 24px;
 }
 
-.who {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 8px;
+/* Avatar overlaps the band's bottom edge. */
+.identity {
+  margin-top: -48px;
+  text-align: center;
 
   h2 {
-    margin: 0;
-    font-size: 1.2rem;
-  }
-
-  p {
-    margin: 2px 0 6px;
-    color: var(--ion-color-medium);
+    margin: 12px 0 0;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--app-ink);
+    overflow-wrap: anywhere;
   }
 }
 
 .avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 1.4rem;
-  font-weight: 700;
-  background: var(--ion-color-secondary);
-  color: var(--ion-color-secondary-contrast);
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  border: 5px solid var(--app-paper);
+  border-radius: 50%;
+  background: var(--app-ink);
+  color: var(--app-on-ink);
+  font-size: 30px;
+  font-weight: 600;
 }
 
-ion-list-header {
-  padding-left: 0;
+.username {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--app-muted);
 }
 
-ion-input,
-ion-textarea {
-  margin-bottom: 12px;
+.role {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: var(--app-mint-soft);
+  color: var(--app-ink);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-.skeleton {
-  height: 52px;
-  margin-bottom: 12px;
-  border-radius: 8px;
+.heading {
+  margin: 32px 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--app-ink);
+}
+
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-surface);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+
+  .label {
+    font-size: 12px;
+    color: var(--app-muted);
+  }
+
+  .helper {
+    font-size: 11px;
+    color: var(--app-muted);
+  }
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--app-rule);
+  border-radius: 14px;
+  background: var(--app-paper);
+  color: var(--app-muted);
+
+  &.tall {
+    align-items: flex-start;
+    min-height: 76px;
+    padding-top: 12px;
+  }
+
+  &:focus-within {
+    border-color: var(--app-ink);
+  }
+
+  .icon {
+    --icon-size: 18px;
+  }
+
+  input,
+  textarea {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--app-ink);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  input {
+    height: 42px;
+  }
+
+  textarea {
+    resize: none;
+    line-height: 1.4;
+  }
+}
+
+/* Read-only rows. */
+.account {
+  gap: 0;
+  padding-block: 4px;
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    color: var(--app-muted);
+
+    & + .row {
+      border-top: 1px solid var(--app-rule);
+    }
+  }
+
+  .icon {
+    --icon-size: 18px;
+  }
+
+  .label {
+    flex: 1;
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--app-ink);
+  }
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--app-muted);
+
+  .icon {
+    --icon-size: 13px;
+  }
+}
+
+.save,
+.logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border-radius: var(--app-radius-control);
+  font: inherit;
+  cursor: pointer;
+}
+
+.save {
+  height: 48px;
+  margin-top: 20px;
+  border: 0;
+  background: var(--app-ink);
+  color: var(--app-on-ink);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
+  &:disabled {
+    opacity: 0.7;
+  }
+
+  ion-spinner {
+    --color: var(--app-on-ink);
+    width: 22px;
+    height: 22px;
+  }
 }
 
 .logout {
+  height: 44px;
+  margin-top: 12px;
+  border: 1px solid var(--app-rust);
+  background: transparent;
+  color: var(--app-rust);
+  font-size: 14px;
+  font-weight: 500;
+
+  .icon {
+    --icon-size: 17px;
+  }
+}
+
+.form-error {
+  margin: 16px 0 0;
+}
+
+.skeleton {
+  height: 140px;
   margin-top: 24px;
+  --border-radius: var(--app-radius-sheet);
 }

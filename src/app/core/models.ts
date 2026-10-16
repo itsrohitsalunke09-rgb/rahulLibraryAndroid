@@ -113,3 +113,13 @@ export interface Page<T> {
 }
 
 export const STAFF_ROLES: Role[] = ['ADMIN', 'LIBRARIAN'];
+
+/** Role as shown to people. */
+export function roleLabel(role: Role | null): string {
+  return role === 'ADMIN' ? 'Admin' : role === 'LIBRARIAN' ? 'Librarian' : 'Student';
+}
+
+/** Marathi titles get the Devanagari font. */
+export function isMarathi(category?: string): boolean {
+  return category === 'Marathi Literature';
+}

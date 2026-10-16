@@ -1,15 +1,18 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/login"></ion-back-button>
     </ion-buttons>
-    <ion-title>Student registration</ion-title>
+    <ion-title>Create account</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <form class="wrap" (ngSubmit)="submit()">
+    <p class="lede">For students. The librarian can issue books to you once your account exists.</p>
+
     <ion-list lines="none">
+      <h2 class="form-section">About you</h2>
       <ion-input label="Full name" labelPlacement="floating" fill="outline" name="fullName"
                  autocomplete="name" [(ngModel)]="form.fullName"></ion-input>
 
@@ -19,6 +22,7 @@
       <ion-textarea label="Address" labelPlacement="floating" fill="outline" name="address" rows="3"
                     [(ngModel)]="form.address"></ion-textarea>
 
+      <h2 class="form-section">Contact</h2>
       <ion-input label="Mobile number" labelPlacement="floating" fill="outline" type="tel" name="phone"
                  inputmode="numeric" maxlength="10" helperText="10 digits, used for due-date reminders"
                  [(ngModel)]="form.phone"></ion-input>
@@ -26,6 +30,7 @@
       <ion-input label="Email" labelPlacement="floating" fill="outline" type="email" name="email"
                  autocomplete="email" [(ngModel)]="form.email"></ion-input>
 
+      <h2 class="form-section">Sign-in details</h2>
       <ion-input label="Username" labelPlacement="floating" fill="outline" name="username"
                  autocapitalize="off" autocomplete="username" [(ngModel)]="form.username"></ion-input>
 
@@ -36,7 +41,7 @@
     </ion-list>
 
     @if (error()) {
-      <ion-text color="danger"><p class="error">{{ error() }}</p></ion-text>
+      <p class="form-error" role="alert">{{ error() }}</p>
     }
 
     <ion-button type="submit" expand="block" [disabled]="loading()">
