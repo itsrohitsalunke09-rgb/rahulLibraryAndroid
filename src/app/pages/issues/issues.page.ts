@@ -58,12 +58,25 @@ export class IssuesPage implements ViewWillEnter {
   constructor() {
     addIcons({ returnDownBackOutline, swapHorizontalOutline });
     this.loadYears();
-    // Dashboard tiles link here with ?status=OUT / OVERDUE.
+    // Dashboard tiles link here with ?status=OUT / OVERDUE, plus &year=… when a year is chosen there.
     this.route.queryParamMap.subscribe(params => {
+      if (!params.has('status') && !params.has('year')) {
+        return;
+      }
       const status = params.get('status') as Filter | null;
+      const year = Number(params.get('year')) || null;
+      let changed = false;
       if (status && FILTERS.includes(status) && status !== this.filter()) {
         this.filter.set(status);
+        changed = true;
+      }
+      if (year !== this.year()) {
+        this.year.set(year);
+        changed = true;
+      }
+      if (changed) {
         this.issues.reset();
+        this.loadCounts();
       }
     });
   }
@@ -105,6 +118,17 @@ export class IssuesPage implements ViewWillEnter {
     this.year.set(year);
     this.filter.set('YEAR');
     this.issues.reset();
+    this.loadCounts();
+  }
+
+  /** Removes the year so the tabs show issues from every year again. */
+  clearYear() {
+    this.year.set(null);
+    if (this.filter() === 'YEAR') {
+      this.filter.set('ALL');
+    }
+    this.issues.reset();
+    this.loadCounts();
   }
 
   yearCancelled() {
@@ -182,16 +206,18 @@ export class IssuesPage implements ViewWillEnter {
     if (q) {
       return this.api.issues(page, 20, undefined, q);
     }
+    // A chosen year narrows every tab to issues made in that year.
+    const year = this.year();
     switch (this.filter()) {
-      case 'OUT': return this.api.issuesOut(page);
-      case 'OVERDUE': return this.api.issues(page, 20, 'OVERDUE');
-      case 'RETURNED': return this.api.issues(page, 20, 'RETURNED');
-      case 'YEAR': return this.year() != null ? this.api.issuesInYear(this.year()!, page) : this.api.issuesOut(page);
-      default: return this.api.issues(page);
+      case 'OUT': return this.api.issuesOut(page, 20, year);
+      case 'OVERDUE': return year ? this.api.issuesInYear(year, page, 20, 'OVERDUE') : this.api.issues(page, 20, 'OVERDUE');
+      case 'RETURNED': return year ? this.api.issuesInYear(year, page, 20, 'RETURNED') : this.api.issues(page, 20, 'RETURNED');
+      case 'YEAR': return year ? this.api.issuesInYear(year, page) : this.api.issuesOut(page);
+      default: return year ? this.api.issuesInYear(year, page) : this.api.issues(page);
     }
   }
 
   private loadCounts() {
-    this.api.issueCounts().subscribe({ next: c => this.counts.set(c), error: () => {} });
+    this.api.issueCounts(this.year()).subscribe({ next: c => this.counts.set(c), error: () => {} });
   }
 }

@@ -91,9 +91,12 @@ export class ApiService {
     return this.http.get<Page<BookIssue>>(`${this.base}/issues`, { params });
   }
 
-  /** Every issue made in the given year (by issued date), any status, newest first. */
-  issuesInYear(year: number, page: number, size = 20) {
-    const params = new HttpParams().set('page', page).set('size', size).set('year', year);
+  /** Issues made in the given year (by issued date), newest first; optionally only one status. */
+  issuesInYear(year: number, page: number, size = 20, status?: IssueStatus) {
+    let params = new HttpParams().set('page', page).set('size', size).set('year', year);
+    if (status) {
+      params = params.set('status', status);
+    }
     return this.http.get<Page<BookIssue>>(`${this.base}/issues`, { params });
   }
 
@@ -103,13 +106,18 @@ export class ApiService {
   }
 
   /** Every copy currently out (not returned), overdue ones included. */
-  issuesOut(page: number, size = 20) {
-    const params = new HttpParams().set('page', page).set('size', size);
+  issuesOut(page: number, size = 20, year?: number | null) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (year) {
+      params = params.set('year', year);
+    }
     return this.http.get<Page<BookIssue>>(`${this.base}/issues/issued`, { params });
   }
 
-  issueCounts() {
-    return this.http.get<IssueCounts>(`${this.base}/issues/counts`);
+  /** Tab counts; with a year, only issues made in that year. */
+  issueCounts(year?: number | null) {
+    const params = year ? new HttpParams().set('year', year) : undefined;
+    return this.http.get<IssueCounts>(`${this.base}/issues/counts`, { params });
   }
 
   myIssues(page: number, size = 20) {

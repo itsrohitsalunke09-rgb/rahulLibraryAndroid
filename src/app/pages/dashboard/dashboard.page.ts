@@ -98,7 +98,10 @@ export class DashboardPage implements ViewWillEnter {
 
   open(tile: Tile) {
     if (tile.link) {
-      this.router.navigate([tile.link], { queryParams: tile.query });
+      // Issue tiles open Issues for the year chosen here (no year = all years).
+      const year = this.year();
+      const queryParams = tile.query?.['status'] && year ? { ...tile.query, year } : tile.query;
+      this.router.navigate([tile.link], { queryParams });
     }
   }
 

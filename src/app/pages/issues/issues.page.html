@@ -38,6 +38,17 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  @if (year() && !query()) {
+    <!-- The chosen year narrows every tab; clear it to see all years again. -->
+    <div class="year-scope">
+      <span>Issued in <strong>{{ year() }}</strong></span>
+      <button type="button" (click)="clearYear()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg)" aria-hidden="true"></span>
+        All years
+      </button>
+    </div>
+  }
+
   @if (issues.error()) {
     <p class="page-error" role="alert">{{ issues.error() }}</p>
   }
