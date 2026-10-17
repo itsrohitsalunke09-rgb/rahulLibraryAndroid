@@ -76,6 +76,12 @@ describe('StoryViewComponent', () => {
     expect(el.querySelector('.text p')?.classList.contains('cap')).toBe(false);
   });
 
+  it('sidePhotoHasNoDropCap', () => {
+    const el = render(story({ template: 'SIDE_PHOTO', body: 'The fair opened.\n\nSecond part.' }));
+    expect(el.querySelector('article.view-side-photo')).not.toBeNull();
+    expect(el.querySelector('.text p')?.classList.contains('cap')).toBe(false);
+  });
+
   it('previewPhotoUsedInsteadOfServer', () => {
     const el = render(story({ hasPhoto: false }), 'blob:x');
     expect(el.querySelector('img')?.getAttribute('src')).toBe('blob:x');

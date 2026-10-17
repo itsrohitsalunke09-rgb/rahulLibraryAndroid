@@ -12,6 +12,11 @@ describe('effectiveTemplate', () => {
     expect(effectiveTemplate('NOTICE', true)).toBe('NOTICE');
     expect(effectiveTemplate('NOTICE', false)).toBe('NOTICE');
   });
+
+  it('readsAnUnknownTemplateAsClassic', () => {
+    expect(effectiveTemplate('POSTER' as any, true)).toBe('CLASSIC');
+    expect(effectiveTemplate('POSTER' as any, false)).toBe('CLASSIC');
+  });
 });
 
 describe('showsPhoto', () => {

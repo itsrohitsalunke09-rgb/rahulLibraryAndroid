@@ -14,7 +14,7 @@ export const NEWS_TEMPLATES: { value: NewsTemplate; label: string }[] = [
  * A Notice stays a Notice either way (it never shows a photo).
  */
 export function effectiveTemplate(template: NewsTemplate | null | undefined, hasPhoto: boolean): NewsTemplate {
-  if (!template) {
+  if (!template || !NEWS_TEMPLATES.some(t => t.value === template)) {
     return 'CLASSIC';
   }
   if (!hasPhoto && (template === 'SIDE_PHOTO' || template === 'PHOTO_BANNER')) {

@@ -64,6 +64,28 @@ describe('NewspaperPage', () => {
     expect(present).toHaveBeenCalled();
   });
 
+  it('aDoubleTapOpensOnlyOneStory', async () => {
+    let finish!: () => void;
+    const present = vi.fn(() => new Promise<void>(resolve => { finish = resolve; }));
+    const create = vi.fn(() => Promise.resolve({ present }));
+    TestBed.configureTestingModule({
+      imports: [NewspaperPage],
+      providers: [
+        { provide: ApiService, useValue: { news: vi.fn(() => of(page([story(1)]))), storyPhoto: vi.fn(() => of(new Blob())) } },
+        { provide: ModalController, useValue: { create } },
+      ],
+    });
+    const fixture = TestBed.createComponent(NewspaperPage);
+    const first = fixture.componentInstance.open(story(1));
+    void fixture.componentInstance.open(story(1));
+    expect(create).toHaveBeenCalledTimes(1);
+    await Promise.resolve();
+    finish();
+    await first;
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(fixture.componentInstance.opening()).toBe(false);
+  });
+
   it('showsEmptyState', () => {
     const el = render(of(page([])));
     expect(el.textContent).toContain("No news yet — the librarian's stories will appear here.");

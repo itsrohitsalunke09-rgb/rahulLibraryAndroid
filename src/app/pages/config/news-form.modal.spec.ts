@@ -90,6 +90,10 @@ describe('NewsFormModal', () => {
     TestBed.resetTestingModule();
     const missing = create({ ...story, template: undefined as unknown as NewsStory['template'] });
     expect(missing.form.template).toBe('CLASSIC');
+
+    TestBed.resetTestingModule();
+    const unknown = create({ ...story, template: 'POSTER' as unknown as NewsStory['template'] });
+    expect(unknown.form.template).toBe('CLASSIC');
   });
 
   it('saveSendsTemplate', () => {

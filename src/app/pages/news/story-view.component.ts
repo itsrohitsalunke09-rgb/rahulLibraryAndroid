@@ -23,8 +23,8 @@ export class StoryViewComponent {
   readonly cssClass = computed(() => 'view-' + templateClass(this.template()));
   readonly showsPhoto = computed(() => showsPhoto(this.template(), this.hasPhoto()));
   readonly paragraphs = computed(() => paragraphs(this.story().body));
-  /** A centred notice reads oddly with a drop cap; every other template keeps it. */
-  readonly capAllowed = computed(() => this.template() !== 'NOTICE');
+  /** A centred notice reads oddly with a drop cap, and beside the floated side photo it squeezes the first lines. */
+  readonly capAllowed = computed(() => this.template() !== 'NOTICE' && this.template() !== 'SIDE_PHOTO');
 
   readonly hasDropCap = hasDropCap;
 }

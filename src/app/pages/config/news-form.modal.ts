@@ -100,7 +100,8 @@ export class NewsFormModal implements OnInit, OnDestroy {
         eventDate: this.story.eventDate,
         photoCaption: this.story.photoCaption ?? '',
         removePhoto: false,
-        template: this.story.template ?? 'CLASSIC',
+        // An unknown stored value reads as Classic, so a picker tile is always the checked one.
+        template: NEWS_TEMPLATES.some(t => t.value === this.story?.template) ? this.story.template : 'CLASSIC',
       };
       this.keepsExisting.set(this.story.hasPhoto);
     }

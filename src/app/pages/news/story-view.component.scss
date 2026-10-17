@@ -61,6 +61,11 @@ figure.side {
   }
 }
 
+/* Lines beside the float are short; justified text would gap, so keep them ragged. */
+.view-side-photo .text p {
+  text-align: start;
+}
+
 /* ---- Notice: centred inside a warning-coloured box, no photo ---- */
 .box {
   padding: 22px 18px 8px;

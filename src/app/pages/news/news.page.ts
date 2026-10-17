@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonRefresher, IonRefresherContent, ModalController, ViewWillEnter
 } from '@ionic/angular';
@@ -27,8 +27,19 @@ export class NewspaperPage implements ViewWillEnter {
     this.stories.revisit();
   }
 
+  /** True while a story modal is being created and presented, so a double tap opens only one. */
+  readonly opening = signal(false);
+
   async open(story: NewsStory) {
-    const modal = await this.modals.create({ component: StoryModal, componentProps: { story } });
-    await modal.present();
+    if (this.opening()) {
+      return;
+    }
+    this.opening.set(true);
+    try {
+      const modal = await this.modals.create({ component: StoryModal, componentProps: { story } });
+      await modal.present();
+    } finally {
+      this.opening.set(false);
+    }
   }
 }
