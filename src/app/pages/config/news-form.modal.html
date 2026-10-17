@@ -55,7 +55,7 @@
           <app-news-card [story]="draft()" [previewPhoto]="previewPhoto()" />
         </div>
       </div>
-      <button type="button" class="secondary" (click)="previewFull()">Preview full story</button>
+      <button type="button" class="secondary" [disabled]="previewing()" (click)="previewFull()">Preview full story</button>
     </div>
 
     <h3 class="form-section">Story</h3>

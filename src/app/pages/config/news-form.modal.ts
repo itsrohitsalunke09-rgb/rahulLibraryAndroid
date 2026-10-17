@@ -48,6 +48,8 @@ export class NewsFormModal implements OnInit, OnDestroy {
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly error = signal('');
+  /** The full-story preview is opening. */
+  readonly previewing = signal(false);
   /** Object URL of the newly chosen photo, for the preview. */
   readonly previewUrl = signal('');
   /** The existing photo is still kept (editing, not removed, nothing chosen to replace it). */
@@ -138,11 +140,21 @@ export class NewsFormModal implements OnInit, OnDestroy {
 
   /** Opens the story full-screen as readers will see it, before saving. */
   async previewFull() {
-    const modal = await this.modals.create({
-      component: StoryModal,
-      componentProps: { story: this.draft(), previewPhoto: this.previewPhoto() },
-    });
-    await modal.present();
+    // One preview at a time: a double tap must not stack two modals. Cleared once the preview is
+    // presented; from then on it covers the button, so the form cannot be tapped again until it closes.
+    if (this.previewing()) {
+      return;
+    }
+    this.previewing.set(true);
+    try {
+      const modal = await this.modals.create({
+        component: StoryModal,
+        componentProps: { story: this.draft(), previewPhoto: this.previewPhoto() },
+      });
+      await modal.present();
+    } finally {
+      this.previewing.set(false);
+    }
   }
 
   async choosePhoto(file: File) {

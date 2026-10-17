@@ -154,6 +154,21 @@ describe('NewsFormModal', () => {
     expect(present).toHaveBeenCalled();
   });
 
+  it('previewFullOpensOneModalOnDoubleTap', async () => {
+    const modal = create(story);
+    let presented!: () => void;
+    present.mockImplementation(() => new Promise<void>(resolve => (presented = resolve)));
+    const first = modal.previewFull();
+    const second = modal.previewFull();
+    expect(modal.previewing()).toBe(true);
+    await second;
+    await vi.waitFor(() => expect(present).toHaveBeenCalled());
+    presented();
+    await first;
+    expect(modals.create).toHaveBeenCalledTimes(1);
+    expect(modal.previewing()).toBe(false);
+  });
+
   it('editWithoutPhotoChangeSendsNoFile', () => {
     const modal = create(story);
     modal.save();
