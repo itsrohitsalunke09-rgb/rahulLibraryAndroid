@@ -9,7 +9,7 @@ import { NewsFormModal } from './news-form.modal';
 
 const story: NewsStory = {
   id: 7, headline: 'Book fair', body: 'It was fun.', eventDate: '2026-10-04', photoCaption: 'Crowd',
-  hasPhoto: true, photoVersion: 2, createdByName: 'Asha', createdAt: '2026-10-04T10:00:00', updatedAt: '2026-10-04T10:00:00',
+  hasPhoto: true, photoVersion: 2, template: 'SIDE_PHOTO', createdByName: 'Asha', createdAt: '2026-10-04T10:00:00', updatedAt: '2026-10-04T10:00:00',
 };
 
 describe('NewsFormModal', () => {
@@ -43,6 +43,24 @@ describe('NewsFormModal', () => {
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     expect(modal.form.eventDate).toBe(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`);
+  });
+
+  it('newStorySendsClassicTemplate', () => {
+    const modal = create();
+    modal.form.headline = 'Fair';
+    modal.form.body = 'Text';
+    modal.save();
+    expect(api.saveStory.mock.calls[0][0].template).toBe('CLASSIC');
+  });
+
+  it('editKeepsTheStoryTemplateAndDefaultsMissingOnesToClassic', () => {
+    let modal = create(story);
+    modal.save();
+    expect(api.saveStory.mock.calls[0][0].template).toBe('SIDE_PHOTO');
+
+    TestBed.resetTestingModule();
+    modal = create({ ...story, template: undefined as unknown as NewsStory['template'] });
+    expect(modal.form.template).toBe('CLASSIC');
   });
 
   it('editWithoutPhotoChangeSendsNoFile', () => {

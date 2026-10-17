@@ -1,0 +1,168 @@
+@use 'paper';
+
+// One card per story on the app's own surface tokens, so it follows light and dark mode.
+// Serif headline as in the paper; small sans date and excerpt read better at card size.
+
+:host {
+  display: block;
+}
+
+.card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--app-rule);
+  border-radius: 16px;
+  background: var(--app-surface);
+  color: var(--app-ink);
+  font-family: paper.$sans;
+}
+
+.body {
+  padding: 12px 14px 14px;
+}
+
+.headline {
+  margin: 0;
+  font-family: paper.$serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--app-ink);
+  overflow-wrap: anywhere;
+}
+
+.date {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+
+.excerpt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+// Grey block while the photo loads, and in its place if it fails.
+.photo,
+.thumb {
+  display: block;
+  object-fit: cover;
+  background: var(--app-rule);
+
+  &.failed {
+    color: transparent;
+  }
+}
+
+/* ---- Classic: photo strip on top ---- */
+.card-classic .photo {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  max-height: 140px;
+}
+
+/* ---- Side photo: small square beside the text ---- */
+.card-side-photo {
+  .body {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .thumb {
+    flex: none;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+  }
+
+  .beside {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .headline {
+    font-size: 17px;
+  }
+
+  .excerpt {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+/* ---- Notice: warning edge, tag, bigger headline, no photo ---- */
+.card-notice {
+  border-inline-start: 4px solid var(--ion-color-warning);
+
+  .headline {
+    font-size: 21px;
+    line-height: 1.2;
+  }
+
+  .excerpt {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+.tag {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: var(--app-rust-soft);
+  color: var(--app-rust);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---- Photo banner: headline on a dark band across the photo ---- */
+.banner {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  height: 160px;
+  background: var(--app-rule);
+
+  .photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Near-black band stays dark in both themes, so white type always reads.
+  .headline {
+    position: relative;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(12, 12, 12, 0.72);
+    color: #fff;
+  }
+}
+
+.card-photo-banner .body {
+  padding-block: 10px 12px;
+
+  .date {
+    margin: 0;
+  }
+}

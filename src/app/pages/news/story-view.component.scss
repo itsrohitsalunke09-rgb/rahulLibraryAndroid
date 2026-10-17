@@ -1,0 +1,125 @@
+@use 'paper';
+
+// The full story on newsprint (same look as the story page); the template only changes the layout.
+@include paper.tokens;
+@include paper.figure;
+@include paper.body-text;
+
+:host {
+  display: block;
+  color: var(--paper-ink);
+}
+
+.headline {
+  @include paper.headline;
+  font-size: clamp(26px, 7.2vw, 36px);
+  letter-spacing: -0.01em;
+}
+
+.byline {
+  margin: 12px 0 0;
+  padding: 8px 0;
+  border-block: 1px solid var(--paper-rule);
+  font-family: paper.$serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--paper-muted);
+}
+
+.date {
+  @include paper.kicker;
+  margin-inline-end: 6px;
+  font-style: normal;
+}
+
+.text {
+  display: flow-root; // contains the floated side photo
+  margin-top: 18px;
+}
+
+/* ---- Classic: photo on top ---- */
+.view-classic figure {
+  margin-top: 0;
+}
+
+.view-classic .photo {
+  max-height: 240px;
+}
+
+/* ---- Side photo: text wraps a small photo on the right ---- */
+figure.side {
+  float: right;
+  width: 120px;
+  margin: 4px 0 8px 14px;
+
+  .photo {
+    aspect-ratio: 1;
+  }
+
+  figcaption {
+    font-size: 12px;
+  }
+}
+
+/* ---- Notice: centred inside a warning-coloured box, no photo ---- */
+.box {
+  padding: 22px 18px 8px;
+  border: 2px solid var(--ion-color-warning);
+  border-radius: 14px;
+  text-align: center;
+
+  .byline {
+    border-color: transparent;
+  }
+
+  .text p {
+    text-align: center;
+    hyphens: manual;
+  }
+}
+
+.tag {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--app-rust-soft);
+  color: var(--app-rust);
+  font-family: paper.$sans;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---- Photo banner: headline on a dark band across the photo ---- */
+.view-photo-banner figure {
+  margin-top: 0;
+}
+
+// The photo fills the box behind the headline; a very long headline grows the banner instead of spilling out.
+.banner {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 240px;
+  background: var(--paper-blank);
+
+  .photo {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  // Near-black band stays dark in both themes, so white type always reads.
+  // Positioned so it paints above the photo (whose filter puts it on its own layer).
+  .headline {
+    position: relative;
+    width: 100%;
+    padding: 12px 16px 14px;
+    background: rgba(12, 12, 12, 0.72);
+    color: #fff;
+    font-size: clamp(22px, 6.4vw, 30px);
+  }
+}

@@ -1,0 +1,49 @@
+<ng-template #photo let-cls>
+  @if (previewPhoto(); as url) {
+    <img [class]="cls" [src]="url" alt="" />
+  } @else {
+    <img [class]="cls" [appStoryPhoto]="story()" alt="" />
+  }
+</ng-template>
+
+<article class="card" [class]="cssClass()">
+  @switch (template()) {
+    @case ('PHOTO_BANNER') {
+      <div class="banner">
+        <ng-container *ngTemplateOutlet="photo; context: { $implicit: 'photo' }" />
+        <h2 class="headline">{{ story().headline }}</h2>
+      </div>
+      <div class="body">
+        <p class="date">{{ story().eventDate | shortDate }}</p>
+      </div>
+    }
+    @case ('SIDE_PHOTO') {
+      <div class="body">
+        <ng-container *ngTemplateOutlet="photo; context: { $implicit: 'thumb' }" />
+        <div class="beside">
+          <h2 class="headline">{{ story().headline }}</h2>
+          <p class="date">{{ story().eventDate | shortDate }}</p>
+          <p class="excerpt">{{ excerpt() }}</p>
+        </div>
+      </div>
+    }
+    @case ('NOTICE') {
+      <div class="body">
+        <span class="tag">Notice</span>
+        <h2 class="headline">{{ story().headline }}</h2>
+        <p class="date">{{ story().eventDate | shortDate }}</p>
+        <p class="excerpt">{{ excerpt() }}</p>
+      </div>
+    }
+    @default {
+      @if (showsPhoto()) {
+        <ng-container *ngTemplateOutlet="photo; context: { $implicit: 'photo' }" />
+      }
+      <div class="body">
+        <h2 class="headline">{{ story().headline }}</h2>
+        <p class="date">{{ story().eventDate | shortDate }}</p>
+        <p class="excerpt">{{ excerpt() }}</p>
+      </div>
+    }
+  }
+</article>

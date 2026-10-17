@@ -131,6 +131,9 @@ export interface UnlinkedCategory {
   books: number;
 }
 
+/** How a story's card and its full page are laid out. */
+export type NewsTemplate = 'CLASSIC' | 'SIDE_PHOTO' | 'NOTICE' | 'PHOTO_BANNER';
+
 export interface NewsStory {
   id: number;
   headline: string;
@@ -141,6 +144,7 @@ export interface NewsStory {
   hasPhoto: boolean;
   /** Bumps whenever the photo changes, so cached images refresh. */
   photoVersion: number;
+  template: NewsTemplate;
   createdByName: string;
   createdAt: string;
   updatedAt: string;
@@ -152,6 +156,7 @@ export interface NewsStoryRequest {
   eventDate: string;
   photoCaption?: string | null;
   removePhoto: boolean;
+  template: NewsTemplate;
 }
 
 export interface Page<T> {

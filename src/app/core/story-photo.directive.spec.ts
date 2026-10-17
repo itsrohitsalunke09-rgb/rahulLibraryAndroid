@@ -14,6 +14,7 @@ const story = (over: Partial<NewsStory> = {}): NewsStory => ({
   eventDate: '2026-10-01',
   hasPhoto: true,
   photoVersion: 1,
+  template: 'CLASSIC',
   createdByName: 'a',
   createdAt: '',
   updatedAt: '',

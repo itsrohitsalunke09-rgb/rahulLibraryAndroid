@@ -1,0 +1,73 @@
+<ng-template #photo>
+  @if (previewPhoto(); as url) {
+    <img class="photo" [src]="url" alt="" />
+  } @else {
+    <img class="photo" [appStoryPhoto]="story()" alt="" />
+  }
+</ng-template>
+
+<ng-template #caption>
+  @if (story().photoCaption) {
+    <figcaption>{{ story().photoCaption }}</figcaption>
+  }
+</ng-template>
+
+<ng-template #headline>
+  <h1 class="headline">{{ story().headline }}</h1>
+</ng-template>
+
+<ng-template #byline>
+  <p class="byline"><span class="date">{{ story().eventDate | shortDate }}</span> By {{ story().createdByName }}</p>
+</ng-template>
+
+<ng-template #paras>
+  @for (p of paragraphs(); track $index) {
+    <p [class.cap]="$first && capAllowed() && hasDropCap(p)">{{ p }}</p>
+  }
+</ng-template>
+
+<article class="view" [class]="cssClass()">
+  @switch (template()) {
+    @case ('PHOTO_BANNER') {
+      <figure>
+        <div class="banner">
+          <ng-container *ngTemplateOutlet="photo" />
+          <ng-container *ngTemplateOutlet="headline" />
+        </div>
+        <ng-container *ngTemplateOutlet="caption" />
+      </figure>
+      <ng-container *ngTemplateOutlet="byline" />
+      <div class="text"><ng-container *ngTemplateOutlet="paras" /></div>
+    }
+    @case ('SIDE_PHOTO') {
+      <ng-container *ngTemplateOutlet="headline" />
+      <ng-container *ngTemplateOutlet="byline" />
+      <div class="text">
+        <figure class="side">
+          <ng-container *ngTemplateOutlet="photo" />
+          <ng-container *ngTemplateOutlet="caption" />
+        </figure>
+        <ng-container *ngTemplateOutlet="paras" />
+      </div>
+    }
+    @case ('NOTICE') {
+      <div class="box">
+        <span class="tag">Notice</span>
+        <ng-container *ngTemplateOutlet="headline" />
+        <ng-container *ngTemplateOutlet="byline" />
+        <div class="text"><ng-container *ngTemplateOutlet="paras" /></div>
+      </div>
+    }
+    @default {
+      @if (showsPhoto()) {
+        <figure>
+          <ng-container *ngTemplateOutlet="photo" />
+          <ng-container *ngTemplateOutlet="caption" />
+        </figure>
+      }
+      <ng-container *ngTemplateOutlet="headline" />
+      <ng-container *ngTemplateOutlet="byline" />
+      <div class="text"><ng-container *ngTemplateOutlet="paras" /></div>
+    }
+  }
+</article>

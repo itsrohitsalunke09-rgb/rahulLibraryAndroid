@@ -8,7 +8,7 @@ import { NewspaperPage } from './news.page';
 
 const story = (id: number): NewsStory => ({
   id, headline: `Headline ${id}`, body: `Body of story ${id}.\n\nSecond paragraph.`, eventDate: '2026-10-04',
-  photoCaption: null, hasPhoto: false, photoVersion: 0, createdByName: 'Asha',
+  photoCaption: null, hasPhoto: false, photoVersion: 0, template: 'CLASSIC', createdByName: 'Asha',
   createdAt: '2026-10-04T10:00:00', updatedAt: '2026-10-04T10:00:00',
 });
 

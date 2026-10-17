@@ -51,7 +51,8 @@ export class NewsFormModal implements OnInit, OnDestroy {
   private modals = inject(ModalController);
   private ui = inject(UiService);
 
-  form: NewsStoryRequest = { headline: '', body: '', eventDate: today(), photoCaption: '', removePhoto: false };
+  form: NewsStoryRequest = { headline: '', body: '', eventDate: today(), photoCaption: '', removePhoto: false,
+    template: 'CLASSIC' };
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly error = signal('');
@@ -72,6 +73,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
         eventDate: this.story.eventDate,
         photoCaption: this.story.photoCaption ?? '',
         removePhoto: false,
+        template: this.story.template ?? 'CLASSIC',
       };
       this.keepsExisting.set(this.story.hasPhoto);
     }
@@ -124,6 +126,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
       eventDate: this.form.eventDate,
       photoCaption: this.hasPhoto() ? (this.form.photoCaption ?? '').trim() || null : null,
       removePhoto: this.form.removePhoto,
+      template: this.form.template,
     };
     if (!request.headline || !request.body || !request.eventDate) {
       this.error.set('Add a headline, the story and its date.');
