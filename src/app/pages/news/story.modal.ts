@@ -1,16 +1,14 @@
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { Component, Input, inject, signal } from '@angular/core';
 import { IonContent, ModalController } from '@ionic/angular';
 import { NewsStory } from '../../core/models';
-import { ShortDatePipe } from '../../core/pipes';
-import { StoryPhotoDirective } from '../../core/story-photo.directive';
-import { hasDropCap, paragraphs } from './paragraphs';
+import { StoryViewComponent } from './story-view.component';
 
-/** One story in full, set like a newspaper article page. */
+/** One story in full, in its template layout. */
 @Component({
   selector: 'app-story',
   templateUrl: 'story.modal.html',
   styleUrls: ['story.modal.scss'],
-  imports: [IonContent, ShortDatePipe, StoryPhotoDirective],
+  imports: [IonContent, StoryViewComponent],
 })
 export class StoryModal {
   private modals = inject(ModalController);
@@ -23,9 +21,8 @@ export class StoryModal {
     return this.current()!;
   }
 
-  readonly paragraphs = computed(() => paragraphs(this.current()?.body ?? ''));
-
-  readonly hasDropCap = hasDropCap;
+  /** Object URL of a photo picked in the form, shown instead of the saved one. */
+  @Input() previewPhoto: string | null = null;
 
   close() {
     this.modals.dismiss();

@@ -3,60 +3,33 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="sheet">
-    <!-- The masthead is fixed text, so it shows at once; only the stories wait for the server. -->
-    <header class="masthead">
-      <h1 class="nameplate">राहुल सार्वजनिक वाचनालय</h1>
-      <p class="dateline"><span>{{ today }}</span><span>Shindewadi</span></p>
-    </header>
+  <!-- The header is fixed text, so it shows at once; only the stories wait for the server. -->
+  <header class="header">
+    <h1 class="name">राहुल सार्वजनिक वाचनालय</h1>
+    <p class="date">{{ today }}</p>
+  </header>
 
+  <div class="list">
     @if (stories.error()) {
       <p class="page-error" role="alert">{{ stories.error() }}</p>
     }
 
     @if (stories.loaded()) {
-      @if (lead(); as s) {
-        <article class="lead" (click)="open(s)">
-          <p class="kicker">{{ s.eventDate | shortDate }}</p>
-          <h2 class="headline">{{ s.headline }}</h2>
-          @if (s.hasPhoto) {
-            <figure>
-              <img class="photo" [appStoryPhoto]="s" alt="" />
-              @if (s.photoCaption) {
-                <figcaption>{{ s.photoCaption }}</figcaption>
-              }
-            </figure>
+      @if (stories.items().length) {
+        <div class="cards">
+          @for (s of stories.items(); track s.id) {
+            <button type="button" class="card-button" [attr.aria-label]="s.headline" (click)="open(s)">
+              <app-news-card [story]="s" />
+            </button>
           }
-          <div class="text"><p [class.cap]="hasDropCap(firstParagraph(s))">{{ firstParagraph(s) }}</p></div>
-          <button type="button" class="more" [attr.aria-label]="'Continue reading: ' + s.headline">Continue reading →</button>
-        </article>
+        </div>
       } @else if (!stories.error()) {
         <p class="empty">No news yet — the librarian's stories will appear here.</p>
       }
-
-      @if (others().length) {
-        <div class="stories">
-          @for (s of others(); track s.id) {
-            <article class="story" (click)="open(s)">
-              <h3 class="headline">{{ s.headline }}</h3>
-              <p class="kicker">{{ s.eventDate | shortDate }}</p>
-              @if (s.hasPhoto) {
-                <img class="thumb" [appStoryPhoto]="s" alt="" />
-              }
-              <p class="excerpt">{{ firstParagraph(s) }}</p>
-              <button type="button" class="more" [attr.aria-label]="'Continue reading: ' + s.headline">Continue reading →</button>
-            </article>
-          }
-        </div>
-      }
     } @else if (!stories.error()) {
-      <div class="skeleton" role="status" aria-label="Loading the news">
-        <span class="bar short"></span>
-        <span class="bar title"></span>
-        <span class="block"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar short"></span>
+      <div class="cards" role="status" aria-label="Loading the news">
+        <span class="skeleton"></span>
+        <span class="skeleton"></span>
       </div>
     }
   </div>

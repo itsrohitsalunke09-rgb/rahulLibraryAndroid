@@ -31,18 +31,37 @@ describe('NewspaperPage', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('rendersMastheadLeadAndOtherStories', () => {
-    const el = render(of(page([story(1), story(2), story(3)])));
-    expect(el.querySelector('.masthead')?.textContent).toContain('राहुल सार्वजनिक वाचनालय');
-    expect(el.querySelector('.lead')?.textContent).toContain('Headline 1');
-    expect(el.querySelectorAll('.story').length).toBe(2);
+  it('rendersSlimHeaderWithNameAndDate', () => {
+    const el = render(of(page([story(1)])));
+    const header = el.querySelector('.header')?.textContent ?? '';
+    expect(header).toContain('राहुल सार्वजनिक वाचनालय');
+    expect(header).toContain(new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
   });
 
-  it('addsDropCapOnlyToALatinLead', () => {
-    const marathi = { ...story(1), body: 'डॉ. आंबेडकर जयंती साजरी झाली.' };
-    expect(render(of(page([marathi]))).querySelector('.lead .text p')?.classList.contains('cap')).toBe(false);
-    TestBed.resetTestingModule();
-    expect(render(of(page([story(1)]))).querySelector('.lead .text p')?.classList.contains('cap')).toBe(true);
+  it('rendersOneCardPerStory', () => {
+    const el = render(of(page([story(1), story(2), story(3)])));
+    expect(el.querySelectorAll('app-news-card').length).toBe(3);
+    expect(el.querySelector('button.card-button')?.getAttribute('aria-label')).toBe('Headline 1');
+  });
+
+  it('opensTheStoryModalWhenACardIsTapped', async () => {
+    const present = vi.fn();
+    const create = vi.fn(() => Promise.resolve({ present }));
+    TestBed.configureTestingModule({
+      imports: [NewspaperPage],
+      providers: [
+        { provide: ApiService, useValue: { news: vi.fn(() => of(page([story(1), story(2)]))), storyPhoto: vi.fn(() => of(new Blob())) } },
+        { provide: ModalController, useValue: { create } },
+      ],
+    });
+    const fixture = TestBed.createComponent(NewspaperPage);
+    fixture.componentInstance.ionViewWillEnter();
+    fixture.detectChanges();
+    const buttons = (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('button.card-button');
+    buttons[1].click();
+    await Promise.resolve();
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ componentProps: { story: expect.objectContaining({ id: 2 }) } }));
+    expect(present).toHaveBeenCalled();
   });
 
   it('showsEmptyState', () => {

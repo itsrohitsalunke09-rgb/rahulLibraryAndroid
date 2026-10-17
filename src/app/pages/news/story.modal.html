@@ -7,24 +7,6 @@
       </button>
     </div>
 
-    <article>
-      <p class="kicker">{{ story.eventDate | shortDate }}</p>
-      <h1 class="headline">{{ story.headline }}</h1>
-      <p class="byline">By {{ story.createdByName }}</p>
-      @if (story.hasPhoto) {
-        <figure>
-          <img class="photo" [appStoryPhoto]="story" alt="" />
-          @if (story.photoCaption) {
-            <figcaption>{{ story.photoCaption }}</figcaption>
-          }
-        </figure>
-      }
-      <div class="text">
-        @for (p of paragraphs(); track $index) {
-          <p [class.cap]="$first && hasDropCap(p)">{{ p }}</p>
-        }
-      </div>
-      <p class="end" aria-hidden="true">■</p>
-    </article>
+    <app-story-view [story]="story" [previewPhoto]="previewPhoto" />
   </div>
 </ion-content>
