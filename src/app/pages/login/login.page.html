@@ -1,29 +1,33 @@
-<!-- Built from Figma "rahul-library" › Login Page - Mobile (node 1:118). -->
+<!-- Built from Figma "rahul-library" › Airy aqua modernism (node 68:1608). -->
 <ion-content [fullscreen]="true">
-  <div class="page">
-    <div class="band" aria-hidden="true"></div>
+  <div class="stage">
+    <!-- Decoration: soft aqua shapes behind the host. -->
+    <img class="backdrop" src="assets/login/sculptural-backdrop.svg" width="485" height="423" alt="" />
+    <img class="accent" src="assets/login/floating-accent.svg" width="106" height="106" alt="" />
 
-    <header class="hero">
-      <h1>Rahul Library</h1>
-      <img class="art" src="assets/login/student.png" width="642" height="456" alt="" />
+    <header class="masthead">
+      <h1 class="marathi" lang="mr">राहुल वाचनालय</h1>
+      <p class="place marathi" lang="mr">शिंदेवाडी</p>
     </header>
 
-    <main class="form-area">
-      <form (ngSubmit)="submit()">
-        <label class="field">
-          <span class="field-label">Username</span>
-          <img src="assets/login/user.svg" width="20" height="20" alt="" />
+    <img class="host" src="assets/login/papa.png" width="1024" height="1536" alt="" />
+
+    <form id="login-form" class="credentials" (ngSubmit)="submit()">
+      <label class="field">
+        <span class="field-label">Username</span>
+        <span class="input">
           <input
             name="username"
             placeholder="username"
             autocomplete="username"
             autocapitalize="off"
             [(ngModel)]="username" />
-        </label>
+        </span>
+      </label>
 
-        <label class="field">
-          <span class="field-label">Password</span>
-          <img src="assets/login/lock.svg" width="20" height="20" alt="" />
+      <label class="field">
+        <span class="field-label">Password</span>
+        <span class="input">
           <input
             name="password"
             placeholder="Enter your password"
@@ -34,6 +38,7 @@
             type="button"
             class="eye"
             [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="showPassword()"
             (click)="showPassword.set(!showPassword())">
             @if (showPassword()) {
               <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
@@ -41,29 +46,32 @@
               <img src="assets/login/eye-off.svg" width="16" height="16" alt="" />
             }
           </button>
-        </label>
+        </span>
+      </label>
 
-        <button type="button" class="text-link forgot" (click)="forgotPassword()">Forgot Password</button>
+      <button type="button" class="forgot" (click)="forgotPassword()">Forgot Password</button>
 
-        @if (error()) {
-          <p class="form-error" role="alert">{{ error() }}</p>
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+
+    </form>
+
+    <div class="actions">
+      <!-- Sits in the bottom group but submits the form above (so Enter works too). -->
+      <button type="submit" form="login-form" class="login" [disabled]="loading()">
+        @if (loading()) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <span>Login</span>
+          <img src="assets/login/arrow-right.svg" width="22" height="22" alt="" />
         }
-
-        <button type="submit" class="login" [disabled]="loading()">
-          @if (loading()) {
-            <ion-spinner name="crescent"></ion-spinner>
-          } @else {
-            Login
-          }
-        </button>
-      </form>
+      </button>
 
       <footer class="links">
-        <button type="button" class="text-link about" (click)="aboutUs()">About us</button>
-        <p class="switch">
-          <span>Don’t have an account?</span> <a routerLink="/register">Sign up</a>
-        </p>
+        <button type="button" class="about" (click)="aboutUs()">About us</button>
+        <p class="switch">Don’t have an account? <a routerLink="/register">Sign up</a></p>
       </footer>
-    </main>
+    </div>
   </div>
 </ion-content>
