@@ -8,6 +8,7 @@ import { NewsStory } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { ShortDatePipe } from '../../core/pipes';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
+import { templateLabel } from '../news/templates';
 import { NewsFormModal } from './news-form.modal';
 
 /** News & events master: list, search, add, edit and delete stories. */
@@ -26,6 +27,7 @@ export class NewsPage implements ViewWillEnter {
 
   readonly stories = new PagedList<NewsStory>((page, size) => this.api.news(page, size), 'Could not load the stories.');
   readonly query = signal('');
+  readonly templateLabel = templateLabel;
   readonly shown = computed(() => {
     const q = this.query().toLowerCase();
     return this.stories.items().filter(s => !q || s.headline.toLowerCase().includes(q));

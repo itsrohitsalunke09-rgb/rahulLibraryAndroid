@@ -1,0 +1,82 @@
+@use 'template-sketch';
+
+.form { padding: 0 0 24px; max-width: 520px; margin: 0 auto; }
+.body textarea { field-sizing: content; min-height: 130px; }
+.photo-input { display: none; }
+.choose { width: 100%; font: inherit; font-size: 14px; text-align: start; cursor: pointer; }
+.preview { display: block; width: 100%; max-height: 240px; object-fit: cover; border-radius: 14px; background: var(--app-rule); }
+.preview.failed { min-height: 120px; color: transparent; }
+.hint { margin: 0; }
+
+/* ---- Template picker: 2×2 tiles, one row of four once there is room ---- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.tile {
+  display: grid;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 8px 9px;
+  border: 1.5px solid var(--app-rule);
+  border-radius: 16px;
+  background: var(--app-paper);
+  color: var(--app-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+
+  &.on {
+    border-color: var(--app-ink);
+    background: rgba(var(--app-ink-rgb), 0.08);
+    color: var(--app-ink);
+    font-weight: 600;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-ink);
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Live preview on a strip of page colour, like the News tab behind a card ---- */
+.stage {
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--app-paper);
+}
+
+/* Outline pill buttons: preview, replace, remove. */
+.secondary,
+.photo-actions button {
+  height: 44px;
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--app-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.secondary { width: 100%; font-size: 14px; }
+.photo-actions { display: flex; gap: 8px; margin-top: 8px; }
+.photo-actions button { flex: 1; }
+.photo-actions .remove { color: var(--app-rust); }
+
+.delete {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 44px;
+  margin-top: 28px; border: 1px solid var(--app-rust); border-radius: var(--app-radius-control);
+  background: transparent; color: var(--app-rust); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.delete:disabled { opacity: 0.6; }
+.delete .icon { --icon-size: 17px; }

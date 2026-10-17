@@ -5,9 +5,15 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
-import { NewsStory, NewsStoryRequest } from '../../core/models';
+import { NewsStory, NewsStoryRequest, NewsTemplate } from '../../core/models';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
 import { UiService, errorMessage } from '../../core/ui.service';
+import { NewsCardComponent } from '../news/news-card.component';
+import { StoryModal } from '../news/story.modal';
+import { NEWS_TEMPLATES, templateClass } from '../news/templates';
+
+/** Arrow keys that move the template choice, and which way. */
+const ARROW_STEPS: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
 
 /** Today as YYYY-MM-DD in the device's time zone. */
 function today(): string {
@@ -16,32 +22,18 @@ function today(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-/** Add or edit one news story with an optional photo; editing also offers Delete. */
+/**
+ * Add or edit one news story with an optional photo; editing also offers Delete.
+ * A template picker on top shows a live card preview, and the full story on request.
+ */
 @Component({
   selector: 'app-news-form',
   templateUrl: 'news-form.modal.html',
-  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSpinner, StoryPhotoDirective],
-  styles: [`
-    .form { padding: 0 0 24px; max-width: 520px; margin: 0 auto; }
-    .body textarea { field-sizing: content; min-height: 130px; }
-    .photo-input { display: none; }
-    .choose { width: 100%; font: inherit; font-size: 14px; text-align: start; cursor: pointer; }
-    .preview { display: block; width: 100%; max-height: 240px; object-fit: cover; border-radius: 14px; background: var(--app-rule); }
-    .preview.failed { min-height: 120px; color: transparent; }
-    .photo-actions { display: flex; gap: 8px; margin-top: 8px; }
-    .photo-actions button {
-      flex: 1; height: 38px; border: 1px solid var(--app-rule); border-radius: var(--app-radius-control);
-      background: transparent; color: var(--app-ink); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
-    }
-    .photo-actions .remove { color: var(--app-rust); }
-    .delete {
-      display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 44px;
-      margin-top: 28px; border: 1px solid var(--app-rust); border-radius: var(--app-radius-control);
-      background: transparent; color: var(--app-rust); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
-    }
-    .delete:disabled { opacity: 0.6; }
-    .delete .icon { --icon-size: 17px; }
-  `],
+  styleUrls: ['news-form.modal.scss'],
+  imports: [
+    FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonSpinner, StoryPhotoDirective,
+    NewsCardComponent
+  ],
 })
 export class NewsFormModal implements OnInit, OnDestroy {
   /** Story to edit; leave empty to add a new one. */
@@ -62,6 +54,39 @@ export class NewsFormModal implements OnInit, OnDestroy {
   readonly keepsExisting = signal(false);
   readonly hasPhoto = computed(() => !!this.previewUrl() || this.keepsExisting());
 
+  readonly templates = NEWS_TEMPLATES;
+  readonly templateClass = templateClass;
+  /**
+   * Bumped whenever a field changes. `form` is a plain object for ngModel, so this is what lets
+   * the computed previews below rebuild only when the staff member actually edits something.
+   */
+  private readonly edits = signal(0);
+  readonly template = computed(() => {
+    this.edits();
+    return this.form.template;
+  });
+  /** The story as it would be saved, with placeholders for empty fields, for the previews. */
+  readonly draft = computed<NewsStory>(() => {
+    this.edits();
+    const f = this.form;
+    const hasPhoto = this.hasPhoto();
+    return {
+      id: this.story?.id ?? 0,
+      headline: f.headline.trim() || 'Your headline',
+      body: f.body.trim() || 'The story text…',
+      eventDate: f.eventDate || today(),
+      photoCaption: hasPhoto ? (f.photoCaption ?? '').trim() || null : null,
+      hasPhoto,
+      photoVersion: this.story?.photoVersion ?? 0,
+      template: f.template,
+      createdByName: this.story?.createdByName ?? '',
+      createdAt: this.story?.createdAt ?? '',
+      updatedAt: this.story?.updatedAt ?? '',
+    };
+  });
+  /** The newly chosen photo; null lets the previews load the saved one themselves. */
+  readonly previewPhoto = computed(() => this.previewUrl() || null);
+
   /** The shrunk photo to upload, if one was chosen. */
   private photo: Blob | null = null;
 
@@ -77,6 +102,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
       };
       this.keepsExisting.set(this.story.hasPhoto);
     }
+    this.changed();
   }
 
   ngOnDestroy() {
@@ -85,6 +111,38 @@ export class NewsFormModal implements OnInit, OnDestroy {
 
   cancel() {
     this.modals.dismiss(null, 'cancel');
+  }
+
+  /** A form field changed; refresh the previews. */
+  changed() {
+    this.edits.update(n => n + 1);
+  }
+
+  chooseTemplate(template: NewsTemplate) {
+    this.form.template = template;
+    this.changed();
+  }
+
+  /** Radio-group arrow keys: move the choice to the next or previous tile and focus it. */
+  onTileKey(event: KeyboardEvent, index: number) {
+    const step = ARROW_STEPS[event.key];
+    if (!step) {
+      return;
+    }
+    event.preventDefault();
+    const next = (index + step + this.templates.length) % this.templates.length;
+    this.chooseTemplate(this.templates[next].value);
+    const tiles = (event.currentTarget as HTMLElement).parentElement?.children;
+    (tiles?.[next] as HTMLElement | undefined)?.focus();
+  }
+
+  /** Opens the story full-screen as readers will see it, before saving. */
+  async previewFull() {
+    const modal = await this.modals.create({
+      component: StoryModal,
+      componentProps: { story: this.draft(), previewPhoto: this.previewPhoto() },
+    });
+    await modal.present();
   }
 
   async choosePhoto(file: File) {

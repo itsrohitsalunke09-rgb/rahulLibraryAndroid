@@ -18,60 +18,105 @@
       <p class="form-error" role="alert">{{ error() }}</p>
     }
 
+    <h3 class="form-section">Template</h3>
+    <div class="form-card">
+      <div class="tiles" role="radiogroup" aria-label="Story template">
+        @for (t of templates; track t.value; let i = $index) {
+          <button type="button" role="radio" class="tile" [class.on]="template() === t.value"
+                  [attr.aria-checked]="template() === t.value" [attr.tabindex]="template() === t.value ? 0 : -1"
+                  (click)="chooseTemplate(t.value)" (keydown)="onTileKey($event, i)">
+            <span [class]="'sketch ' + templateClass(t.value)" aria-hidden="true">
+              @switch (t.value) {
+                @case ('SIDE_PHOTO') {
+                  <i class="ph"></i><span class="col"><i class="hl"></i><i class="ln"></i><i class="ln short"></i></span>
+                }
+                @case ('NOTICE') {
+                  <i class="tg"></i><i class="hl"></i><i class="ln"></i><i class="ln short"></i>
+                }
+                @case ('PHOTO_BANNER') {
+                  <span class="ph"><i class="band"></i></span><i class="ln short"></i>
+                }
+                @default {
+                  <i class="ph"></i><i class="hl"></i><i class="ln short"></i>
+                }
+              }
+            </span>
+            <span class="tile-label">{{ t.label }}</span>
+          </button>
+        }
+      </div>
+      @if (template() === 'NOTICE') {
+        <p class="form-helper hint">Notices don't show a photo.</p>
+      }
+
+      <div class="form-field">
+        <span class="form-label">How it looks in News</span>
+        <div class="stage">
+          <app-news-card [story]="draft()" [previewPhoto]="previewPhoto()" />
+        </div>
+      </div>
+      <button type="button" class="secondary" (click)="previewFull()">Preview full story</button>
+    </div>
+
     <h3 class="form-section">Story</h3>
     <div class="form-card">
       <label class="form-field">
         <span class="form-label">Headline *</span>
         <span class="form-box">
-          <input class="marathi" name="headline" maxlength="150" [(ngModel)]="form.headline" />
+          <input class="marathi" name="headline" maxlength="150" [(ngModel)]="form.headline" (ngModelChange)="changed()" />
         </span>
       </label>
       <label class="form-field">
         <span class="form-label">Event date *</span>
         <span class="form-box">
           <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
-          <input name="eventDate" type="date" [(ngModel)]="form.eventDate" />
+          <input name="eventDate" type="date" [(ngModel)]="form.eventDate" (ngModelChange)="changed()" />
         </span>
       </label>
       <label class="form-field">
         <span class="form-label">Story *</span>
         <span class="form-box tall body">
-          <textarea class="marathi" name="body" rows="6" maxlength="10000" [(ngModel)]="form.body"></textarea>
+          <textarea class="marathi" name="body" rows="6" maxlength="10000" [(ngModel)]="form.body" (ngModelChange)="changed()"></textarea>
         </span>
         <span class="form-helper">A blank line starts a new paragraph.</span>
       </label>
     </div>
 
-    <h3 class="form-section">Photo</h3>
-    <div class="form-card">
-      <input #file class="photo-input" type="file" accept="image/*" (change)="onFilePicked(file)" />
-      <div class="form-field">
-        @if (hasPhoto()) {
-          @if (previewUrl()) {
-            <img class="preview" [src]="previewUrl()" alt="Chosen photo" />
-          } @else if (story) {
-            <img class="preview" [appStoryPhoto]="story" alt="Current photo" />
+    @if (template() !== 'NOTICE') {
+      <h3 class="form-section">Photo</h3>
+      <div class="form-card">
+        <input #file class="photo-input" type="file" accept="image/*" (change)="onFilePicked(file)" />
+        <div class="form-field">
+          @if (hasPhoto()) {
+            @if (previewUrl()) {
+              <img class="preview" [src]="previewUrl()" alt="Chosen photo" />
+            } @else if (story) {
+              <img class="preview" [appStoryPhoto]="story" alt="Current photo" />
+            }
+            <div class="photo-actions">
+              <button type="button" (click)="file.click()">Replace</button>
+              <button type="button" class="remove" (click)="removePhoto()">Remove</button>
+            </div>
+          } @else {
+            <button type="button" class="form-box choose" (click)="file.click()">
+              <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+              Choose photo
+            </button>
+            @if (template() === 'PHOTO_BANNER') {
+              <span class="form-helper">Add a photo for the banner — without one it shows as Classic.</span>
+            }
           }
-          <div class="photo-actions">
-            <button type="button" (click)="file.click()">Replace</button>
-            <button type="button" class="remove" (click)="removePhoto()">Remove</button>
-          </div>
-        } @else {
-          <button type="button" class="form-box choose" (click)="file.click()">
-            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
-            Choose photo
-          </button>
+        </div>
+        @if (hasPhoto()) {
+          <label class="form-field">
+            <span class="form-label">Caption</span>
+            <span class="form-box">
+              <input class="marathi" name="photoCaption" maxlength="200" [(ngModel)]="form.photoCaption" (ngModelChange)="changed()" />
+            </span>
+          </label>
         }
       </div>
-      @if (hasPhoto()) {
-        <label class="form-field">
-          <span class="form-label">Caption</span>
-          <span class="form-box">
-            <input class="marathi" name="photoCaption" maxlength="200" [(ngModel)]="form.photoCaption" />
-          </span>
-        </label>
-      }
-    </div>
+    }
 
     @if (story) {
       <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">

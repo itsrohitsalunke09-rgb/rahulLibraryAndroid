@@ -45,3 +45,21 @@ ion-item {
   --icon-size: 32px;
   color: var(--app-ink);
 }
+
+/* Date with the story's template as a small tag after it. */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.template-tag {
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(var(--app-ink-rgb), 0.08);
+  color: var(--app-ink);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}

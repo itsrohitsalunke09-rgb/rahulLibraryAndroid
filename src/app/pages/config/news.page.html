@@ -33,7 +33,7 @@
             <img slot="start" class="thumb" [appStoryPhoto]="s" alt="" />
             <ion-label>
               <h2 class="marathi">{{ s.headline }}</h2>
-              <p>{{ s.eventDate | shortDate }}</p>
+              <p class="meta">{{ s.eventDate | shortDate }}<span class="template-tag">{{ templateLabel(s.template) }}</span></p>
             </ion-label>
             <span slot="end" class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
           </ion-item>

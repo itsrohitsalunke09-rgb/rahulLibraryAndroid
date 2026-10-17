@@ -1,0 +1,96 @@
+// Tiny drawings of each news card layout for the template picker tiles.
+// Grey blocks stand for photos, ink bars for the headline and text lines.
+
+.sketch {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 56px;
+  padding: 6px;
+  overflow: hidden;
+  border: 1px solid var(--app-rule);
+  border-radius: 8px;
+  background: var(--app-surface);
+
+  i {
+    display: block;
+    flex: none;
+    border-radius: 2px;
+  }
+
+  .ph {
+    flex: 1;
+    border-radius: 3px;
+    background: var(--app-rule-strong);
+  }
+
+  .hl {
+    width: 82%;
+    height: 5px;
+    background: rgba(var(--app-ink-rgb), 0.55);
+  }
+
+  .ln {
+    width: 100%;
+    height: 3px;
+    background: rgba(var(--app-ink-rgb), 0.22);
+  }
+
+  .short {
+    width: 58%;
+  }
+}
+
+// Square photo beside a column of lines.
+.side-photo {
+  flex-direction: row;
+  gap: 5px;
+
+  .ph {
+    flex: none;
+    width: 20px;
+    height: 20px;
+  }
+
+  .col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+// Warning edge, tag pill, bigger headline, no photo.
+.notice {
+  justify-content: center;
+  border-inline-start: 3px solid var(--ion-color-warning);
+
+  .tg {
+    width: 16px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--app-rust);
+    opacity: 0.5;
+  }
+
+  .hl {
+    height: 6px;
+  }
+}
+
+// Photo filling the top with a dark headline band along its bottom.
+.photo-banner {
+  .ph {
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .band {
+    width: 100%;
+    height: 9px;
+    border-radius: 0;
+    background: rgba(12, 12, 12, 0.72);
+  }
+}
