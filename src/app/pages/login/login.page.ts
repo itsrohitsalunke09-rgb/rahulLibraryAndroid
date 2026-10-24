@@ -7,7 +7,7 @@ import {
 import { addIcons } from 'ionicons';
 import { eyeOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
-import { UiService, errorMessage } from '../../core/ui.service';
+import { errorMessage } from '../../core/ui.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,6 @@ import { UiService, errorMessage } from '../../core/ui.service';
 export class LoginPage {
   private auth = inject(AuthService);
   private router = inject(Router);
-  private ui = inject(UiService);
 
   username = '';
   password = '';
@@ -64,8 +63,7 @@ export class LoginPage {
     this.router.navigateByUrl('/forgot-password');
   }
 
-  // Placeholder until the About page is built.
   aboutUs() {
-    this.ui.toast('The About page is coming soon.', 'medium');
+    this.router.navigateByUrl('/about');
   }
 }

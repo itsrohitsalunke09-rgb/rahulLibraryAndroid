@@ -1,0 +1,90 @@
+<!-- Same look as the login screen; text from the library's 2022 souvenir "प्रगती स्मरणिका". -->
+<ion-content [fullscreen]="true">
+  <div class="stage">
+    <img class="backdrop" src="assets/login/sculptural-backdrop.svg" width="485" height="423" alt="" />
+    <img class="accent" src="assets/login/floating-accent.svg" width="106" height="106" alt="" />
+
+    <header class="masthead">
+      <h1 class="marathi" lang="mr">राहुल वाचनालय</h1>
+      <p class="place marathi" lang="mr">शिंदेवाडी</p>
+    </header>
+
+    <main class="about marathi" lang="mr">
+      <section class="intro">
+        <h2 class="title">राहुल सार्वजनिक वाचनालय, शिंदेवाडी</h2>
+        <p class="motto">"वाचाल तर वाचाल"</p>
+        <p class="meta">शासनमान्य इतर 'ब' वर्ग वाचनालय · स्थापना २८ ऑक्टोबर १९९४</p>
+        <p>
+          शिंदेवाडी (ता. माढा, जि. सोलापूर) या छोट्या गावात वाचन संस्कृती रुजवण्यासाठी ग्रंथमित्र
+          <strong>कांतीलाल दत्तू साळुंके</strong> यांनी गावातील सहकाऱ्यांच्या मदतीने हे वाचनालय सुरू केले.
+          एका छोट्या व्यापारी गाळ्यात सुरू झालेले हे वाचनालय आज गावाचे ज्ञानकेंद्र बनले आहे.
+          गावातील तिसरी पिढी आज इथे वाचन करत आहे.
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>आमचा प्रवास</h3>
+        <ol class="timeline">
+          @for (step of timeline; track step.year) {
+            <li><span class="year">{{ step.year }}</span><span>{{ step.text }}</span></li>
+          }
+        </ol>
+      </section>
+
+      <section class="card">
+        <h3>वाचनालयात काय आहे</h3>
+        <ul>
+          <li>सुमारे <strong>१०,४००</strong> ग्रंथांचा संग्रह</li>
+          <li>दररोज <strong>८ दैनिके</strong> आणि <strong>२६ नियतकालिके</strong></li>
+          <li>स्वतंत्र <strong>महिला व बाल विभाग</strong> आणि संदर्भ विभाग</li>
+          <li>१९९५ पासूनच्या <strong>५२ कात्रण वह्या</strong></li>
+          <li>दुर्मिळ ठेवा: तळहातापेक्षा लहान कुराण शरीफची प्रत आणि १७१५ सालचे पर्शियन भाषेतील वाल्मिकी रामायणाचे तीन खंड</li>
+          <li>झेरॉक्स सुविधा आणि सुसज्ज इमारत</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>आमचे उपक्रम</h3>
+        <p>
+          ग्रंथप्रदर्शन, व्याख्याने, जादूचे प्रयोग, गुणवंत विद्यार्थ्यांचा सत्कार, महिला दिन, वाचन प्रेरणा दिन
+          आणि शाळा दत्तक योजना असे उपक्रम दरवर्षी राबवले जातात. २०१५ पासून वाचनालय विविध क्षेत्रांतील
+          मान्यवरांना <strong>"कर्मवीर आमदार बबनराव शिंदे राज्यस्तरीय प्रेरणा पुरस्कार"</strong> प्रदान करते.
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>सन्मान</h3>
+        <ul>
+          <li>आदर्श वाचनालय पुरस्कार – १९९८ ('ड' वर्ग) आणि २०११ ('ब' वर्ग)</li>
+          <li>राज्यस्तरीय प्रतिभा-संग्राम पंढरी गौरव पुरस्कार – २०१८</li>
+          <li>संस्थापक अध्यक्षांना महाराष्ट्र शासनाचा राज्यस्तरीय ग्रंथमित्र पुरस्कार (२०१७–१८)</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>संपर्क</h3>
+        <p class="address">
+          राहुल सार्वजनिक वाचनालय<br />
+          मु. शिंदेवाडी, पो. सापटणे (भो), ता. माढा,<br />
+          जि. सोलापूर – ४१३ २०८
+        </p>
+        <div class="contacts">
+          <a class="contact" [href]="'mailto:' + email">
+            <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+            <span lang="en">{{ email }}</span>
+          </a>
+          <a class="contact" [href]="instagram" target="_blank" rel="noopener">
+            <ion-icon name="logo-instagram" aria-hidden="true"></ion-icon>
+            <span lang="en">rahul_public_library</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <div class="actions">
+      <footer class="links">
+        <button type="button" class="about-back" (click)="back()">Back to sign in</button>
+      </footer>
+    </div>
+  </div>
+</ion-content>

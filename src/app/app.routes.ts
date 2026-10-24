@@ -24,6 +24,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
   },
   {
+    // Open to everyone: linked from the login screen.
+    path: 'about',
+    loadComponent: () => import('./pages/about/about.page').then(m => m.AboutPage),
+  },
+  {
     path: 'tabs',
     canMatch: [authGuard],
     loadChildren: () => import('./tabs/tabs.routes').then(m => m.routes),

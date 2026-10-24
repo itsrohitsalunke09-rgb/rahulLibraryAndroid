@@ -1,0 +1,147 @@
+/* Layout on top of the login styles (login.page.scss): a scrolling column under the masthead. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.about {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(14 * var(--s));
+  margin: calc(var(--safe-top) + 165 * var(--s)) calc(20 * var(--s)) 0;
+  font-size: calc(15 * var(--s));
+  line-height: 1.6;
+  color: var(--login-ink);
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--s));
+  padding: 0 calc(4 * var(--s));
+}
+
+.title {
+  margin: 0;
+  font-size: calc(22 * var(--s));
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--login-teal);
+}
+
+.motto {
+  font-size: calc(17 * var(--s));
+  font-weight: 600;
+  color: var(--login-teal);
+}
+
+.meta {
+  font-size: calc(13 * var(--s));
+  color: var(--login-muted);
+}
+
+/* White boxes like the login inputs. */
+.card {
+  padding: calc(16 * var(--s));
+  border: 1px solid var(--login-border);
+  border-radius: calc(16 * var(--s));
+  background: var(--login-input);
+
+  h3 {
+    margin: 0 0 calc(10 * var(--s));
+    font-size: calc(17 * var(--s));
+    font-weight: 600;
+    color: var(--login-teal);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+
+  li + li {
+    margin-top: calc(6 * var(--s));
+  }
+}
+
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: calc(78 * var(--s)) 1fr;
+    gap: calc(10 * var(--s));
+  }
+
+  .year {
+    font-weight: 600;
+    color: var(--login-teal);
+  }
+}
+
+.address {
+  color: var(--login-muted);
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--s));
+  margin-top: calc(14 * var(--s));
+}
+
+/* 48px tall, full-width links so they are easy to tap. */
+.contact {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--s));
+  min-height: 48px;
+  padding: 0 calc(14 * var(--s));
+  border: 1px solid var(--login-border);
+  border-radius: 100px;
+  color: var(--login-teal);
+  font-weight: 500;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  ion-icon {
+    flex: 0 0 auto;
+    font-size: calc(20 * var(--s));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--login-teal);
+    outline-offset: 2px;
+  }
+}
+
+.actions {
+  position: relative;
+  inset: auto;
+  margin: auto calc(28 * var(--s)) 0;
+  padding: calc(24 * var(--s)) 0 calc(var(--safe-bottom) + 21 * var(--s));
+}
+
+.about-back {
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: calc(14 * var(--s));
+  font-weight: 500;
+  color: var(--login-teal);
+  cursor: pointer;
+}
