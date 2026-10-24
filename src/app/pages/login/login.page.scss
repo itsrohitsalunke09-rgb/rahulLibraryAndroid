@@ -79,12 +79,13 @@ ion-content {
   opacity: var(--login-shape-opacity);
 }
 
-/* The host fills a 289 × 566 slot in the design (as cropped there). */
+/* The host fills a 280 × 511 slot in the design (measured from the updated frame with
+   the current photo: head at y≈112, hand at x≈283, feet at y≈609). */
 .host {
-  left: calc(-21.94 * var(--s));
-  top: top-at(70.84);
-  width: calc(289.35 * var(--s));
-  height: calc(566.4 * var(--s));
+  left: calc(12.4 * var(--s));
+  top: top-at(115);
+  width: calc(280.2 * var(--s));
+  height: calc(510.6 * var(--s));
 }
 
 .masthead {
@@ -240,7 +241,7 @@ ion-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: calc(22 * var(--s));
+  gap: calc(60 * var(--s));
 }
 
 .login {
@@ -318,3 +319,4 @@ ion-content {
     text-decoration: none;
   }
 }
+
