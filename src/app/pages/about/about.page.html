@@ -1,5 +1,6 @@
 <!-- Same look as the login screen; text from the library's 2022 souvenir "प्रगती स्मरणिका". -->
-<ion-content [fullscreen]="true">
+<!-- The page itself doesn't scroll: the shapes and masthead stay put, only .scroller moves. -->
+<ion-content [fullscreen]="true" [scrollY]="false">
   <div class="stage">
     <img class="backdrop" src="assets/login/sculptural-backdrop.svg" width="485" height="423" alt="" />
     <img class="accent" src="assets/login/floating-accent.svg" width="106" height="106" alt="" />
@@ -9,7 +10,8 @@
       <p class="place marathi" lang="mr">शिंदेवाडी</p>
     </header>
 
-    <main class="about marathi" lang="mr">
+    <div class="scroller">
+    <main class="about-body marathi" lang="mr">
       <section class="intro">
         <h2 class="title">राहुल सार्वजनिक वाचनालय, शिंदेवाडी</h2>
         <p class="motto">"वाचाल तर वाचाल"</p>
@@ -85,6 +87,7 @@
       <footer class="links">
         <button type="button" class="about-back" (click)="back()">Back to sign in</button>
       </footer>
+    </div>
     </div>
   </div>
 </ion-content>
