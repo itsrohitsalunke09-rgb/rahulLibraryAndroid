@@ -163,6 +163,22 @@ export class ApiService {
     return changes(this.http.delete<void>(`${this.base}/users/${id}`));
   }
 
+  /** The user's Aadhaar card photo (staff only); 404 when none was added. */
+  aadhaarPhoto(userId: number) {
+    return this.http.get(`${this.base}/users/${userId}/aadhaar`, { responseType: 'blob' });
+  }
+
+  /** Stores or replaces the Aadhaar card photo; photo is the already-shrunk image. */
+  saveAadhaarPhoto(userId: number, photo: Blob) {
+    const form = new FormData();
+    form.append('photo', photo, 'aadhaar.jpg');
+    return this.http.put<void>(`${this.base}/users/${userId}/aadhaar`, form);
+  }
+
+  deleteAadhaarPhoto(userId: number) {
+    return this.http.delete<void>(`${this.base}/users/${userId}/aadhaar`);
+  }
+
   updateProfile(profile: ProfileUpdate) {
     return changes(this.http.put<UserAccount>(`${this.base}/users/profile`, profile));
   }

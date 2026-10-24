@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonSpinner, IonTitle, IonToggle, IonToolbar,
@@ -6,8 +7,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
+import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
 import { Role, UserAccount, UserRequest } from '../../core/models';
 import { RoleLabelPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -23,9 +26,18 @@ import { UiService, errorMessage } from '../../core/ui.service';
     .form { max-width: 520px; margin: 0 auto; }
     .active-row { margin-top: 14px; }
     .danger-zone { max-width: 520px; margin: 32px auto 16px; }
+    .photo-input { display: none; }
+    .choose { width: 100%; font: inherit; font-size: 14px; text-align: start; cursor: pointer; }
+    .preview { display: block; width: 100%; max-height: 260px; object-fit: contain; border-radius: 14px; background: var(--app-rule); }
+    .photo-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .photo-actions button {
+      flex: 1; height: 44px; border: 1px solid var(--app-rule); border-radius: var(--app-radius-control);
+      background: transparent; color: var(--app-ink); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .photo-actions .remove { color: var(--app-rust); }
   `],
 })
-export class UserFormModal implements OnInit {
+export class UserFormModal implements OnInit, OnDestroy {
   /** Account to edit; leave empty to create one. */
   @Input() user?: UserAccount;
 
@@ -40,6 +52,14 @@ export class UserFormModal implements OnInit {
   readonly saving = signal(false);
   readonly error = signal('');
   readonly showPassword = signal(false);
+  /** Object URL of the Aadhaar card photo shown: the saved one, or a newly chosen one. */
+  readonly aadhaarUrl = signal('');
+  readonly aadhaarLoading = signal(false);
+  readonly aadhaarError = signal('');
+  /** Newly chosen (already shrunk) Aadhaar photo to upload on save. */
+  private aadhaarPhoto: Blob | null = null;
+  /** The account had a saved photo when the form opened. */
+  private hadAadhaar = false;
 
   constructor() {
     addIcons({ eyeOutline, eyeOffOutline });
@@ -53,7 +73,69 @@ export class UserFormModal implements OnInit {
         username: u.username, fullName: u.fullName, email: u.email ?? '', phone: u.phone ?? '',
         role: u.role, active: u.active, password: ''
       };
+      this.loadAadhaar(u.id);
     }
+  }
+
+  ngOnDestroy() {
+    this.showAadhaar('');
+  }
+
+  async onAadhaarPicked(input: HTMLInputElement) {
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+    this.aadhaarError.set('');
+    try {
+      // Larger than news photos so the card's number and text stay readable.
+      this.aadhaarPhoto = await resizePhoto(file, 1600, 0.85);
+      this.showAadhaar(URL.createObjectURL(this.aadhaarPhoto));
+    } catch (err) {
+      this.aadhaarError.set(err instanceof Error && err.message ? err.message : PHOTO_DECODE_ERROR);
+    }
+  }
+
+  removeAadhaar() {
+    this.aadhaarPhoto = null;
+    this.showAadhaar('');
+  }
+
+  private loadAadhaar(userId: number) {
+    this.aadhaarLoading.set(true);
+    this.api.aadhaarPhoto(userId).subscribe({
+      next: blob => {
+        this.hadAadhaar = true;
+        this.aadhaarLoading.set(false);
+        this.showAadhaar(URL.createObjectURL(blob));
+      },
+      error: err => {
+        this.aadhaarLoading.set(false);
+        if (!(err instanceof HttpErrorResponse && err.status === 404)) {
+          this.aadhaarError.set(errorMessage(err, 'Could not load the Aadhaar card photo.'));
+        }
+      }
+    });
+  }
+
+  /** Swaps the shown photo, freeing the old object URL. */
+  private showAadhaar(url: string) {
+    if (this.aadhaarUrl()) {
+      URL.revokeObjectURL(this.aadhaarUrl());
+    }
+    this.aadhaarUrl.set(url);
+  }
+
+  /** Upload a newly chosen photo, or delete the saved one if it was removed; null when nothing changed. */
+  private aadhaarChange(userId: number): Observable<unknown> | null {
+    if (this.aadhaarPhoto) {
+      return this.api.saveAadhaarPhoto(userId, this.aadhaarPhoto);
+    }
+    if (this.hadAadhaar && !this.aadhaarUrl()) {
+      return this.api.deleteAadhaarPhoto(userId);
+    }
+    return null;
   }
 
   get isSelf() {
@@ -95,8 +177,23 @@ export class UserFormModal implements OnInit {
     this.error.set('');
     this.api.saveUser(request, this.user?.id).subscribe({
       next: saved => {
-        this.ui.toast(this.user ? 'Account updated.' : 'Account created.');
-        this.modals.dismiss(saved, 'saved');
+        const done = () => {
+          this.ui.toast(this.user ? 'Account updated.' : 'Account created.');
+          this.modals.dismiss(saved, 'saved');
+        };
+        const photo = this.aadhaarChange(saved.id);
+        if (!photo) {
+          done();
+          return;
+        }
+        photo.subscribe({
+          next: done,
+          // The account is saved either way; close so a retry can't create it twice.
+          error: err => {
+            this.ui.error(err, 'Account saved, but the Aadhaar card photo could not be saved. Open the account to try again.');
+            this.modals.dismiss(saved, 'saved');
+          }
+        });
       },
       error: err => {
         this.saving.set(false);

@@ -51,6 +51,31 @@
       </label>
     </div>
 
+    <h3 class="form-section">Aadhaar card</h3>
+    <div class="form-card">
+      <input #aadhaarFile class="photo-input" type="file" accept="image/*" (change)="onAadhaarPicked(aadhaarFile)" />
+      <div class="form-field">
+        @if (aadhaarLoading()) {
+          <ion-spinner name="crescent" aria-label="Loading the Aadhaar card photo"></ion-spinner>
+        } @else if (aadhaarUrl()) {
+          <img class="preview" [src]="aadhaarUrl()" alt="Aadhaar card photo" />
+          <div class="photo-actions">
+            <button type="button" (click)="aadhaarFile.click()">Replace</button>
+            <button type="button" class="remove" (click)="removeAadhaar()">Remove</button>
+          </div>
+        } @else {
+          <button type="button" class="form-box choose" (click)="aadhaarFile.click()">
+            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+            Upload Aadhaar card photo
+          </button>
+          <span class="form-helper">Optional. Take a photo or pick one; only staff can see it.</span>
+        }
+        @if (aadhaarError()) {
+          <p class="form-error" role="alert">{{ aadhaarError() }}</p>
+        }
+      </div>
+    </div>
+
     <h3 class="form-section">Access</h3>
     <div class="form-card">
       <label class="form-field">
