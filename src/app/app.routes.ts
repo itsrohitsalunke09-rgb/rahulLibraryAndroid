@@ -18,6 +18,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/register/register.page').then(m => m.RegisterPage),
   },
   {
+    path: 'forgot-password',
+    canMatch: [guestGuard],
+    data: { preload: 'guest' satisfies PreloadFor },
+    loadComponent: () => import('./pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
+  },
+  {
     path: 'tabs',
     canMatch: [authGuard],
     loadChildren: () => import('./tabs/tabs.routes').then(m => m.routes),

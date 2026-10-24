@@ -25,11 +25,17 @@ export class LoginPage {
   readonly loading = signal(false);
   readonly error = signal('');
   readonly showPassword = signal(false);
+  /** Good news shown above the button, e.g. after a password reset. */
+  readonly notice = signal('');
 
   constructor() {
     addIcons({ eyeOutline });
-    if (inject(ActivatedRoute).snapshot.queryParamMap.has('expired')) {
+    const params = inject(ActivatedRoute).snapshot.queryParamMap;
+    if (params.has('expired')) {
       this.error.set('Your session has expired. Please sign in again.');
+    }
+    if (params.has('reset')) {
+      this.notice.set('Password changed. Sign in with your new password.');
     }
   }
 
@@ -40,6 +46,7 @@ export class LoginPage {
     }
     this.loading.set(true);
     this.error.set('');
+    this.notice.set('');
     this.auth.login(this.username.trim(), this.password).subscribe({
       next: () => {
         this.loading.set(false);
@@ -53,11 +60,11 @@ export class LoginPage {
     });
   }
 
-  // Placeholders until password reset and the About page are built.
   forgotPassword() {
-    this.ui.toast('Password reset is coming soon. For now, ask the librarian to reset it.', 'medium');
+    this.router.navigateByUrl('/forgot-password');
   }
 
+  // Placeholder until the About page is built.
   aboutUs() {
     this.ui.toast('The About page is coming soon.', 'medium');
   }

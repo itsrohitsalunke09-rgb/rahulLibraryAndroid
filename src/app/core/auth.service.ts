@@ -53,6 +53,15 @@ export class AuthService {
     return this.startSession(this.http.post<AuthUser>(`${environment.apiUrl}/auth/register`, data));
   }
 
+  /** Emails a reset code; the answer is the same whether or not an account uses the email. */
+  sendResetCode(email: string) {
+    return this.http.post<void>(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, code: string, password: string) {
+    return this.http.post<void>(`${environment.apiUrl}/auth/reset-password`, { email, code, password });
+  }
+
   /** Store the profile returned after the user edits it, so the app shows the new details. */
   updateProfile(profile: UserAccount) {
     const user = this.user();

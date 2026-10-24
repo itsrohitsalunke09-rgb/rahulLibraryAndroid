@@ -53,6 +53,8 @@
 
       @if (error()) {
         <p class="error" role="alert">{{ error() }}</p>
+      } @else if (notice()) {
+        <p class="notice" role="status">{{ notice() }}</p>
       }
 
     </form>
