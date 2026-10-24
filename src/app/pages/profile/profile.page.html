@@ -6,7 +6,7 @@
 
   <div class="wrap">
     <section class="identity">
-      <div class="avatar" aria-hidden="true">{{ initials() }}</div>
+      <div class="avatar" aria-hidden="true">{{ profile()?.fullName ?? '' | initials }}</div>
       <h2>{{ profile()?.fullName }}</h2>
       <p class="username">&#64;{{ profile()?.username }}</p>
       <span class="role">{{ roleLabel() }}</span>

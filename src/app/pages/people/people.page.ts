@@ -7,7 +7,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { personAdd, peopleOutline } from 'ionicons/icons';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { clearLinkFilters } from '../../core/link-filters';
@@ -99,18 +99,7 @@ export class PeoplePage implements ViewWillEnter {
   }
 
   private fetch(page: number, size: number): Observable<Page<UserAccount>> {
-    const q = this.query();
-    if (q) {
-      // The backend's search covers active students only and is not paged.
-      return this.api.searchStudents(q).pipe(map(list => asSinglePage(list)));
-    }
     const role = this.filter();
-    return this.api.users(page, size, role === 'ALL' ? undefined : role);
+    return this.api.users(page, size, role === 'ALL' ? undefined : role, this.query());
   }
-}
-
-function asSinglePage<T>(content: T[]): Page<T> {
-  return {
-    content, totalElements: content.length, totalPages: 1, size: content.length, number: 0, first: true, last: true
-  };
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
@@ -25,13 +25,9 @@ export class NewsPage implements ViewWillEnter {
   private modals = inject(ModalController);
   private api = inject(ApiService);
 
-  readonly stories = new PagedList<NewsStory>((page, size) => this.api.news(page, size), 'Could not load the stories.');
   readonly query = signal('');
+  readonly stories = new PagedList<NewsStory>((page, size) => this.api.news(page, size, this.query()), 'Could not load the stories.');
   readonly templateLabel = templateLabel;
-  readonly shown = computed(() => {
-    const q = this.query().toLowerCase();
-    return this.stories.items().filter(s => !q || s.headline.toLowerCase().includes(q));
-  });
 
   ionViewWillEnter() {
     this.stories.revisit();
@@ -39,6 +35,7 @@ export class NewsPage implements ViewWillEnter {
 
   search(value: string | null | undefined) {
     this.query.set((value ?? '').trim());
+    this.stories.reset();
   }
 
   async edit(story?: NewsStory) {

@@ -2,6 +2,12 @@ import { BookIssue } from './models';
 
 const DAY = 24 * 60 * 60 * 1000;
 
+/** A date as YYYY-MM-DD in the device's time zone (toISOString would give the UTC day). */
+export function localIsoDate(date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 /** Whole days from today until an ISO date (negative when in the past). */
 export function daysUntil(isoDate: string): number {
   const today = new Date();

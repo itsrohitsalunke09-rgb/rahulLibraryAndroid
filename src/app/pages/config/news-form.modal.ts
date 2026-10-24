@@ -4,6 +4,7 @@ import {
   IonButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
+import { localIsoDate } from '../../core/dates';
 import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
 import { NewsStory, NewsStoryRequest, NewsTemplate } from '../../core/models';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
@@ -14,13 +15,6 @@ import { NEWS_TEMPLATES, templateClass } from '../news/templates';
 
 /** Arrow keys that move the template choice, and which way. */
 const ARROW_STEPS: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-
-/** Today as YYYY-MM-DD in the device's time zone. */
-function today(): string {
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
 
 /**
  * Add or edit one news story with an optional photo; editing also offers Delete.
@@ -43,7 +37,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
   private modals = inject(ModalController);
   private ui = inject(UiService);
 
-  form: NewsStoryRequest = { headline: '', body: '', eventDate: today(), photoCaption: '', removePhoto: false,
+  form: NewsStoryRequest = { headline: '', body: '', eventDate: localIsoDate(), photoCaption: '', removePhoto: false,
     template: 'CLASSIC' };
   readonly saving = signal(false);
   readonly deleting = signal(false);
@@ -76,7 +70,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
       id: this.story?.id ?? 0,
       headline: f.headline.trim() || 'Your headline',
       body: f.body.trim() || 'The story text…',
-      eventDate: f.eventDate || today(),
+      eventDate: f.eventDate || localIsoDate(),
       photoCaption: hasPhoto ? (f.photoCaption ?? '').trim() || null : null,
       hasPhoto,
       photoVersion: this.story?.photoVersion ?? 0,

@@ -5,7 +5,7 @@ import {
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { formatDate } from '../../core/dates';
+import { formatDate, localIsoDate } from '../../core/dates';
 import { Book, UserAccount } from '../../core/models';
 import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -114,7 +114,7 @@ export class IssueBookModal implements OnDestroy {
     const days = Number(this.days) || 14;
     const due = new Date();
     due.setDate(due.getDate() + days);
-    return formatDate(due.toISOString().slice(0, 10));
+    return formatDate(localIsoDate(due));
   }
 
   cancel() {

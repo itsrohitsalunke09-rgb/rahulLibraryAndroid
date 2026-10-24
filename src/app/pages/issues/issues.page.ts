@@ -10,6 +10,7 @@ import { addIcons } from 'ionicons';
 import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
+import { loadIssueYears, openYearSelect } from '../../core/issue-years';
 import { clearLinkFilters } from '../../core/link-filters';
 import { BookIssue, IssueCounts, Page } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
@@ -102,12 +103,8 @@ export class IssuesPage implements ViewWillEnter {
   }
 
   /** Opens the year dropdown (also when the Year tab is tapped again to change the year). */
-  async openYears() {
-    // Fetch the years fresh each time so new issues (or a newly deployed server) show up.
-    await this.loadYears();
-    // Let the year options render before the dropdown reads them.
-    await new Promise(resolve => setTimeout(resolve));
-    await this.yearSelect()?.open();
+  openYears() {
+    return openYearSelect(this.api, this.years, this.yearSelect);
   }
 
   setYear(value: unknown) {
@@ -138,17 +135,8 @@ export class IssuesPage implements ViewWillEnter {
     }
   }
 
-  private loadYears(): Promise<void> {
-    return new Promise(resolve => this.api.issueYears().subscribe({
-      next: years => { this.years.set(years); resolve(); },
-      // Keep the last list we had; offer the current year only if there was none.
-      error: () => {
-        if (!this.years().length) {
-          this.years.set([new Date().getFullYear()]);
-        }
-        resolve();
-      }
-    }));
+  private loadYears() {
+    return loadIssueYears(this.api, this.years);
   }
 
   search(value: string | null | undefined) {

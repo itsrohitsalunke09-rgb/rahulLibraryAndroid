@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { markDataChanged } from './freshness';
 import { Page } from './models';
 import { PAGE_SIZE, PagedList } from './paged-list';
@@ -77,5 +77,17 @@ describe('PagedList', () => {
     list.more(scrollEvent());
     expect(calls.at(-1)).toEqual({ page: 3, size: PAGE_SIZE });
     expect(list.items()).toEqual(Array.from({ length: 80 }, (_, i) => i));
+  });
+
+  it('completes a scroll event whose page load is cancelled by a reset', () => {
+    const pages = new Subject<Page<number>>();
+    const list = new PagedList<number>(() => pages);
+    list.reset();
+    pages.next({ content: [1], totalElements: 40, totalPages: 2, size: 20, number: 0, first: true, last: false });
+    const complete = vi.fn();
+    list.more({ target: { complete } } as never);
+    expect(complete).not.toHaveBeenCalled();
+    list.reset();
+    expect(complete).toHaveBeenCalledTimes(1);
   });
 });

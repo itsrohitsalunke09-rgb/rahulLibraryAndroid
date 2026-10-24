@@ -245,14 +245,14 @@
             <p>
               This will permanently remove this book record.
               @if (borrowers().length) {
-                It is currently issued to {{ borrowers().join(', ') }}. Review the active issue before deleting.
+                It is currently issued to {{ borrowers().join(', ') }}. Mark those copies returned before deleting it.
               } @else {
                 Its issue history will be deleted too.
               }
             </p>
             <div class="pair">
               <button class="solid" [disabled]="busy()" (click)="confirmingDelete.set(false)">Cancel</button>
-              <button class="solid danger" [disabled]="busy()" (click)="remove()">
+              <button class="solid danger" [disabled]="busy() || borrowers().length > 0" (click)="remove()">
                 @if (busy()) { <ion-spinner name="crescent"></ion-spinner> } @else { Delete book }
               </button>
             </div>

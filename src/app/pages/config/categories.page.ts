@@ -36,8 +36,11 @@ export class CategoriesPage {
     this.loadUnlinked();
   }
 
-  loadUnlinked() {
-    this.api.unlinkedCategories().subscribe({ next: list => this.unlinked.set(list), error: () => this.unlinked.set([]) });
+  loadUnlinked(done?: () => void) {
+    this.api.unlinkedCategories().subscribe({
+      next: list => { this.unlinked.set(list); done?.(); },
+      error: () => { this.unlinked.set([]); done?.(); }
+    });
   }
 
   search(value: string | null | undefined) {
@@ -45,9 +48,11 @@ export class CategoriesPage {
   }
 
   refresh(event: RefresherCustomEvent) {
-    this.store.load(true);
-    this.loadUnlinked();
-    setTimeout(() => event.target.complete(), 400);
+    // Stop the spinner once both requests have answered.
+    let pending = 2;
+    const settled = () => --pending || event.target.complete();
+    this.store.load(true, settled);
+    this.loadUnlinked(settled);
   }
 
   async edit(category?: BookCategory, presetName?: string) {

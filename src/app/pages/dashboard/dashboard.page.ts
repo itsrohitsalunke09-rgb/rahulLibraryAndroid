@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Freshness } from '../../core/freshness';
+import { openYearSelect } from '../../core/issue-years';
 import { Dashboard } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 
@@ -72,11 +73,8 @@ export class DashboardPage implements ViewWillEnter {
   }
 
   /** Opens the year list, fetched fresh so it matches the issues on the server. */
-  async openYears() {
-    await this.loadYears();
-    // Let the year options render before the dropdown reads them.
-    await new Promise(resolve => setTimeout(resolve));
-    await this.yearSelect()?.open();
+  openYears() {
+    return openYearSelect(this.api, this.years, this.yearSelect);
   }
 
   setYear(value: unknown) {
@@ -86,18 +84,6 @@ export class DashboardPage implements ViewWillEnter {
     }
     this.year.set(year);
     this.load();
-  }
-
-  private loadYears(): Promise<void> {
-    return new Promise(resolve => this.api.issueYears().subscribe({
-      next: years => { this.years.set(years); resolve(); },
-      error: () => {
-        if (!this.years().length) {
-          this.years.set([new Date().getFullYear()]);
-        }
-        resolve();
-      }
-    }));
   }
 
   open(tile: Tile) {

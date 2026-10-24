@@ -151,9 +151,13 @@ export class BookDetailModal implements OnInit {
   }
 
   private reloadBook() {
-    this.api.book(this.current()!.id).subscribe(book => {
-      this.current.set(book);
-      this.changed = true;
+    this.api.book(this.current()!.id).subscribe({
+      next: book => {
+        this.current.set(book);
+        this.changed = true;
+      },
+      // The issue itself went through; only the copy count shown here is out of date.
+      error: err => this.ui.error(err, 'Book issued, but the copy count could not be refreshed.')
     });
   }
 

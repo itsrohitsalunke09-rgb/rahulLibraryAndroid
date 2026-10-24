@@ -3,15 +3,16 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonSkeletonText, IonSpinner } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { formatDate } from '../../core/dates';
+import { formatDate, localIsoDate } from '../../core/dates';
 import { ProfileUpdate, roleLabel } from '../../core/models';
+import { InitialsPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
-  imports: [FormsModule, IonContent, IonSpinner, IonSkeletonText],
+  imports: [FormsModule, IonContent, IonSpinner, IonSkeletonText, InitialsPipe],
 })
 export class ProfilePage {
   private api = inject(ApiService);
@@ -24,7 +25,7 @@ export class ProfilePage {
   /** The page opens read-only; Edit profile switches to the form. */
   readonly editing = signal(false);
   readonly error = signal('');
-  readonly today = new Date().toISOString().slice(0, 10);
+  readonly today = localIsoDate();
   readonly roleLabel = computed(() => roleLabel(this.auth.role()));
 
   form: ProfileUpdate = { fullName: '' };
@@ -59,11 +60,6 @@ export class ProfilePage {
         dateOfBirth: p.dateOfBirth ?? '', address: p.address ?? ''
       };
     }
-  }
-
-  initials() {
-    const name = this.profile()?.fullName ?? '';
-    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 
   save() {

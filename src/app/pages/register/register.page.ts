@@ -7,6 +7,7 @@ import {
 import { addIcons } from 'ionicons';
 import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
+import { localIsoDate } from '../../core/dates';
 import { RegistrationRequest } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 
@@ -26,7 +27,7 @@ export class RegisterPage {
   form: RegistrationRequest = {
     fullName: '', dateOfBirth: '', address: '', phone: '', email: '', username: '', password: ''
   };
-  readonly today = new Date().toISOString().slice(0, 10);
+  readonly today = localIsoDate();
   readonly loading = signal(false);
   readonly error = signal('');
   readonly showPassword = signal(false);

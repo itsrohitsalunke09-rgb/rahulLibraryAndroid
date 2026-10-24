@@ -6,7 +6,7 @@
     <ion-title>News &amp; events</ion-title>
   </ion-toolbar>
   <ion-toolbar class="with-actions">
-    <ion-searchbar placeholder="Search headline" [debounce]="200"
+    <ion-searchbar placeholder="Search headline" [debounce]="350"
                    (ionInput)="search($event.detail.value)"></ion-searchbar>
     <div slot="end" class="search-actions">
       <button class="heading-action" aria-label="Add story" (click)="edit()">
@@ -26,9 +26,9 @@
   }
 
   @if (stories.loaded()) {
-    @if (shown().length) {
+    @if (stories.items().length) {
       <ion-list inset="true" lines="full">
-        @for (s of shown(); track s.id) {
+        @for (s of stories.items(); track s.id) {
           <ion-item button detail="false" (click)="edit(s)">
             <img slot="start" class="thumb" [appStoryPhoto]="s" alt="" />
             <ion-label>

@@ -26,6 +26,8 @@ export class PagedList<T> {
   /** Next page index, counted in PAGE_SIZE pages. */
   private page = 0;
   private request?: Subscription;
+  /** Callback of the request in flight; run if that request is cancelled, so its spinner still completes. */
+  private pendingDone?: () => void;
   private freshness = new Freshness();
 
   constructor(
@@ -80,12 +82,16 @@ export class PagedList<T> {
     const replace = page === 0;
     if (replace) {
       this.request?.unsubscribe();
+      // An unfinished infinite-scroll event never fires again, so finish the cancelled one.
+      this.pendingDone?.();
       this.finished.set(false);
       this.freshness.mark();
     }
     this.loading.set(true);
+    this.pendingDone = done;
     this.request = this.fetch(page, size).subscribe({
       next: result => {
+        this.pendingDone = undefined;
         this.items.update(list => (replace ? result.content : [...list, ...result.content]));
         this.total.set(result.totalElements);
         this.finished.set(result.last || result.content.length === 0);
@@ -96,6 +102,7 @@ export class PagedList<T> {
         done?.();
       },
       error: err => {
+        this.pendingDone = undefined;
         if (replace) {
           this.freshness.invalidate();
         }

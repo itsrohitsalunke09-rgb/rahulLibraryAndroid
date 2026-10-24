@@ -136,10 +136,14 @@ export class ApiService {
   }
 
   // ---- Users ----
-  users(page: number, size = 20, role?: Role) {
+  /** q matches the start of the name, username, email or phone, in any role or active state. */
+  users(page: number, size = 20, role?: Role, q?: string) {
     let params = new HttpParams().set('page', page).set('size', size).set('sort', 'fullName,asc');
     if (role) {
       params = params.set('role', role);
+    }
+    if (q) {
+      params = params.set('q', q);
     }
     return this.http.get<Page<UserAccount>>(`${this.base}/users`, { params });
   }
@@ -164,8 +168,13 @@ export class ApiService {
   }
 
   // ---- News ----
-  news(page: number, size = 10) {
-    return this.http.get<Page<NewsStory>>(`${this.base}/news`, { params: new HttpParams().set('page', page).set('size', size) });
+  /** q matches part of the headline. */
+  news(page: number, size = 10, q?: string) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (q) {
+      params = params.set('q', q);
+    }
+    return this.http.get<Page<NewsStory>>(`${this.base}/news`, { params });
   }
 
   /** Creates a story, or updates it when id is given; photo is the already-shrunk image, if changed. */

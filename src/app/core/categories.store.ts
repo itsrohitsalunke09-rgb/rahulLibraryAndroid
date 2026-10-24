@@ -19,9 +19,10 @@ export class CategoriesStore {
   readonly error = signal('');
   private freshness = new Freshness();
 
-  /** Loads the list if it hasn't been loaded yet (or `force` to refresh). */
-  load(force = false) {
+  /** Loads the list if it hasn't been loaded yet (or `force` to refresh); `done` runs once it settles. */
+  load(force = false, done?: () => void) {
     if ((this.loaded() && !force) || this.loading()) {
+      done?.();
       return;
     }
     this.loading.set(true);
@@ -32,11 +33,13 @@ export class CategoriesStore {
         this.items.set(list);
         this.loaded.set(true);
         this.loading.set(false);
+        done?.();
       },
       error: err => {
         this.freshness.invalidate();
         this.error.set(errorMessage(err, 'Could not load book categories.'));
         this.loading.set(false);
+        done?.();
       }
     });
   }
