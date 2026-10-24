@@ -42,7 +42,9 @@ ion-content {
   max-width: 480px;
   min-height: max(100%, calc(var(--safe-top) + 756 * var(--s) + var(--safe-bottom)));
   margin: 0 auto;
-  overflow: hidden;
+  /* Visible, not hidden: on screens wider than 480px the shapes run on to the screen edges
+     (ion-content clips them there) instead of stopping at the centred column. */
+  overflow: visible;
   font-family: var(--ion-font-family);
   letter-spacing: 0.2px;
   color: var(--login-ink);
