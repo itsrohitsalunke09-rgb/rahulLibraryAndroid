@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
   IonSkeletonText, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
-import { FREQUENCY_LABELS, Periodical, rupees } from '../../core/models';
+import { FREQUENCY_LABELS, Periodical, byFrequency, rupees } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 import { PeriodicalFormModal } from './periodical-form.modal';
 
@@ -26,6 +26,8 @@ export class PeriodicalsPage implements ViewWillEnter {
   readonly loaded = signal(false);
   readonly error = signal('');
   readonly labels = FREQUENCY_LABELS;
+  /** A card per frequency, daily first. */
+  readonly groups = computed(() => byFrequency(this.items()));
   readonly rupees = rupees;
 
   ionViewWillEnter() {

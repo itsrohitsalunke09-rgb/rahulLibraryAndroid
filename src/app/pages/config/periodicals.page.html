@@ -23,20 +23,23 @@
 
   @if (loaded()) {
     @if (items().length) {
-      <ion-list inset="true" lines="full">
-        @for (p of items(); track p.id) {
-          <ion-item button detail="false" (click)="edit(p)" [class.off]="!p.active">
-            <ion-label>
-              <h2 class="marathi">{{ p.name }}</h2>
-              <p>
-                {{ labels[p.frequency] }}{{ p.language ? ' · ' + p.language : '' }}
-                @if (!p.active) { · <strong>Not subscribed</strong> }
-              </p>
-            </ion-label>
-            <span slot="end" class="price">{{ rupees(p.price) }}</span>
-          </ion-item>
-        }
-      </ion-list>
+      @for (group of groups(); track group.frequency) {
+        <h2 class="section-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
+        <ion-list inset="true" lines="full">
+          @for (p of group.items; track p.id) {
+            <ion-item button detail="false" (click)="edit(p)" [class.off]="!p.active">
+              <ion-label>
+                <h2 class="marathi">{{ p.name }}</h2>
+                <p>
+                  {{ p.language }}
+                  @if (!p.active) { {{ p.language ? '·' : '' }} <strong>Not subscribed</strong> }
+                </p>
+              </ion-label>
+              <span slot="end" class="price">{{ rupees(p.price) }}</span>
+            </ion-item>
+          }
+        </ion-list>
+      }
     } @else if (!error()) {
       <div class="empty-state">
         <span class="icon empty-icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>

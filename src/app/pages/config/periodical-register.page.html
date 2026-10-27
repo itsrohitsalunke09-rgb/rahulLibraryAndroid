@@ -35,14 +35,18 @@
         }
       </div>
     } @else if (lines().length) {
+      @for (group of groups(); track group.frequency) {
+      <h2 class="group-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
       <div class="card">
-        @for (line of lines(); track line.periodicalId) {
+        @for (line of group.items; track line.periodicalId) {
           <div class="line" [class.on]="line.arrived">
             <label class="tick">
               <input type="checkbox" [(ngModel)]="line.arrived" (ngModelChange)="changed()" />
               <span class="what">
                 <span class="name marathi">{{ line.name }}</span>
-                <span class="meta">{{ labels[line.frequency] }}{{ line.language ? ' · ' + line.language : '' }}</span>
+                @if (line.language) {
+                  <span class="meta">{{ line.language }}</span>
+                }
               </span>
             </label>
             <label class="price">
@@ -54,6 +58,7 @@
           </div>
         }
       </div>
+      }
 
       <div class="summary">
         <span>{{ ticked() }} of {{ lines().length }} received</span>

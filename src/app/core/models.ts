@@ -198,6 +198,16 @@ export function byFrequency<T extends { frequency: PeriodicalFrequency }>(items:
     .filter(group => group.items.length);
 }
 
+/** The report with only one frequency's rows, totals recounted (for a per-card PDF). */
+export function onlyFrequency(report: MonthReport, frequency: PeriodicalFrequency): MonthReport {
+  const rows = report.rows.filter(r => r.frequency === frequency);
+  return {
+    ...report, rows,
+    totalIssues: rows.reduce((sum, r) => sum + r.issues, 0),
+    totalAmount: rows.reduce((sum, r) => sum + r.amount, 0),
+  };
+}
+
 /** A newspaper or magazine the library takes (Configuration → Newspapers & magazines). */
 export interface Periodical {
   id: number;

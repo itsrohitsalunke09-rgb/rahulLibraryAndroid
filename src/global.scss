@@ -306,6 +306,14 @@ ion-list-header {
   color: var(--app-ink);
 }
 
+/* How many items under a section title (e.g. papers per frequency). */
+.group-count {
+  margin-inline-start: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
 ion-item {
   --padding-start: 16px;
   --inner-padding-end: 16px;

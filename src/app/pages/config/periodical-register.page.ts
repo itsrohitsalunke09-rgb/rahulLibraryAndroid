@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -7,7 +7,7 @@ import {
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { formatDate, localIsoDate } from '../../core/dates';
-import { FREQUENCY_LABELS, RegisterRow, rupees } from '../../core/models';
+import { FREQUENCY_LABELS, RegisterRow, byFrequency, rupees } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 /** One editable line: price is a string while typing. */
@@ -37,6 +37,8 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
   /** Ticks or prices changed since the day was loaded or saved. */
   readonly dirty = signal(false);
   readonly labels = FREQUENCY_LABELS;
+  /** A card per frequency, daily first; same line objects, so ticks still land in lines(). */
+  readonly groups = computed(() => byFrequency(this.lines()));
   readonly rupees = rupees;
   readonly formatDate = formatDate;
 

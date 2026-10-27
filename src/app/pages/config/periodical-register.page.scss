@@ -17,6 +17,8 @@ ion-back-button { --color: var(--app-ink); --icon-font-size: 22px; }
 }
 .when { margin: 8px 2px 14px; font-size: 13px; color: var(--app-muted); }
 
+.group-title { margin: 18px 4px 8px; font-size: 15px; font-weight: 600; color: var(--app-ink); }
+
 .card {
   padding: 4px 14px; border: 1px solid var(--app-rule); border-radius: var(--app-radius-sheet); background: var(--app-surface);
 }

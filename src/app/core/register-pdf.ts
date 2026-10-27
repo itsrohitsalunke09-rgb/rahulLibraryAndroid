@@ -375,13 +375,13 @@ function wrap(text: string, size: number, bold: boolean, maxW: number, maxLines:
  * the rows stretch so the page is filled, and each month's total is highlighted.
  */
 export function drawRegisterPage(months: { report: MonthReport; monthName: string }[], library: string,
-                                 orientation: Orientation): PdfPage {
+                                 orientation: Orientation, title = 'Newspaper & magazine register'): PdfPage {
   const [pageW, pageH] = A4[orientation];
   const page = new PdfPage(pageW, pageH);
   const period = months.length === 1 ? months[0].monthName : `${months[0].monthName} to ${months[months.length - 1].monthName}`;
 
   drawText(page, library, MARGIN, 24, 17, { bold: true, maxW: pageW - 2 * MARGIN });
-  drawText(page, `Newspaper & magazine register - ${period}`, MARGIN, 46, 11);
+  drawText(page, `${title} - ${period}`, MARGIN, 46, 11);
 
   // Lay out each month (column positions, header lines), then share the height between all rows.
   const blocks = months.map(m => {
@@ -463,6 +463,7 @@ export function drawRegisterPage(months: { report: MonthReport; monthName: strin
  * The register for one or more months as one A4 PDF: months packed up to three to a page when
  * they fit at a readable size, oldest first. Ready to save.
  */
-export function registerPdf(months: { report: MonthReport; monthName: string }[], library: string, orientation: Orientation): Promise<Uint8Array> {
-  return buildPdf(packPages(months, orientation).map(page => drawRegisterPage(page, library, orientation)));
+export function registerPdf(months: { report: MonthReport; monthName: string }[], library: string, orientation: Orientation,
+                            title?: string): Promise<Uint8Array> {
+  return buildPdf(packPages(months, orientation).map(page => drawRegisterPage(page, library, orientation, title)));
 }

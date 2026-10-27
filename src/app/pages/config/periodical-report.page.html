@@ -21,7 +21,7 @@
 
     <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
       <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
-      {{ exporting() ? 'Saving PDF…' : 'Export PDF…' }}
+      {{ exporting() ? 'Saving PDF…' : 'Export all PDF…' }}
     </button>
     <p class="note">Saves a print-ready PDF for the months you tick (up to 3 years back), one page per month: one row per newspaper, one column per date with the price paid, day totals and the month's total expense.</p>
 
@@ -37,8 +37,10 @@
       </div>
     } @else if (report(); as r) {
       @if (r.rows.length) {
+        @for (group of groups(); track group.frequency) {
+        <h2 class="group-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
         <div class="card">
-          @for (row of r.rows; track row.periodicalId) {
+          @for (row of group.items; track row.periodicalId) {
             <div class="row">
               <div class="what">
                 <span class="name marathi">{{ row.name }}</span>
@@ -53,7 +55,16 @@
             </div>
           }
         </div>
-        <div class="summary">
+        <div class="summary group-summary">
+          <span>{{ group.issues }} cop{{ group.issues === 1 ? 'y' : 'ies' }}</span>
+          <strong>{{ rupees(group.amount) }}</strong>
+        </div>
+        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf(group.frequency)">
+          <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Export {{ labels[group.frequency] }} PDF…
+        </button>
+        }
+        <div class="summary total">
           <span>{{ r.totalIssues }} cop{{ r.totalIssues === 1 ? 'y' : 'ies' }} in total</span>
           <strong>{{ rupees(r.totalAmount) }}</strong>
         </div>

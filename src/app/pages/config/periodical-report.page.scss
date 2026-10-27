@@ -8,3 +8,6 @@
 .export { gap: 8px; margin-bottom: 6px; color: var(--ion-color-primary); font-weight: 600; }
 .export + .note { margin-bottom: 14px; }
 .export:disabled { opacity: 0.6; }
+.group-summary { margin: 10px 4px 8px; }
+.group-summary strong { font-size: 15px; }
+.total { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--app-rule); }
