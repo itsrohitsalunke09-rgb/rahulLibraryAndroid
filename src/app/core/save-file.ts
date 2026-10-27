@@ -1,12 +1,16 @@
-import { Capacitor } from '@capacitor/core';
-import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
-/** Folder inside the phone's Documents where exported files go. */
-export const SAVE_FOLDER = 'Rahul Library';
+/** The app's own Android plugin (android/…/DownloadsPlugin.java). */
+interface DownloadsPlugin {
+  /** Saves into Download › Rahul Library and shows a "Download complete" notification that opens it. */
+  save(options: { fileName: string; data: string; mimeType: string }): Promise<{ path: string; uri: string; notified: boolean }>;
+}
+
+const Downloads = registerPlugin<DownloadsPlugin>('Downloads');
 
 /**
- * Saves a generated file where the user can find it: on the phone in Documents › Rahul Library
- * (visible in the Files app), in a browser as a normal download. Returns where it went, for a message.
+ * Saves a generated file to the phone's Download › Rahul Library folder with a notification,
+ * or downloads it in a browser. Returns where it went, for a message.
  */
 export async function saveFile(bytes: Uint8Array, fileName: string, mimeType: string): Promise<string> {
   if (!Capacitor.isNativePlatform()) {
@@ -18,25 +22,10 @@ export async function saveFile(bytes: Uint8Array, fileName: string, mimeType: st
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
     return `Downloads › ${fileName}`;
   }
-  // Android 10 and older ask for storage access; newer versions allow it without asking.
-  const { publicStorage } = await Filesystem.requestPermissions();
-  if (publicStorage !== 'granted') {
-    throw new Error('Allow storage access to save the PDF.');
-  }
   let binary = '';
   for (let i = 0; i < bytes.length; i += 0x8000) {
     binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   }
-  const data = btoa(binary);
-  const write = (name: string) =>
-    Filesystem.writeFile({ path: `${SAVE_FOLDER}/${name}`, data, directory: Directory.Documents, recursive: true });
-  try {
-    await write(fileName);
-    return `Documents › ${SAVE_FOLDER} › ${fileName}`;
-  } catch {
-    // Android won't let a reinstalled app overwrite a file an earlier install saved; keep both.
-    const stamped = fileName.replace(/(\.[^.]+)$/, `-${Date.now().toString(36)}$1`);
-    await write(stamped);
-    return `Documents › ${SAVE_FOLDER} › ${stamped}`;
-  }
+  const { path } = await Downloads.save({ fileName, data: btoa(binary), mimeType });
+  return path;
 }

@@ -1,6 +1,9 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonSkeletonText, IonSpinner } from '@ionic/angular';
+import { RouterLink } from '@angular/router';
+import { IonContent, IonIcon, IonSkeletonText, IonSpinner } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { ellipsisVertical } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { formatDate, localIsoDate } from '../../core/dates';
@@ -12,7 +15,7 @@ import { UiService, errorMessage } from '../../core/ui.service';
   selector: 'app-profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
-  imports: [FormsModule, IonContent, IonSpinner, IonSkeletonText, InitialsPipe],
+  imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSpinner, IonSkeletonText, InitialsPipe],
 })
 export class ProfilePage {
   private api = inject(ApiService);
@@ -32,6 +35,7 @@ export class ProfilePage {
   protected readonly formatDate = formatDate;
 
   constructor() {
+    addIcons({ ellipsisVertical });
     // Fill the form from the stored profile now, and again whenever it is saved.
     effect(() => {
       if (this.profile()) {

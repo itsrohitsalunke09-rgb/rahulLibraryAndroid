@@ -8,6 +8,8 @@ import { TabsPage } from './tabs.page';
 
 /** Staff-only pages: guarded, and preloaded only for staff. */
 const STAFF_ONLY = { canMatch: [roleGuard(STAFF_ROLES)], data: { preload: STAFF_ROLES satisfies PreloadFor } };
+/** The masters (Profile › ⋮): admins only. */
+const ADMIN_ONLY = { canMatch: [roleGuard(['ADMIN'])], data: { preload: ['ADMIN'] satisfies PreloadFor } };
 
 export const routes: Routes = [
   {
@@ -43,18 +45,23 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/config.page').then(m => m.ConfigPage),
       },
       {
-        path: 'config/categories',
-        ...STAFF_ONLY,
+        path: 'profile/masters',
+        ...ADMIN_ONLY,
+        loadComponent: () => import('../pages/config/masters.page').then(m => m.MastersPage),
+      },
+      {
+        path: 'profile/masters/categories',
+        ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/categories.page').then(m => m.CategoriesPage),
       },
       {
-        path: 'config/news',
-        ...STAFF_ONLY,
+        path: 'profile/masters/news',
+        ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/news.page').then(m => m.NewsPage),
       },
       {
-        path: 'config/periodicals',
-        ...STAFF_ONLY,
+        path: 'profile/masters/periodicals',
+        ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/periodicals.page').then(m => m.PeriodicalsPage),
       },
       {
@@ -68,8 +75,8 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/periodical-report.page').then(m => m.PeriodicalReportPage),
       },
       {
-        path: 'config/about',
-        ...STAFF_ONLY,
+        path: 'profile/masters/about',
+        ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/about-master.page').then(m => m.AboutMasterPage),
       },
       {

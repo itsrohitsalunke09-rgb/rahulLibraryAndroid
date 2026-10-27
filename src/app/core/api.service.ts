@@ -6,7 +6,7 @@ import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
-  MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
+  MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
 
@@ -186,6 +186,11 @@ export class ApiService {
   }
 
   // ---- Newspapers & magazines (staff) ----
+  /** The subscribed ones, readable by anyone signed in (Catalog tab). */
+  subscribedPeriodicals() {
+    return this.http.get<PeriodicalSummary[]>(`${this.base}/periodicals/subscribed`);
+  }
+
   periodicals() {
     return this.http.get<Periodical[]>(`${this.base}/periodicals`);
   }

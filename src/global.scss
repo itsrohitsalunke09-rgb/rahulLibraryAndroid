@@ -684,7 +684,17 @@ ion-alert.md .alert-button {
 ion-toast {
   --border-radius: 14px;
   --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  --color: #ffffff;
   font-weight: 500;
+}
+
+/* Every toast in the app is one of two: green when it worked, red when it didn't (UiService.toast). */
+ion-toast.toast-success {
+  --background: #2e7d32;
+}
+
+ion-toast.toast-error {
+  --background: #c62828;
 }
 
 ion-popover {

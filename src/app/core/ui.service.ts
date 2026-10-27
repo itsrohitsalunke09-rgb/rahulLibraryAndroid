@@ -8,13 +8,16 @@ export class UiService {
   private toasts = inject(ToastController);
   private alerts = inject(AlertController);
 
-  async toast(message: string, color: 'success' | 'danger' | 'medium' = 'success') {
-    const toast = await this.toasts.create({ message, color, duration: 2500, position: 'top' });
+  /** Green when something worked, red when it didn't (or needs the user to do something first). */
+  async toast(message: string, kind: 'success' | 'error' = 'success') {
+    const toast = await this.toasts.create({
+      message, duration: kind === 'error' ? 3500 : 2500, position: 'top', cssClass: `toast-${kind}`,
+    });
     await toast.present();
   }
 
   async error(err: unknown, fallback: string) {
-    await this.toast(errorMessage(err, fallback), 'danger');
+    await this.toast(errorMessage(err, fallback), 'error');
   }
 
   async confirm(header: string, message: string, confirmText = 'OK', destructive = false): Promise<boolean> {

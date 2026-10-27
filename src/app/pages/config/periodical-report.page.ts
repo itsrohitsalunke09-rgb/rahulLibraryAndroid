@@ -8,9 +8,14 @@ import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { FREQUENCY_LABELS, MonthReport, rupees } from '../../core/models';
 import { DEFAULT_ABOUT } from '../../core/about-content';
-import { registerPdf } from '../../core/register-pdf';
+import { Orientation, registerPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
+
+/** How far back the PDF export reaches: 3 years. */
+const EXPORT_MONTHS = 36;
+/** Remembers the last page layout chosen for the PDF on this phone. */
+const ORIENTATION_KEY = 'rahul-library.pdf-orientation';
 
 /** Monthly newspaper report: copies received, cost, and missing days, to check against the vendor's bill. */
 @Component({
@@ -55,42 +60,94 @@ export class PeriodicalReportPage implements ViewWillEnter {
     this.pick(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
   }
 
-  /** Asks which month, then saves it as a printable table (newspaper × date with prices and totals). */
+  /**
+   * Asks which months (any of the last 3 years), then saves them as one printable PDF:
+   * a page per month with newspaper × date prices and totals, oldest month first.
+   */
   async exportPdf() {
     if (this.exporting()) {
       return;
     }
     const alert = await this.alerts.create({
       header: 'Export PDF',
-      subHeader: 'Which month?',
-      inputs: recentMonths(this.thisMonth, 12).map(m => ({
-        type: 'radio' as const, label: this.monthName(m), value: m, checked: m === this.month(),
+      subHeader: 'Tick one or more months',
+      inputs: recentMonths(this.thisMonth, EXPORT_MONTHS).map(m => ({
+        type: 'checkbox' as const, label: this.monthName(m), value: m, checked: m === this.month(),
       })),
-      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
+      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Next', role: 'confirm' }],
     });
     await alert.present();
-    const { role, data } = await alert.onDidDismiss<{ values: string }>();
-    const month = data?.values;
-    if (role !== 'confirm' || !month) {
+    const { role, data } = await alert.onDidDismiss<{ values: string[] }>();
+    const months = [...(data?.values ?? [])].sort();
+    if (role !== 'confirm') {
+      return;
+    }
+    if (!months.length) {
+      this.ui.toast('Tick at least one month to export.', 'error');
+      return;
+    }
+    const orientation = await this.askOrientation();
+    if (!orientation) {
       return;
     }
     this.exporting.set(true);
     try {
       const shown = this.report();
-      const report = shown && shown.month === month ? shown : await firstValueFrom(this.api.periodicalReport(month));
-      if (!report.rows.some(r => r.issues > 0)) {
-        this.ui.toast(`Nothing is ticked in the register for ${this.monthName(month)} yet.`, 'medium');
+      const reports = await Promise.all(months.map(m =>
+        shown && shown.month === m ? Promise.resolve(shown) : firstValueFrom(this.api.periodicalReport(m))));
+      // A month with nothing ticked would just be an empty grid; leave it out.
+      const pages = reports.filter(r => r.rows.some(row => row.issues > 0))
+        .map(report => ({ report, monthName: this.monthName(report.month) }));
+      if (!pages.length) {
+        this.ui.toast(months.length === 1
+          ? `Nothing is ticked in the register for ${this.monthName(months[0])} yet.`
+          : 'Nothing is ticked in the register for those months yet.', 'error');
         return;
       }
-      const pdf = registerPdf(report, DEFAULT_ABOUT.title, this.monthName(month));
-      const where = await saveFile(pdf, `newspaper-register-${month}.pdf`, 'application/pdf');
-      this.ui.toast(`PDF saved to ${where}`);
+      this.ui.toast(`Saving PDF (${pages.length} month${pages.length === 1 ? '' : 's'})… it will appear in Download.`);
+      const first = pages[0].report.month;
+      const last = pages[pages.length - 1].report.month;
+      const name = first === last ? `newspaper-register-${first}.pdf` : `newspaper-register-${first}-to-${last}.pdf`;
+      const where = await saveFile(await registerPdf(pages, DEFAULT_ABOUT.title, orientation), name, 'application/pdf');
+      const skipped = months.length - pages.length;
+      this.ui.toast(`PDF saved to ${where}` + (skipped ? ` (${skipped} month${skipped === 1 ? '' : 's'} with no entries left out)` : ''));
     } catch (err) {
       this.ui.toast(err instanceof HttpErrorResponse ? errorMessage(err, 'Could not create the PDF.')
-        : (err as Error)?.message || 'Could not create the PDF.', 'danger');
+        : (err as Error)?.message || 'Could not create the PDF.', 'error');
     } finally {
       this.exporting.set(false);
     }
+  }
+
+  /** Landscape or portrait A4; remembers the last choice on this phone. Null when cancelled. */
+  private async askOrientation(): Promise<Orientation | null> {
+    let last: Orientation = 'landscape';
+    try {
+      last = localStorage.getItem(ORIENTATION_KEY) === 'portrait' ? 'portrait' : 'landscape';
+    } catch {
+      // Storage unavailable: start from landscape.
+    }
+    const alert = await this.alerts.create({
+      header: 'Page layout',
+      subHeader: 'Both print on A4',
+      inputs: [
+        { type: 'radio', label: 'Landscape – dates across', value: 'landscape', checked: last === 'landscape' },
+        { type: 'radio', label: 'Portrait – dates down', value: 'portrait', checked: last === 'portrait' },
+      ],
+      message: 'Portrait suits up to about 12 newspapers; with more, landscape is easier to read.',
+      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss<{ values: Orientation }>();
+    if (role !== 'confirm' || !data?.values) {
+      return null;
+    }
+    try {
+      localStorage.setItem(ORIENTATION_KEY, data.values);
+    } catch {
+      // Not remembered; fine.
+    }
+    return data.values;
   }
 
   private load() {

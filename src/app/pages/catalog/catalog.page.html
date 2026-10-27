@@ -3,11 +3,22 @@
   <ion-toolbar>
     <ion-title>
       Catalog
-      @if (books.loaded() && !books.error()) {
-        <span class="count">{{ books.total() }} {{ query() ? 'found' : 'book' + (books.total() === 1 ? '' : 's') }}</span>
+      @if (tab() === 'books') {
+        @if (books.loaded() && !books.error()) {
+          <span class="count">{{ books.total() }} {{ query() ? 'found' : 'book' + (books.total() === 1 ? '' : 's') }}</span>
+        }
+      } @else if (papers(); as list) {
+        <span class="count">{{ list.length }} subscribed</span>
       }
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
+      <ion-segment-button value="books" class="marathi">पुस्तके</ion-segment-button>
+      <ion-segment-button value="papers" class="marathi">दैनिके &amp; नियतकालिके</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  @if (tab() === 'books') {
   <ion-toolbar class="search-bar" [class.with-actions]="auth.isStaff()">
     <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
     <ion-searchbar
@@ -27,12 +38,50 @@
       </div>
     }
   </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content>
-  <ion-refresher slot="fixed" (ionRefresh)="books.refresh($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+
+  @if (tab() === 'papers') {
+    @if (papersError()) {
+      <p class="page-error" role="alert">{{ papersError() }}</p>
+    }
+    @if (papers(); as list) {
+      @if (list.length) {
+        <ion-list inset="true" lines="full">
+          @for (p of list; track p.id) {
+            <ion-item>
+              <ion-label>
+                <h2 class="marathi">{{ p.name }}</h2>
+                <p class="author marathi">{{ labels[p.frequency] }}{{ p.language ? ' · ' + p.language : '' }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <div class="empty-state">
+          <span class="icon empty-icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+          <h2>No newspapers or magazines yet</h2>
+          <p>Check back once the library has added the ones it subscribes to.</p>
+        </div>
+      }
+    } @else if (!papersError()) {
+      <ion-list inset="true" lines="full">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <ion-item>
+            <ion-label>
+              <h2><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></h2>
+              <p><ion-skeleton-text [animated]="true" style="width: 30%"></ion-skeleton-text></p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  } @else {
 
   @if (books.error()) {
     <p class="page-error" role="alert">{{ books.error() }}</p>
@@ -89,4 +138,5 @@
   <ion-infinite-scroll [disabled]="books.finished()" (ionInfinite)="books.more($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
+  }
 </ion-content>

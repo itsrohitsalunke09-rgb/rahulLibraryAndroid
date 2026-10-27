@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/config/periodicals" text=""></ion-back-button>
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Newspaper register</ion-title>
     <ion-buttons slot="end">
@@ -66,8 +66,12 @@
     } @else if (!error()) {
       <div class="empty-state">
         <h2>No newspapers or magazines yet</h2>
-        <p>Add the ones you subscribe to first.</p>
-        <a class="secondary link" routerLink="/tabs/config/periodicals">Newspapers &amp; magazines</a>
+        @if (auth.isAdmin()) {
+          <p>Add the ones you subscribe to first.</p>
+          <a class="secondary link" routerLink="/tabs/profile/masters/periodicals">Newspapers &amp; magazines</a>
+        } @else {
+          <p>Ask an admin to add the ones you subscribe to.</p>
+        }
       </div>
     }
   </div>

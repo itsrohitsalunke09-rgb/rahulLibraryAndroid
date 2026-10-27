@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/config/periodicals" text=""></ion-back-button>
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Monthly report</ion-title>
   </ion-toolbar>
@@ -23,7 +23,7 @@
       <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
       {{ exporting() ? 'Saving PDF…' : 'Export PDF…' }}
     </button>
-    <p class="note">Saves a print-ready table for the month you choose: one row per newspaper, one column per date with the price paid, day totals and the month's total expense.</p>
+    <p class="note">Saves a print-ready PDF for the months you tick (up to 3 years back), one page per month: one row per newspaper, one column per date with the price paid, day totals and the month's total expense.</p>
 
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>

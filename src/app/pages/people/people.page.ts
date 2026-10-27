@@ -81,7 +81,7 @@ export class PeoplePage implements ViewWillEnter {
 
   async open(user?: UserAccount) {
     if (user && !this.canEdit(user)) {
-      this.ui.toast('Only an admin can edit admin accounts.', 'medium');
+      this.ui.toast('Only an admin can edit admin accounts.', 'error');
       return;
     }
     const modal = await this.modals.create({ component: UserFormModal, componentProps: { user } });

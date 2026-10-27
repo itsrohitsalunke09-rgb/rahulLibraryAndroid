@@ -2,6 +2,11 @@
   <!-- Cyan band with the title; it scrolls with the page so the avatar can sit across its edge. -->
   <header class="band">
     <h1>{{ editing() ? 'Edit profile' : 'Profile' }}</h1>
+    @if (auth.isAdmin()) {
+      <button type="button" class="more" aria-label="Masters" routerLink="/tabs/profile/masters">
+        <ion-icon name="ellipsis-vertical" aria-hidden="true"></ion-icon>
+      </button>
+    }
   </header>
 
   <div class="wrap">

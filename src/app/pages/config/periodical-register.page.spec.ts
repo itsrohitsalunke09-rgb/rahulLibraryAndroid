@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
+import { AuthService } from '../../core/auth.service';
 import { localIsoDate } from '../../core/dates';
 import { DayRegister, rupees } from '../../core/models';
 import { UiService } from '../../core/ui.service';
@@ -22,7 +23,10 @@ describe('PeriodicalRegisterPage', () => {
     api = { periodicalRegister: vi.fn(() => of(day)), savePeriodicalRegister: vi.fn(() => of(day)) };
     confirm = vi.fn(async () => false);
     TestBed.configureTestingModule({
-      providers: [{ provide: ApiService, useValue: api }, { provide: UiService, useValue: { toast: vi.fn(), confirm } }],
+      providers: [
+        { provide: ApiService, useValue: api }, { provide: UiService, useValue: { toast: vi.fn(), confirm } },
+        { provide: AuthService, useValue: { isAdmin: () => false } },
+      ],
     });
     const page = TestBed.runInInjectionContext(() => new PeriodicalRegisterPage());
     page.ionViewWillEnter();

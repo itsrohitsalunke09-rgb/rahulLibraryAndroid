@@ -5,6 +5,7 @@ import {
   IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonSkeletonText, IonSpinner, IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
+import { AuthService } from '../../core/auth.service';
 import { formatDate, localIsoDate } from '../../core/dates';
 import { FREQUENCY_LABELS, RegisterRow, rupees } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -25,6 +26,7 @@ type Line = RegisterRow & { priceText: string };
 export class PeriodicalRegisterPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
+  protected auth = inject(AuthService);
 
   readonly today = localIsoDate();
   readonly date = signal(this.today);
