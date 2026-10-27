@@ -76,13 +76,13 @@ export class CatalogPage implements ViewWillEnter {
   }
 
   async open(book: Book) {
-    const modal = await this.modals.create({ component: BookDetailModal, componentProps: { book } });
+    // An issue or an edit updates just this row, the moment it happens.
+    const onChange = (changed: Book) => this.books.replace(b => b.id === changed.id, changed);
+    const modal = await this.modals.create({ component: BookDetailModal, componentProps: { book, onChange } });
     await modal.present();
-    const { data, role } = await modal.onWillDismiss<Book>();
+    const { role } = await modal.onWillDismiss<Book>();
     if (role === 'deleted') {
       this.books.remove(b => b.id === book.id);
-    } else if (role === 'changed' && data) {
-      this.books.replace(b => b.id === data.id, data);
     }
   }
 

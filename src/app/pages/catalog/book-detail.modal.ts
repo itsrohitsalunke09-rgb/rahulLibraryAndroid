@@ -34,6 +34,8 @@ type Section = 'none' | 'details' | 'history' | 'edit';
 })
 export class BookDetailModal implements OnInit {
   @Input({ required: true }) book!: Book;
+  /** Told about every change right away, so the list is current however the popup closes (the phone's back button skips close()). */
+  @Input() onChange?: (book: Book) => void;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
@@ -115,6 +117,7 @@ export class BookDetailModal implements OnInit {
         this.saving.set(false);
         this.current.set(saved);
         this.changed = true;
+        this.onChange?.(saved);
         this.section.set('none');
         this.ui.toast('Book updated.');
       },
@@ -155,6 +158,7 @@ export class BookDetailModal implements OnInit {
       next: book => {
         this.current.set(book);
         this.changed = true;
+        this.onChange?.(book);
       },
       // The issue itself went through; only the copy count shown here is out of date.
       error: err => this.ui.error(err, 'Book issued, but the copy count could not be refreshed.')

@@ -1,60 +1,26 @@
 import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import {
   IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { formatDate, localIsoDate } from '../../core/dates';
 import { Book, UserAccount } from '../../core/models';
-import { MarathiPipe } from '../../core/pipes';
+import { AvatarHuePipe, InitialsPipe, MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 /** Wait this long after the last keystroke before searching. */
 const SEARCH_DELAY = 300;
+/** Loan periods offered as one-tap choices, in days. */
+const LOAN_PERIODS = [7, 14, 21, 30];
 
 @Component({
   selector: 'app-issue-book',
   templateUrl: 'issue-book.modal.html',
+  styleUrls: ['issue-book.modal.scss'],
   imports: [
-    FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonFooter, IonSpinner,
-    MarathiPipe
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonFooter, IonSpinner,
+    MarathiPipe, InitialsPipe, AvatarHuePipe
   ],
-  styles: [`
-    .wrap { max-width: 520px; margin: 0 auto; }
-    .book-card {
-      padding: 14px 16px; border-radius: var(--app-radius-sheet);
-      border: 1px solid var(--app-rule); background: var(--app-surface);
-      box-shadow: inset 4px 0 0 var(--ion-color-success);
-    }
-    .book { margin: 0 0 2px; font-size: 1.0625rem; font-weight: 700; }
-    .hint { color: var(--ion-color-medium); margin: 0; font-size: 0.875rem; }
-
-    /* Student picker: the results open as a list right under the search box. */
-    .picker input::-webkit-search-cancel-button { display: none; }
-    .picker .chevron { --icon-size: 16px; }
-    .options {
-      display: grid; max-height: 264px; overflow-y: auto; padding: 4px;
-      border: 1px solid var(--app-rule); border-radius: 14px; background: var(--app-paper);
-    }
-    .option {
-      display: grid; gap: 2px; padding: 10px 12px; border: 0; border-radius: 10px;
-      background: transparent; color: var(--app-ink); font: inherit; text-align: start; cursor: pointer;
-    }
-    .option + .option { box-shadow: 0 -1px 0 var(--app-rule); }
-    .option:hover, .option:focus-visible { background: var(--app-surface); outline: none; }
-    .option .name { font-size: 14px; font-weight: 500; }
-    .option .meta, .status { font-size: 12px; color: var(--app-muted); }
-    .status { margin: 0; padding: 10px 12px; line-height: 1.4; }
-    .chosen { color: var(--app-ink); }
-
-    .issue-bar {
-      display: grid; gap: 16px; background: var(--app-surface);
-      padding: 16px 16px calc(12px + var(--ion-safe-area-bottom, 0px));
-    }
-    .issue-bar .form-error { margin: 0; }
-    ion-footer { border-top: 1px solid var(--app-rule); box-shadow: none; }
-  `],
 })
 export class IssueBookModal implements OnDestroy {
   @Input({ required: true }) book!: Book;
@@ -73,7 +39,8 @@ export class IssueBookModal implements OnDestroy {
   readonly selected = signal<UserAccount | null>(null);
   readonly saving = signal(false);
   readonly error = signal('');
-  days: number | string = 14;
+  readonly periods = LOAN_PERIODS;
+  readonly days = signal(14);
   private search$?: Subscription;
   private timer?: ReturnType<typeof setTimeout>;
 
@@ -110,11 +77,11 @@ export class IssueBookModal implements OnDestroy {
     this.search$?.unsubscribe();
   }
 
+  /** "Wed, 11 Nov 2026". */
   dueDate() {
-    const days = Number(this.days) || 14;
     const due = new Date();
-    due.setDate(due.getDate() + days);
-    return formatDate(localIsoDate(due));
+    due.setDate(due.getDate() + this.days());
+    return due.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   cancel() {
@@ -123,13 +90,9 @@ export class IssueBookModal implements OnDestroy {
 
   issue() {
     const student = this.selected();
-    const days = Math.floor(Number(this.days));
+    const days = this.days();
     if (!student) {
       this.error.set('Choose a student first.');
-      return;
-    }
-    if (!days || days < 1) {
-      this.error.set('Loan period must be at least 1 day.');
       return;
     }
     this.saving.set(true);

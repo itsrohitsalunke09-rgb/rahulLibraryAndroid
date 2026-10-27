@@ -9,61 +9,84 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content>
   <div class="wrap">
-    <div class="book-card">
-      <p class="book" [class.marathi]="book.category | marathi">{{ book.title }}</p>
-      <p class="hint">{{ book.availableCopies }} cop{{ book.availableCopies === 1 ? 'y' : 'ies' }} on the shelf</p>
-    </div>
+    <!-- The book being lent, with how many copies are on the shelf. -->
+    <section class="book">
+      <span class="book-icon" aria-hidden="true"><span class="icon" style="--icon: url(assets/icons/book.svg)"></span></span>
+      <span class="book-text">
+        <span class="title" [class.marathi]="book.category | marathi">{{ book.title }}</span>
+        <span class="by" [class.marathi]="book.category | marathi">{{ book.author }}</span>
+        @if (book.registrationNumber) {
+          <span class="reg">Reg. no. {{ book.registrationNumber }}</span>
+        }
+      </span>
+      <span class="stock">{{ book.availableCopies }} of {{ book.totalCopies }} on the shelf</span>
+    </section>
 
-    <h3 class="form-section">Student</h3>
-    <div class="form-card">
-      <!-- Searchable dropdown: type to search, tap a name to choose it. -->
-      <div class="form-field picker">
-        <label class="form-label" for="student-search">Issue to</label>
-        <span class="form-box">
-          <span class="icon" style="--icon: url(assets/icons/search.svg)" aria-hidden="true"></span>
-          <input #input id="student-search" type="search" autocomplete="off" enterkeyhint="search"
-                 placeholder="Name, username or phone" role="combobox" aria-autocomplete="list"
-                 aria-controls="student-options" [attr.aria-expanded]="open()"
-                 [value]="query()" (input)="type($any($event.target).value)" (focus)="open.set(true)" />
-          @if (query()) {
-            <button type="button" class="form-box-action" aria-label="Clear student" (click)="clear(); input.focus()">
-              <span class="icon" style="--icon: url(assets/icons/close.svg)" aria-hidden="true"></span>
-            </button>
-          } @else {
-            <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
-          }
+    <h3 class="step">Student</h3>
+    @if (selected(); as s) {
+      <!-- Chosen: shown as a card, with a way back to the search. -->
+      <div class="chosen">
+        <span class="avatar" [style.--hue]="s.username | avatarHue" aria-hidden="true">{{ s.fullName | initials }}</span>
+        <span class="who">
+          <span class="name">{{ s.fullName }}</span>
+          <span class="meta">{{ s.username }}{{ s.phone ? ' · ' + s.phone : '' }}</span>
         </span>
+        <button type="button" class="change" (click)="clear()">Change</button>
+      </div>
+    } @else {
+      <!-- Searchable list: type to search, tap a name to choose it. -->
+      <label class="search">
+        <span class="sr-only">Search students</span>
+        <span class="icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
+        <input #input type="search" autocomplete="off" enterkeyhint="search"
+               placeholder="Name, username or phone" role="combobox" aria-autocomplete="list"
+               aria-controls="student-options" [attr.aria-expanded]="open()"
+               [value]="query()" (input)="type($any($event.target).value)" (focus)="open.set(true)" />
+        @if (query()) {
+          <button type="button" class="clear" aria-label="Clear search" (click)="clear(); input.focus()">
+            <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
+          </button>
+        }
+      </label>
 
-        @if (open() && !selected()) {
-          <div id="student-options" class="options" role="listbox" aria-label="Students">
-            @for (student of students(); track student.id) {
-              <button type="button" class="option" role="option" [attr.aria-selected]="false" (click)="choose(student)">
+      @if (open()) {
+        <div id="student-options" class="options" role="listbox" aria-label="Students">
+          @for (student of students(); track student.id) {
+            <button type="button" class="option" role="option" [attr.aria-selected]="false" (click)="choose(student)">
+              <span class="avatar" [style.--hue]="student.username | avatarHue" aria-hidden="true">{{ student.fullName | initials }}</span>
+              <span class="who">
                 <span class="name">{{ student.fullName }}</span>
                 <span class="meta">{{ student.username }}{{ student.phone ? ' · ' + student.phone : '' }}</span>
-              </button>
-            } @empty {
-              <p class="status">
-                @if (searching()) {
-                  Searching…
-                } @else if (searched()) {
-                  No active student matches. Check the spelling or start of the name.
-                } @else {
-                  Type the start of a student's name.
-                }
-              </p>
-            }
-          </div>
-        }
+              </span>
+            </button>
+          } @empty {
+            <p class="status">
+              @if (searching()) {
+                Searching…
+              } @else if (searched()) {
+                No active student matches. Check the spelling or the start of the name.
+              } @else {
+                Type the start of a student's name.
+              }
+            </p>
+          }
+        </div>
+      }
+    }
 
-        @if (selected(); as s) {
-          <span class="form-helper chosen">
-            {{ s.username }}{{ s.phone ? ' · ' + s.phone : '' }}
-          </span>
-        }
-      </div>
+    <h3 class="step">Loan period</h3>
+    <div class="periods" role="radiogroup" aria-label="Loan period">
+      @for (d of periods; track d) {
+        <button type="button" class="period" role="radio" [class.on]="days() === d" [attr.aria-checked]="days() === d"
+                (click)="days.set(d)">{{ d }} days</button>
+      }
     </div>
+    <p class="due">
+      <span class="icon" style="--icon: url(assets/icons/field-calendar.svg); --icon-size: 16px" aria-hidden="true"></span>
+      Due back <strong>{{ dueDate() }}</strong>
+    </p>
   </div>
 </ion-content>
 
@@ -72,20 +95,14 @@
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
-    <label class="form-field">
-      <span class="form-label">Loan period (days)</span>
-      <span class="form-box">
-        <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
-        <input type="number" min="1" inputmode="numeric" name="days" [(ngModel)]="days" />
-      </span>
-      <span class="form-helper">Due back {{ dueDate() }}</span>
-    </label>
-    <ion-button expand="block" [disabled]="!selected() || saving()" (click)="issue()">
+    <button type="button" class="primary" [disabled]="!selected() || saving()" (click)="issue()">
       @if (saving()) {
         <ion-spinner name="crescent"></ion-spinner>
+      } @else if (selected(); as s) {
+        Issue to {{ s.fullName }}
       } @else {
-        Issue{{ selected() ? ' to ' + selected()!.fullName : '' }}
+        Choose a student to issue
       }
-    </ion-button>
+    </button>
   </div>
 </ion-footer>
