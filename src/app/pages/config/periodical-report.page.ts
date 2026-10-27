@@ -1,7 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import {
-  IonBackButton, IonButtons, IonContent, IonHeader, IonSkeletonText, IonTitle, IonToolbar, ViewWillEnter
+  AlertController, IonBackButton, IonButtons, IonContent, IonHeader, IonSkeletonText, IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { FREQUENCY_LABELS, MonthReport, rupees } from '../../core/models';
@@ -27,6 +29,7 @@ export class PeriodicalReportPage implements ViewWillEnter {
   readonly error = signal('');
   readonly exporting = signal(false);
   private ui = inject(UiService);
+  private alerts = inject(AlertController);
   readonly labels = FREQUENCY_LABELS;
   readonly rupees = rupees;
 
@@ -52,21 +55,39 @@ export class PeriodicalReportPage implements ViewWillEnter {
     this.pick(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
   }
 
-  /** The month as a printable table (newspaper × date with prices and totals), shared or downloaded as PDF. */
+  /** Asks which month, then saves it as a printable table (newspaper × date with prices and totals). */
   async exportPdf() {
-    const report = this.report();
-    if (!report || this.exporting()) {
+    if (this.exporting()) {
+      return;
+    }
+    const alert = await this.alerts.create({
+      header: 'Export PDF',
+      subHeader: 'Which month?',
+      inputs: recentMonths(this.thisMonth, 12).map(m => ({
+        type: 'radio' as const, label: this.monthName(m), value: m, checked: m === this.month(),
+      })),
+      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss<{ values: string }>();
+    const month = data?.values;
+    if (role !== 'confirm' || !month) {
       return;
     }
     this.exporting.set(true);
     try {
-      const pdf = registerPdf(report, DEFAULT_ABOUT.title, this.monthName(report.month));
-      await saveFile(pdf, `newspaper-register-${report.month}.pdf`, 'application/pdf');
-    } catch (err) {
-      // Closing Android's share sheet without choosing an app is not an error.
-      if (!/cancel/i.test(String((err as Error)?.message ?? err))) {
-        this.ui.error(err, 'Could not create the PDF.');
+      const shown = this.report();
+      const report = shown && shown.month === month ? shown : await firstValueFrom(this.api.periodicalReport(month));
+      if (!report.rows.some(r => r.issues > 0)) {
+        this.ui.toast(`Nothing is ticked in the register for ${this.monthName(month)} yet.`, 'medium');
+        return;
       }
+      const pdf = registerPdf(report, DEFAULT_ABOUT.title, this.monthName(month));
+      const where = await saveFile(pdf, `newspaper-register-${month}.pdf`, 'application/pdf');
+      this.ui.toast(`PDF saved to ${where}`);
+    } catch (err) {
+      this.ui.toast(err instanceof HttpErrorResponse ? errorMessage(err, 'Could not create the PDF.')
+        : (err as Error)?.message || 'Could not create the PDF.', 'danger');
     } finally {
       this.exporting.set(false);
     }
@@ -89,4 +110,13 @@ export class PeriodicalReportPage implements ViewWillEnter {
       }
     });
   }
+}
+
+/** "2026-10" and the months before it, newest first. */
+export function recentMonths(latest: string, count: number): string[] {
+  const [year, month] = latest.split('-').map(Number);
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(year, month - 1 - i, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
 }

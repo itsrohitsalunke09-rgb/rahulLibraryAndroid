@@ -19,6 +19,12 @@
     </div>
     <p class="when">{{ monthName(month()) }}{{ month() === thisMonth ? ' · so far' : '' }}</p>
 
+    <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
+      <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
+      {{ exporting() ? 'Saving PDF…' : 'Export PDF…' }}
+    </button>
+    <p class="note">Saves a print-ready table for the month you choose: one row per newspaper, one column per date with the price paid, day totals and the month's total expense.</p>
+
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
@@ -51,11 +57,6 @@
           <span>{{ r.totalIssues }} cop{{ r.totalIssues === 1 ? 'y' : 'ies' }} in total</span>
           <strong>{{ rupees(r.totalAmount) }}</strong>
         </div>
-        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
-          <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
-          {{ exporting() ? 'Creating PDF…' : 'Export PDF (print-ready table)' }}
-        </button>
-        <p class="note">The PDF has one row per newspaper and one column per date with the price paid, plus day totals and the month's total expense.</p>
         <p class="note">"Missing" counts the days so far with no copy of a daily paper, including days it wasn't printed.</p>
       } @else {
         <div class="empty-state">
