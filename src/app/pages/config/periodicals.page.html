@@ -17,17 +17,6 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="shortcuts">
-    <a class="shortcut" routerLink="/tabs/config/periodicals/register">
-      <span class="icon" style="--icon: url(assets/icons/sheet.svg); --icon-size: 18px" aria-hidden="true"></span>
-      Daily register
-    </a>
-    <a class="shortcut" routerLink="/tabs/config/periodicals/report">
-      <span class="icon" style="--icon: url(assets/icons/copies.svg); --icon-size: 18px" aria-hidden="true"></span>
-      Monthly report
-    </a>
-  </div>
-
   @if (error()) {
     <p class="page-error" role="alert">{{ error() }}</p>
   }

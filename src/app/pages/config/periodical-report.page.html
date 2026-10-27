@@ -37,7 +37,7 @@
               <div class="what">
                 <span class="name marathi">{{ row.name }}</span>
                 <span class="meta">
-                  {{ labels[row.frequency] }} · {{ row.issues }} cop{{ row.issues === 1 ? 'y' : 'ies' }}
+                  {{ row.issues }} cop{{ row.issues === 1 ? 'y' : 'ies' }}
                   @if (row.missingDays) {
                     · <span class="missing">{{ row.missingDays }} day{{ row.missingDays === 1 ? '' : 's' }} missing</span>
                   }
@@ -51,6 +51,11 @@
           <span>{{ r.totalIssues }} cop{{ r.totalIssues === 1 ? 'y' : 'ies' }} in total</span>
           <strong>{{ rupees(r.totalAmount) }}</strong>
         </div>
+        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
+          <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
+          {{ exporting() ? 'Creating PDF…' : 'Export PDF (print-ready table)' }}
+        </button>
+        <p class="note">The PDF has one row per newspaper and one column per date with the price paid, plus day totals and the month's total expense.</p>
         <p class="note">"Missing" counts the days so far with no copy of a daily paper, including days it wasn't printed.</p>
       } @else {
         <div class="empty-state">

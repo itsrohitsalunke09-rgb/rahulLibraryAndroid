@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
   IonSkeletonText, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
@@ -15,7 +14,7 @@ import { PeriodicalFormModal } from './periodical-form.modal';
   templateUrl: 'periodicals.page.html',
   styleUrls: ['categories.page.scss', 'periodicals.page.scss'],
   imports: [
-    RouterLink, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
     IonList, IonItem, IonLabel, IonSkeletonText
   ],
 })

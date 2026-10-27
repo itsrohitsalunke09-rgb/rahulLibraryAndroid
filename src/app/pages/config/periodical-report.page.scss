@@ -4,4 +4,6 @@
 .row .what { flex: 1; }
 .amount { font-size: 15px; color: var(--app-ink); white-space: nowrap; }
 .missing { color: var(--app-rust); font-weight: 500; }
-.note { margin: 0 4px; font-size: 12px; line-height: 1.45; color: var(--app-muted); }
+.note { margin: 0 4px 8px; font-size: 12px; line-height: 1.45; color: var(--app-muted); }
+.export { gap: 8px; margin-bottom: 12px; color: var(--ion-color-primary); font-weight: 600; }
+.export:disabled { opacity: 0.6; }

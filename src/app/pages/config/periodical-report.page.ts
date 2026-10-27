@@ -5,7 +5,10 @@ import {
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { FREQUENCY_LABELS, MonthReport, rupees } from '../../core/models';
-import { errorMessage } from '../../core/ui.service';
+import { DEFAULT_ABOUT } from '../../core/about-content';
+import { registerPdf } from '../../core/register-pdf';
+import { saveFile } from '../../core/save-file';
+import { UiService, errorMessage } from '../../core/ui.service';
 
 /** Monthly newspaper report: copies received, cost, and missing days, to check against the vendor's bill. */
 @Component({
@@ -22,6 +25,8 @@ export class PeriodicalReportPage implements ViewWillEnter {
   readonly report = signal<MonthReport | null>(null);
   readonly loading = signal(false);
   readonly error = signal('');
+  readonly exporting = signal(false);
+  private ui = inject(UiService);
   readonly labels = FREQUENCY_LABELS;
   readonly rupees = rupees;
 
@@ -45,6 +50,26 @@ export class PeriodicalReportPage implements ViewWillEnter {
     const [y, m] = this.month().split('-').map(Number);
     const d = new Date(y, m - 1 + months, 1);
     this.pick(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+
+  /** The month as a printable table (newspaper × date with prices and totals), shared or downloaded as PDF. */
+  async exportPdf() {
+    const report = this.report();
+    if (!report || this.exporting()) {
+      return;
+    }
+    this.exporting.set(true);
+    try {
+      const pdf = registerPdf(report, DEFAULT_ABOUT.title, this.monthName(report.month));
+      await saveFile(pdf, `newspaper-register-${report.month}.pdf`, 'application/pdf');
+    } catch (err) {
+      // Closing Android's share sheet without choosing an app is not an error.
+      if (!/cancel/i.test(String((err as Error)?.message ?? err))) {
+        this.ui.error(err, 'Could not create the PDF.');
+      }
+    } finally {
+      this.exporting.set(false);
+    }
   }
 
   private load() {

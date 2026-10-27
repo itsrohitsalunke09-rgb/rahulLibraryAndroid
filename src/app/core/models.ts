@@ -232,6 +232,8 @@ export interface ReportRow {
   amount: number;
   /** Days so far this month a daily paper didn't come; null for weeklies and monthlies. */
   missingDays: number | null;
+  /** Price paid on each day of the month (index 0 = the 1st); null when no copy came. */
+  prices: (number | null)[];
 }
 
 export interface MonthReport {
