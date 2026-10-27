@@ -133,6 +133,12 @@ export class BookDetailModal implements OnInit {
     await modal.present();
     const { role } = await modal.onWillDismiss();
     if (role === 'issued') {
+      // One copy just left the shelf: show it at once, then confirm with the server in the background.
+      const book = this.current()!;
+      const issued = { ...book, availableCopies: Math.max(0, book.availableCopies - 1) };
+      this.current.set(issued);
+      this.changed = true;
+      this.onChange?.(issued);
       this.reloadBook();
       this.loadHistory();
     }

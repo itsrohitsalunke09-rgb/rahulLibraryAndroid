@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ModalController } from '@ionic/angular';
-import { of } from 'rxjs';
+import { NEVER, Observable, of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { CategoriesStore } from '../../core/categories.store';
@@ -12,11 +12,11 @@ describe('BookDetailModal', () => {
   const book = { id: 7, title: 'Wings of Fire', author: 'Kalam', totalCopies: 1, availableCopies: 1 } as Book;
   const afterIssue = { ...book, availableCopies: 0 };
 
-  it('tellsTheCatalogAboutTheIssuedBookStraightAway', async () => {
+  async function issueWith(serverBook: Observable<Book>) {
     const onChange = vi.fn();
     TestBed.configureTestingModule({
       providers: [
-        { provide: ApiService, useValue: { book: vi.fn(() => of(afterIssue)), bookIssues: vi.fn(() => of([])) } },
+        { provide: ApiService, useValue: { book: vi.fn(() => serverBook), bookIssues: vi.fn(() => of([])) } },
         // The issue popup reports a successful issue.
         { provide: ModalController, useValue: {
           create: vi.fn(async () => ({ present: vi.fn(), onWillDismiss: async () => ({ role: 'issued' }) })),
@@ -33,8 +33,18 @@ describe('BookDetailModal', () => {
     fixture.detectChanges();
 
     await fixture.componentInstance.issue();
+    return { fixture, onChange };
+  }
 
+  it('tellsTheCatalogAboutTheIssuedBookStraightAway', async () => {
+    const { onChange } = await issueWith(of(afterIssue));
     // Without waiting for the popup to close, which the phone's back button would skip.
+    expect(onChange).toHaveBeenCalledWith(afterIssue);
+  });
+
+  it('showsOneCopyFewerWithoutWaitingForTheServer', async () => {
+    const { fixture, onChange } = await issueWith(NEVER);
+    expect(fixture.componentInstance.current()?.availableCopies).toBe(0);
     expect(onChange).toHaveBeenCalledWith(afterIssue);
   });
 });
