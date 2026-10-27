@@ -1,0 +1,7 @@
+/* On top of periodical-register.page.scss (header, ‹ month ›, card, summary). */
+.row { display: flex; align-items: center; gap: 12px; min-height: 60px; }
+.row + .row { border-top: 1px solid var(--app-rule); }
+.row .what { flex: 1; }
+.amount { font-size: 15px; color: var(--app-ink); white-space: nowrap; }
+.missing { color: var(--app-rust); font-weight: 500; }
+.note { margin: 0 4px; font-size: 12px; line-height: 1.45; color: var(--app-muted); }

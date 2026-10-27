@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Papers &amp; magazines</ion-title>
+    <ion-buttons slot="end">
+      <button class="heading-action" aria-label="Add newspaper or magazine" (click)="edit()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="shortcuts">
+    <a class="shortcut" routerLink="/tabs/config/periodicals/register">
+      <span class="icon" style="--icon: url(assets/icons/sheet.svg); --icon-size: 18px" aria-hidden="true"></span>
+      Daily register
+    </a>
+    <a class="shortcut" routerLink="/tabs/config/periodicals/report">
+      <span class="icon" style="--icon: url(assets/icons/copies.svg); --icon-size: 18px" aria-hidden="true"></span>
+      Monthly report
+    </a>
+  </div>
+
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loaded()) {
+    @if (items().length) {
+      <ion-list inset="true" lines="full">
+        @for (p of items(); track p.id) {
+          <ion-item button detail="false" (click)="edit(p)" [class.off]="!p.active">
+            <ion-label>
+              <h2 class="marathi">{{ p.name }}</h2>
+              <p>
+                {{ labels[p.frequency] }}{{ p.language ? ' · ' + p.language : '' }}
+                @if (!p.active) { · <strong>Not subscribed</strong> }
+              </p>
+            </ion-label>
+            <span slot="end" class="price">{{ rupees(p.price) }}</span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!error()) {
+      <div class="empty-state">
+        <span class="icon empty-icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+        <h2>No newspapers or magazines yet</h2>
+        <p>Add each one you subscribe to with the + button, with its usual price per copy.</p>
+      </div>
+    }
+  } @else {
+    <ion-list inset="true" lines="full">
+      @for (i of [1, 2, 3]; track i) {
+        <ion-item><ion-label><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></ion-label></ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

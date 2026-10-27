@@ -39,6 +39,18 @@
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
       </div>
     </ion-item>
+    <ion-item button detail="false" routerLink="/tabs/config/periodicals">
+      <span slot="start" class="master-icon" aria-hidden="true">
+        <span class="icon" style="--icon: url(assets/icons/copies.svg); --icon-size: 20px"></span>
+      </span>
+      <ion-label>
+        <h2>Newspapers &amp; magazines</h2>
+        <p>Subscriptions and price per copy, used by the daily register</p>
+      </ion-label>
+      <div slot="end" class="end">
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+      </div>
+    </ion-item>
     <ion-item button detail="false" routerLink="/tabs/config/about">
       <span slot="start" class="master-icon" aria-hidden="true">
         <span class="icon" style="--icon: url(assets/icons/book.svg); --icon-size: 20px"></span>
@@ -46,6 +58,34 @@
       <ion-label>
         <h2>About us page</h2>
         <p>Library history, collection, activities and contact, shown from the login screen</p>
+      </ion-label>
+      <div slot="end" class="end">
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <h2 class="section-title">Registers</h2>
+  <ion-list inset="true" lines="full">
+    <ion-item button detail="false" routerLink="/tabs/config/periodicals/register">
+      <span slot="start" class="master-icon" aria-hidden="true">
+        <span class="icon" style="--icon: url(assets/icons/sheet.svg); --icon-size: 20px"></span>
+      </span>
+      <ion-label>
+        <h2>Daily newspaper register</h2>
+        <p>Tick the newspapers and magazines that came today, with their price</p>
+      </ion-label>
+      <div slot="end" class="end">
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+      </div>
+    </ion-item>
+    <ion-item button detail="false" routerLink="/tabs/config/periodicals/report">
+      <span slot="start" class="master-icon" aria-hidden="true">
+        <span class="icon" style="--icon: url(assets/icons/clock.svg); --icon-size: 20px"></span>
+      </span>
+      <ion-label>
+        <h2>Monthly newspaper report</h2>
+        <p>Copies received, total cost and missing days</p>
       </ion-label>
       <div slot="end" class="end">
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>

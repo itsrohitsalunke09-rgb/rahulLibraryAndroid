@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config/periodicals" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Monthly report</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <div class="day">
+      <button type="button" class="step" aria-label="Previous month" (click)="shift(-1)">‹</button>
+      <label class="date">
+        <span class="sr-only">Month</span>
+        <input #monthBox type="month" [max]="thisMonth" [value]="month()" (change)="pick(monthBox.value); monthBox.value = month()" />
+      </label>
+      <button type="button" class="step" aria-label="Next month" [disabled]="month() >= thisMonth" (click)="shift(1)">›</button>
+    </div>
+    <p class="when">{{ monthName(month()) }}{{ month() === thisMonth ? ' · so far' : '' }}</p>
+
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (loading() && !report()) {
+      <div class="card">
+        @for (i of [1, 2, 3]; track i) {
+          <ion-skeleton-text [animated]="true" style="height: 44px; margin: 8px 0"></ion-skeleton-text>
+        }
+      </div>
+    } @else if (report(); as r) {
+      @if (r.rows.length) {
+        <div class="card">
+          @for (row of r.rows; track row.periodicalId) {
+            <div class="row">
+              <div class="what">
+                <span class="name marathi">{{ row.name }}</span>
+                <span class="meta">
+                  {{ labels[row.frequency] }} · {{ row.issues }} cop{{ row.issues === 1 ? 'y' : 'ies' }}
+                  @if (row.missingDays) {
+                    · <span class="missing">{{ row.missingDays }} day{{ row.missingDays === 1 ? '' : 's' }} missing</span>
+                  }
+                </span>
+              </div>
+              <strong class="amount">{{ rupees(row.amount) }}</strong>
+            </div>
+          }
+        </div>
+        <div class="summary">
+          <span>{{ r.totalIssues }} cop{{ r.totalIssues === 1 ? 'y' : 'ies' }} in total</span>
+          <strong>{{ rupees(r.totalAmount) }}</strong>
+        </div>
+        <p class="note">"Missing" counts the days so far with no copy of a daily paper, including days it wasn't printed.</p>
+      } @else {
+        <div class="empty-state">
+          <h2>Nothing for this month</h2>
+          <p>Copies ticked in the daily register show up here.</p>
+        </div>
+      }
+    }
+  </div>
+</ion-content>

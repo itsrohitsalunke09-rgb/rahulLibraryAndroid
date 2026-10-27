@@ -5,8 +5,9 @@ import { environment } from '../../environments/environment';
 import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
-  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, NewsStory, NewsStoryRequest, Page,
-  ProfileUpdate, Role, UnlinkedCategory, UserAccount, UserRequest
+  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
+  MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
+  UserAccount, UserRequest
 } from './models';
 
 /** Thin wrapper over the Spring Boot API (same endpoints the website uses). */
@@ -182,6 +183,35 @@ export class ApiService {
 
   updateProfile(profile: ProfileUpdate) {
     return changes(this.http.put<UserAccount>(`${this.base}/users/profile`, profile));
+  }
+
+  // ---- Newspapers & magazines (staff) ----
+  periodicals() {
+    return this.http.get<Periodical[]>(`${this.base}/periodicals`);
+  }
+
+  savePeriodical(periodical: PeriodicalRequest, id?: number) {
+    return id
+      ? this.http.put<Periodical>(`${this.base}/periodicals/${id}`, periodical)
+      : this.http.post<Periodical>(`${this.base}/periodicals`, periodical);
+  }
+
+  deletePeriodical(id: number) {
+    return this.http.delete<void>(`${this.base}/periodicals/${id}`);
+  }
+
+  /** The arrival register for one day (YYYY-MM-DD). */
+  periodicalRegister(date: string) {
+    return this.http.get<DayRegister>(`${this.base}/periodicals/register`, { params: { date } });
+  }
+
+  savePeriodicalRegister(date: string, entries: RegisterEntry[]) {
+    return this.http.put<DayRegister>(`${this.base}/periodicals/register`, entries, { params: { date } });
+  }
+
+  /** Copies and cost per newspaper/magazine for a month (YYYY-MM). */
+  periodicalReport(month: string) {
+    return this.http.get<MonthReport>(`${this.base}/periodicals/report`, { params: { month } });
   }
 
   // ---- About us page ----

@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>{{ periodical ? 'Edit' : 'Add' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving() || deleting()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form class="form" (ngSubmit)="save()">
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <h3 class="form-section">Newspaper or magazine</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Name *</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+          <input class="marathi" name="name" maxlength="120" placeholder="e.g. लोकसत्ता" [(ngModel)]="form.name" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Language</span>
+        <span class="form-box">
+          <input class="marathi" name="language" maxlength="30" placeholder="e.g. मराठी" [(ngModel)]="form.language" />
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Comes out</span>
+        <span class="form-box select">
+          <select name="frequency" [(ngModel)]="form.frequency">
+            @for (f of frequencies; track f[0]) {
+              <option [value]="f[0]">{{ f[1] }}</option>
+            }
+          </select>
+          <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+        </span>
+      </label>
+      <label class="form-field">
+        <span class="form-label">Price of one copy (₹)</span>
+        <span class="form-box">
+          <span class="field-prefix" aria-hidden="true">₹</span>
+          <input name="price" type="number" inputmode="decimal" min="0" max="10000" step="0.5" placeholder="0" [(ngModel)]="form.price" />
+        </span>
+        <span class="form-helper">The usual price. In the daily register you can change it for one day, e.g. a dearer Sunday edition.</span>
+      </label>
+    </div>
+
+    <div class="form-panel active-row">
+      <ion-item lines="none">
+        <ion-toggle name="active" [(ngModel)]="form.active">Subscribed</ion-toggle>
+      </ion-item>
+    </div>
+    <p class="form-helper toggle-help">Only subscribed ones show in the daily register. Switch off when a subscription stops; its history stays.</p>
+
+    @if (periodical) {
+      <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">
+        @if (deleting()) { <ion-spinner name="crescent"></ion-spinner> } @else {
+          <span class="icon" style="--icon: url(assets/icons/trash.svg)" aria-hidden="true"></span>
+          Delete
+        }
+      </button>
+    }
+  </form>
+</ion-content>

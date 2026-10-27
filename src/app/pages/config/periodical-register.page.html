@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config/periodicals" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Newspaper register</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving() || loading() || !lines().length">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <div class="day">
+      <button type="button" class="step" aria-label="Previous day" (click)="shift(-1)">‹</button>
+      <label class="date">
+        <span class="sr-only">Date</span>
+        <input #dateBox type="date" [max]="today" [value]="date()" (change)="pickDate(dateBox)" />
+      </label>
+      <button type="button" class="step" aria-label="Next day" [disabled]="date() >= today" (click)="shift(1)">›</button>
+    </div>
+    <p class="when">{{ date() === today ? 'Today' : formatDate(date()) }} · tick each copy that came</p>
+
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (loading()) {
+      <div class="card">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <ion-skeleton-text [animated]="true" style="height: 44px; margin: 8px 0"></ion-skeleton-text>
+        }
+      </div>
+    } @else if (lines().length) {
+      <div class="card">
+        @for (line of lines(); track line.periodicalId) {
+          <div class="line" [class.on]="line.arrived">
+            <label class="tick">
+              <input type="checkbox" [(ngModel)]="line.arrived" (ngModelChange)="changed()" />
+              <span class="what">
+                <span class="name marathi">{{ line.name }}</span>
+                <span class="meta">{{ labels[line.frequency] }}{{ line.language ? ' · ' + line.language : '' }}</span>
+              </span>
+            </label>
+            <label class="price">
+              <span class="sr-only">Price of {{ line.name }}</span>
+              <span aria-hidden="true">₹</span>
+              <input type="number" inputmode="decimal" min="0" step="0.5" [disabled]="!line.arrived"
+                     [(ngModel)]="line.priceText" (ngModelChange)="changed()" />
+            </label>
+          </div>
+        }
+      </div>
+
+      <div class="summary">
+        <span>{{ ticked() }} of {{ lines().length }} received</span>
+        <strong>{{ rupees(total()) }}</strong>
+      </div>
+      <button type="button" class="secondary" (click)="tickAll()">Tick all</button>
+      @if (dirty()) {
+        <p class="unsaved" role="status">Not saved yet. Tap Save at the top.</p>
+      }
+    } @else if (!error()) {
+      <div class="empty-state">
+        <h2>No newspapers or magazines yet</h2>
+        <p>Add the ones you subscribe to first.</p>
+        <a class="secondary link" routerLink="/tabs/config/periodicals">Newspapers &amp; magazines</a>
+      </div>
+    }
+  </div>
+</ion-content>

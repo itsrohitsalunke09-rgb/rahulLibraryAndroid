@@ -180,3 +180,71 @@ export function roleLabel(role: Role | null): string {
 export function isMarathi(category?: string): boolean {
   return category === 'Marathi Literature';
 }
+
+/** How often a newspaper or magazine comes out. */
+export type PeriodicalFrequency = 'DAILY' | 'WEEKLY' | 'FORTNIGHTLY' | 'MONTHLY';
+
+export const FREQUENCY_LABELS: Record<PeriodicalFrequency, string> = {
+  DAILY: 'Daily', WEEKLY: 'Weekly', FORTNIGHTLY: 'Fortnightly', MONTHLY: 'Monthly',
+};
+
+/** A newspaper or magazine the library takes (Configuration → Newspapers & magazines). */
+export interface Periodical {
+  id: number;
+  name: string;
+  language?: string | null;
+  frequency: PeriodicalFrequency;
+  /** Usual price of one copy, in rupees. */
+  price: number;
+  /** False once the subscription stops; its register history stays. */
+  active: boolean;
+}
+
+export type PeriodicalRequest = Omit<Periodical, 'id'>;
+
+/** One line of a day's arrival register. */
+export interface RegisterRow {
+  periodicalId: number;
+  name: string;
+  language?: string | null;
+  frequency: PeriodicalFrequency;
+  defaultPrice: number;
+  arrived: boolean;
+  price: number;
+}
+
+export interface DayRegister {
+  date: string;
+  rows: RegisterRow[];
+}
+
+export interface RegisterEntry {
+  periodicalId: number;
+  arrived: boolean;
+  price: number | null;
+}
+
+export interface ReportRow {
+  periodicalId: number;
+  name: string;
+  frequency: PeriodicalFrequency;
+  issues: number;
+  amount: number;
+  /** Days so far this month a daily paper didn't come; null for weeklies and monthlies. */
+  missingDays: number | null;
+}
+
+export interface MonthReport {
+  month: string;
+  from: string;
+  to: string;
+  rows: ReportRow[];
+  totalIssues: number;
+  totalAmount: number;
+}
+
+/** "₹1,250.50" (Indian digit grouping). */
+export function rupees(amount: number): string {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    .format(amount);
+}
