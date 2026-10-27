@@ -78,3 +78,11 @@ ion-item {
   --icon-size: 32px;
   color: var(--app-ink);
 }
+
+/* How many papers in each frequency card. */
+.group-count {
+  margin-inline-start: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--app-muted);
+}

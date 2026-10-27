@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSkeletonText, IonTitle,
@@ -6,7 +6,7 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { Book, FREQUENCY_LABELS, PeriodicalSummary } from '../../core/models';
+import { Book, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
 import { errorMessage } from '../../core/ui.service';
@@ -36,6 +36,8 @@ export class CatalogPage implements ViewWillEnter {
   /** null until loaded. */
   readonly papers = signal<PeriodicalSummary[] | null>(null);
   readonly papersError = signal('');
+  /** Daily, weekly, fortnightly, monthly: a card each. */
+  readonly paperGroups = computed(() => byFrequency(this.papers() ?? []));
   protected readonly labels = FREQUENCY_LABELS;
 
   ionViewWillEnter() {

@@ -191,6 +191,13 @@ export const FREQUENCY_LABELS: Record<PeriodicalFrequency, string> = {
 /** A subscribed newspaper or magazine as the catalog shows it (no price). */
 export type PeriodicalSummary = Pick<Periodical, 'id' | 'name' | 'language' | 'frequency'>;
 
+/** One card per frequency, in FREQUENCY_LABELS order; frequencies with nothing are left out. */
+export function byFrequency<T extends { frequency: PeriodicalFrequency }>(items: T[]) {
+  return (Object.keys(FREQUENCY_LABELS) as PeriodicalFrequency[])
+    .map(frequency => ({ frequency, items: items.filter(p => p.frequency === frequency) }))
+    .filter(group => group.items.length);
+}
+
 /** A newspaper or magazine the library takes (Configuration → Newspapers & magazines). */
 export interface Periodical {
   id: number;
