@@ -1,0 +1,132 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>About us page</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong (click)="save()" [disabled]="saving() || loading()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading()) {
+    <div class="loading"><ion-spinner name="crescent" aria-label="Loading"></ion-spinner></div>
+  } @else {
+    <form class="form" (ngSubmit)="save()">
+      <p class="lead">This text appears on the About us page, which opens from the login screen.</p>
+
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+
+      <h3 class="form-section">Heading</h3>
+      <div class="form-card">
+        <label class="form-field">
+          <span class="form-label">Library name *</span>
+          <span class="form-box">
+            <input class="marathi" name="title" maxlength="150" [(ngModel)]="form.title" />
+          </span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Motto</span>
+          <span class="form-box">
+            <input class="marathi" name="motto" maxlength="150" [(ngModel)]="form.motto" />
+          </span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Line under the motto</span>
+          <span class="form-box">
+            <input class="marathi" name="tagline" maxlength="200" [(ngModel)]="form.tagline" />
+          </span>
+          <span class="form-helper">E.g. recognition and founding date.</span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Introduction</span>
+          <span class="form-box tall">
+            <textarea class="marathi" name="intro" rows="6" maxlength="3000" [(ngModel)]="form.intro"></textarea>
+          </span>
+          <span class="form-helper">A blank line starts a new paragraph.</span>
+        </label>
+      </div>
+
+      <h3 class="form-section">Our journey (आमचा प्रवास)</h3>
+      <div class="form-card">
+        @for (step of form.timeline; track $index; let i = $index) {
+          <div class="row">
+            <label class="form-field year">
+              <span class="form-label">Year</span>
+              <span class="form-box">
+                <input class="marathi" [name]="'year' + i" maxlength="20" [(ngModel)]="step.year" />
+              </span>
+            </label>
+            <label class="form-field grow">
+              <span class="form-label">What happened</span>
+              <span class="form-box">
+                <input class="marathi" [name]="'step' + i" maxlength="200" [(ngModel)]="step.text" />
+              </span>
+            </label>
+            <button type="button" class="icon-btn remove" [attr.aria-label]="'Remove row ' + (i + 1)" (click)="removeStep(i)">
+              <span class="icon" style="--icon: url(assets/icons/trash.svg); --icon-size: 18px" aria-hidden="true"></span>
+            </button>
+          </div>
+        }
+        <button type="button" class="add" (click)="addStep()">+ Add a year</button>
+      </div>
+
+      <h3 class="form-section">Sections</h3>
+      <p class="hint">Each section is a box on the page. In the text, a blank line starts a new paragraph and a line starting with "- " becomes a bullet point.</p>
+      @for (section of form.sections; track $index; let i = $index; let last = $last; let first = $first) {
+        <div class="form-card section">
+          <label class="form-field">
+            <span class="form-label">Heading</span>
+            <span class="form-box">
+              <input class="marathi" [name]="'heading' + i" maxlength="100" [(ngModel)]="section.heading" />
+            </span>
+          </label>
+          <label class="form-field">
+            <span class="form-label">Text</span>
+            <span class="form-box tall">
+              <textarea class="marathi" [name]="'body' + i" rows="6" maxlength="5000" [(ngModel)]="section.body"></textarea>
+            </span>
+          </label>
+          <div class="section-actions">
+            <button type="button" [disabled]="first" [attr.aria-label]="'Move section ' + (i + 1) + ' up'" (click)="moveSection(i, -1)">↑ Up</button>
+            <button type="button" [disabled]="last" [attr.aria-label]="'Move section ' + (i + 1) + ' down'" (click)="moveSection(i, 1)">↓ Down</button>
+            <button type="button" class="remove" (click)="removeSection(i)">Remove</button>
+          </div>
+        </div>
+      }
+      <button type="button" class="add standalone" (click)="addSection()">+ Add a section</button>
+
+      <h3 class="form-section">Contact (संपर्क)</h3>
+      <div class="form-card">
+        <label class="form-field">
+          <span class="form-label">Address</span>
+          <span class="form-box tall">
+            <textarea class="marathi" name="address" rows="3" maxlength="500" [(ngModel)]="form.address"></textarea>
+          </span>
+          <span class="form-helper">Each line shows on its own line.</span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Email</span>
+          <span class="form-box">
+            <input name="email" type="email" autocapitalize="off" maxlength="120" [(ngModel)]="form.email" />
+          </span>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Instagram link</span>
+          <span class="form-box">
+            <input name="instagram" type="url" autocapitalize="off" maxlength="300" placeholder="https://www.instagram.com/…" [(ngModel)]="form.instagram" />
+          </span>
+          <span class="form-helper">Leave email or Instagram empty to hide it.</span>
+        </label>
+      </div>
+
+      <button type="button" class="reset" (click)="restoreDefault()">Use the original text</button>
+    </form>
+  }
+</ion-content>

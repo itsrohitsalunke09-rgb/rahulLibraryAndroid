@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, IssueCounts, IssueStatus, NewsStory, NewsStoryRequest, Page,
@@ -181,6 +182,16 @@ export class ApiService {
 
   updateProfile(profile: ProfileUpdate) {
     return changes(this.http.put<UserAccount>(`${this.base}/users/profile`, profile));
+  }
+
+  // ---- About us page ----
+  /** The saved About Us content, or null when none has been saved yet (the server answers 204). */
+  about() {
+    return this.http.get<AboutContent | null>(`${this.base}/about`);
+  }
+
+  saveAbout(content: AboutContent) {
+    return this.http.put<AboutContent>(`${this.base}/about`, content);
   }
 
   // ---- News ----

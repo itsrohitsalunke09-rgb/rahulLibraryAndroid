@@ -1,33 +1,43 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { logoInstagram, mailOutline } from 'ionicons/icons';
+import { DEFAULT_ABOUT, aboutBlocks, instagramHandle, withDefaults } from '../../core/about-content';
+import { ApiService } from '../../core/api.service';
 
-/** About the library (from the 2022 silver-jubilee souvenir "प्रगती स्मरणिका"), in the login screen's look. */
+/** About the library, in the login screen's look. Text comes from Configuration → About us page. */
 @Component({
   selector: 'app-about',
   templateUrl: 'about.page.html',
   styleUrls: ['../login/login.page.scss', 'about.page.scss'],
   imports: [IonContent, IonIcon],
 })
-export class AboutPage {
+export class AboutPage implements OnInit {
   private router = inject(Router);
+  private api = inject(ApiService);
 
-  readonly email = 'rahul.library@gmail.com';
-  readonly instagram = 'https://www.instagram.com/rahul_public_library';
-
-  readonly timeline = [
-    { year: '१९९४', text: 'वाचनालयाची स्थापना' },
-    { year: '१९९५–९६', text: "'ड' वर्ग शासनमान्यता" },
-    { year: '२००२–०३', text: "'क' वर्ग शासनमान्यता" },
-    { year: '२००५', text: 'आमदार बबनराव शिंदे यांच्या स्थानिक विकास निधीतून नवीन इमारत' },
-    { year: '२००६–०७', text: "'ब' वर्ग शासनमान्यता" },
-    { year: '२०२०', text: 'रौप्य महोत्सव – २५ वर्षांची वाटचाल' },
-  ];
+  /** The built-in text shows at once; the saved version replaces it when it arrives. */
+  readonly content = signal(DEFAULT_ABOUT);
+  readonly introBlocks = computed(() => aboutBlocks(this.content().intro));
+  readonly sections = computed(() => this.content().sections.map(s => ({ heading: s.heading, blocks: aboutBlocks(s.body) })));
+  readonly addressLines = computed(() => this.content().address.split('\n').map(l => l.trim()).filter(Boolean));
+  readonly instagramHandle = computed(() => instagramHandle(this.content().instagram));
 
   constructor() {
     addIcons({ logoInstagram, mailOutline });
+  }
+
+  ngOnInit() {
+    this.api.about().subscribe({
+      next: saved => {
+        if (saved) {
+          this.content.set(withDefaults(saved));
+        }
+      },
+      // Offline or the server is asleep: keep showing the built-in text.
+      error: () => undefined,
+    });
   }
 
   back() {

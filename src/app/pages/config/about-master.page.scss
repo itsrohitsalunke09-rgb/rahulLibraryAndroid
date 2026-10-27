@@ -1,0 +1,32 @@
+.form { max-width: 560px; margin: 0 auto; padding-bottom: 32px; }
+.loading { display: grid; place-items: center; padding: 48px 0; }
+.lead, .hint { margin: 0 0 12px; font-size: 14px; line-height: 1.45; color: var(--app-muted); }
+.hint { margin-top: -4px; }
+
+/* Year | text | remove, on one line. */
+.row { display: flex; align-items: flex-end; gap: 8px; }
+.row + .row { margin-top: 12px; }
+.row .year { flex: 0 0 96px; }
+.row .grow { flex: 1; min-width: 0; }
+
+.icon-btn {
+  display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; margin-bottom: 2px;
+  border: 1px solid var(--app-rule); border-radius: var(--app-radius-control); background: transparent;
+  color: var(--app-rust); cursor: pointer;
+}
+
+/* Outline pill buttons, like the news form's. */
+.add, .section-actions button, .reset {
+  height: 44px; padding: 0 14px; border: 1px solid var(--app-rule); border-radius: var(--app-radius-control);
+  background: transparent; color: var(--app-ink); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.add { width: 100%; margin-top: 14px; color: var(--ion-color-primary); }
+.add.standalone { margin: 0 0 8px; }
+
+.section + .section, .section { margin-bottom: 12px; }
+.section-actions { display: flex; gap: 8px; margin-top: 12px; }
+.section-actions button { flex: 1; }
+.section-actions button:disabled { opacity: 0.45; cursor: default; }
+.remove { color: var(--app-rust); }
+
+.reset { width: 100%; margin-top: 24px; color: var(--app-muted); }
