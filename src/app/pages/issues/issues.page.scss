@@ -1,33 +1,11 @@
-.end {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  margin-inline-start: 8px;
-}
-
-.return {
-  --border-radius: 999px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  height: 32px;
-  font-size: 0.8125rem;
-}
-
-/* Due line in the status colour, so the urgent ones stand out. */
-ion-label p.due {
+/* Rows share Catalog's layout (catalog.page.scss); the due line under the chip takes the status colour. */
+.availability .due {
   font-weight: 600;
-  font-size: 0.8125rem;
-  margin-top: 4px;
-}
+  white-space: nowrap;
 
-ion-label p.due-danger { color: var(--ion-color-danger); }
-ion-label p.due-warning { color: var(--ion-color-warning); }
-ion-label p.due-success { color: var(--ion-color-success); }
-
-ion-label h2,
-ion-label p {
-  white-space: normal;
+  &.due-danger { color: var(--ion-color-danger); }
+  &.due-warning { color: var(--ion-color-warning); }
+  &.due-success { color: var(--ion-color-success); }
 }
 
 /* Year tab: a caret shows it opens a list. */

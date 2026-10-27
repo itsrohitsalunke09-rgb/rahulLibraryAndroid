@@ -1,13 +1,13 @@
 import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
-  IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRefresher,
+  IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
+  IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, 
   IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
+import { swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { issueYears, openYearSelect } from '../../core/issue-years';
@@ -28,11 +28,10 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL', 'YEAR'];
 @Component({
   selector: 'app-issues',
   templateUrl: 'issues.page.html',
-  styleUrls: ['issues.page.scss'],
+  styleUrls: ['../catalog/catalog.page.scss', 'issues.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
-    IonRefresherContent, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions, IonItemOption,
-    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSelect, IonSelectOption,
+    IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSelect, IonSelectOption,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe,
     PageSkeletonComponent
   ],
@@ -56,7 +55,7 @@ export class IssuesPage implements ViewWillEnter {
   readonly issues = new PagedList<BookIssue>((page, size) => this.fetch(page, size), 'Could not load issues.');
 
   constructor() {
-    addIcons({ returnDownBackOutline, swapHorizontalOutline });
+    addIcons({ swapHorizontalOutline });
     // Dashboard tiles link here with ?status=OUT / OVERDUE, plus &year=… when a year is chosen there.
     this.route.queryParamMap.subscribe(params => {
       if (!params.has('status') && !params.has('year')) {
@@ -163,8 +162,7 @@ export class IssuesPage implements ViewWillEnter {
     }
   }
 
-  async markReturned(issue: BookIssue, sliding?: IonItemSliding) {
-    await sliding?.close();
+  async markReturned(issue: BookIssue) {
     const ok = await this.ui.confirm('Mark as returned?', `"${issue.bookTitle}" from ${issue.studentName}.`, 'Returned');
     if (!ok) {
       return;
