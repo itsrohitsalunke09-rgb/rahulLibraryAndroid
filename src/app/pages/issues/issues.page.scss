@@ -53,37 +53,3 @@ ion-label p {
   opacity: 0;
   pointer-events: none;
 }
-
-/* Shown while a year narrows the list. */
-.year-scope {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 14px 24px 0;
-  padding: 8px 8px 8px 14px;
-  border-radius: var(--app-radius-control);
-  background: var(--app-mint-soft);
-  color: var(--app-ink);
-  font-size: 13px;
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 30px;
-    padding: 0 12px;
-    border: 0;
-    border-radius: var(--app-radius-control);
-    background: var(--app-surface);
-    color: var(--app-ink);
-    font: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-
-  .icon {
-    --icon-size: 12px;
-  }
-}

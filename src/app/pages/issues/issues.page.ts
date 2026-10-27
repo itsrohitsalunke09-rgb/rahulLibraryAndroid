@@ -43,13 +43,13 @@ export class IssuesPage implements ViewWillEnter {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  readonly filter = signal<Filter>('OUT');
+  readonly filter = signal<Filter>('ALL');
   /** Year that narrows every tab; starts on the current year, null = all years. */
   readonly year = signal<number | null>(new Date().getFullYear());
   readonly years = signal(issueYears());
   private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
   /** Tab to go back to if the year list is closed without picking a year. */
-  private beforeYear: Filter = 'OUT';
+  private beforeYear: Filter = 'ALL';
   readonly query = signal('');
   readonly counts = signal<IssueCounts | null>(null);
   readonly returning = signal<number | null>(null);
