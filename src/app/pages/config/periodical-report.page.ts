@@ -67,16 +67,15 @@ export class PeriodicalReportPage implements ViewWillEnter {
   }
 
   /**
-   * Asks which months (any of the last 3 years), then saves them as one printable PDF:
-   * a page per month with newspaper × date prices and totals, oldest month first.
-   * With a frequency, only those papers (the export button under that card).
+   * Asks which months (any of the last 3 years), then saves one frequency's papers (the card the
+   * button is under) as a printable PDF: newspaper × date prices and totals, oldest month first.
    */
-  async exportPdf(frequency?: PeriodicalFrequency) {
+  async exportPdf(frequency: PeriodicalFrequency) {
     if (this.exporting()) {
       return;
     }
     const alert = await this.alerts.create({
-      header: frequency ? `Export ${this.labels[frequency]} PDF` : 'Export PDF',
+      header: `Export ${this.labels[frequency]} PDF`,
       subHeader: 'Tick one or more months',
       inputs: recentMonths(this.thisMonth, EXPORT_MONTHS).map(m => ({
         type: 'checkbox' as const, label: this.monthName(m), value: m, checked: m === this.month(),
@@ -102,7 +101,7 @@ export class PeriodicalReportPage implements ViewWillEnter {
       const shown = this.report();
       const reports = (await Promise.all(months.map(m =>
         shown && shown.month === m ? Promise.resolve(shown) : firstValueFrom(this.api.periodicalReport(m)))))
-        .map(r => frequency ? onlyFrequency(r, frequency) : r);
+        .map(r => onlyFrequency(r, frequency));
       // A month with nothing ticked would just be an empty grid; leave it out.
       const pages = reports.filter(r => r.rows.some(row => row.issues > 0))
         .map(report => ({ report, monthName: this.monthName(report.month) }));
@@ -115,9 +114,9 @@ export class PeriodicalReportPage implements ViewWillEnter {
       this.ui.toast(`Saving PDF (${pages.length} month${pages.length === 1 ? '' : 's'})… it will appear in Download.`);
       const first = pages[0].report.month;
       const last = pages[pages.length - 1].report.month;
-      const kind = frequency ? `${frequency.toLowerCase()}-` : '';
-      const name = first === last ? `newspaper-register-${kind}${first}.pdf` : `newspaper-register-${kind}${first}-to-${last}.pdf`;
-      const title = frequency ? `${this.labels[frequency]} newspaper & magazine register` : undefined;
+      const kind = frequency.toLowerCase();
+      const name = first === last ? `newspaper-register-${kind}-${first}.pdf` : `newspaper-register-${kind}-${first}-to-${last}.pdf`;
+      const title = `${this.labels[frequency]} newspaper & magazine register`;
       const where = await saveFile(await registerPdf(pages, DEFAULT_ABOUT.title, orientation, title), name, 'application/pdf');
       const skipped = months.length - pages.length;
       this.ui.toast(`PDF saved to ${where}` + (skipped ? ` (${skipped} month${skipped === 1 ? '' : 's'} with no entries left out)` : ''));

@@ -6,7 +6,7 @@
 .missing { color: var(--app-rust); font-weight: 500; }
 .note { margin: 0 4px 8px; font-size: 12px; line-height: 1.45; color: var(--app-muted); }
 .export { gap: 8px; margin-bottom: 6px; color: var(--ion-color-primary); font-weight: 600; }
-.export + .note { margin-bottom: 14px; }
+.intro-note { margin-top: 2px; }
 .export:disabled { opacity: 0.6; }
 .group-summary { margin: 10px 4px 8px; }
 .group-summary strong { font-size: 15px; }

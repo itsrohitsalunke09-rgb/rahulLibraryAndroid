@@ -39,7 +39,7 @@ ion-back-button { --color: var(--app-ink); --icon-font-size: 22px; }
 }
 .price input {
   width: 100%; min-width: 0; border: 0; outline: none; background: transparent; color: var(--app-ink);
-  font: inherit; font-size: 15px; text-align: right;
+  font: inherit; font-size: 15px;
 }
 .price input:disabled { color: var(--app-muted); }
 .price:focus-within { border-color: var(--ion-color-primary); }
