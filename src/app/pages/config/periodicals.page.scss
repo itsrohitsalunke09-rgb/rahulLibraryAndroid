@@ -1,9 +1,4 @@
-/* On top of categories.page.scss (back button, item and empty-state styles). */
-.heading-action {
-  display: grid; place-items: center; width: 44px; height: 44px; margin-right: 4px;
-  border: 0; border-radius: 50%; background: transparent; color: var(--app-ink); cursor: pointer;
-}
-
+/* On top of categories.page.scss (back button, search row, item and empty-state styles). */
 .price {
   font-size: 14px; font-weight: 600; color: var(--app-ink);
 }

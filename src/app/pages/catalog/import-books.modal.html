@@ -1,9 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Import books</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()">{{ result() ? 'Done' : 'Cancel' }}</ion-button>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
     </ion-buttons>
+    <ion-title>Import books</ion-title>
   </ion-toolbar>
 </ion-header>
 

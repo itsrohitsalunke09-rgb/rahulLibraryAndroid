@@ -1,13 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar, ModalController, ViewWillEnter
+  IonRefresherContent, IonSearchbar, IonTitle, IonToolbar, ModalController, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { NewsStory } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { ShortDatePipe } from '../../core/pipes';
 import { StoryPhotoDirective } from '../../core/story-photo.directive';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { templateLabel } from '../news/templates';
 import { NewsFormModal } from './news-form.modal';
 
@@ -18,7 +19,8 @@ import { NewsFormModal } from './news-form.modal';
   styleUrls: ['news.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher,
-    IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonItem, IonLabel, IonSkeletonText, ShortDatePipe, StoryPhotoDirective
+    IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonItem, IonLabel, ShortDatePipe, StoryPhotoDirective,
+    PageSkeletonComponent
   ],
 })
 export class NewsPage implements ViewWillEnter {

@@ -1,21 +1,22 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBadge, IonButton, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonSkeletonText,
+  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, 
   IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { returnDownBackOutline, swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { loadIssueYears, openYearSelect } from '../../core/issue-years';
+import { issueYears, openYearSelect } from '../../core/issue-years';
 import { clearLinkFilters } from '../../core/link-filters';
 import { BookIssue, IssueCounts, Page } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 /**
  * OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number.
@@ -31,8 +32,9 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL', 'YEAR'];
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions, IonItemOption,
-    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, IonSelect, IonSelectOption,
-    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe
+    IonButton, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSelect, IonSelectOption,
+    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe,
+    PageSkeletonComponent
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -42,10 +44,10 @@ export class IssuesPage implements ViewWillEnter {
   private router = inject(Router);
 
   readonly filter = signal<Filter>('OUT');
-  /** Year for the YEAR filter; null until one is picked. */
-  readonly year = signal<number | null>(null);
-  readonly years = signal<number[]>([]);
-  private readonly yearSelect = viewChild<IonSelect>('yearSelect');
+  /** Year that narrows every tab; starts on the current year, null = all years. */
+  readonly year = signal<number | null>(new Date().getFullYear());
+  readonly years = signal(issueYears());
+  private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
   /** Tab to go back to if the year list is closed without picking a year. */
   private beforeYear: Filter = 'OUT';
   readonly query = signal('');
@@ -55,7 +57,6 @@ export class IssuesPage implements ViewWillEnter {
 
   constructor() {
     addIcons({ returnDownBackOutline, swapHorizontalOutline });
-    this.loadYears();
     // Dashboard tiles link here with ?status=OUT / OVERDUE, plus &year=… when a year is chosen there.
     this.route.queryParamMap.subscribe(params => {
       if (!params.has('status') && !params.has('year')) {
@@ -84,7 +85,6 @@ export class IssuesPage implements ViewWillEnter {
     // The tab counts and years go stale with the list, so they reload together.
     if (this.issues.revisit()) {
       this.loadCounts();
-      this.loadYears();
     }
   }
 
@@ -102,14 +102,19 @@ export class IssuesPage implements ViewWillEnter {
     this.issues.reset();
   }
 
-  /** Opens the year dropdown (also when the Year tab is tapped again to change the year). */
-  openYears() {
-    return openYearSelect(this.api, this.years, this.yearSelect);
+  /** Opens the year list under the Year tab (also when tapped again to change the year). */
+  openYears(event: Event) {
+    return openYearSelect(this.yearSelect()?.nativeElement, event);
   }
 
   setYear(value: unknown) {
     const year = Number(value);
     if (!Number.isInteger(year)) {
+      return;
+    }
+    // "All years" in the list.
+    if (year === 0) {
+      this.clearYear();
       return;
     }
     this.year.set(year);
@@ -135,10 +140,6 @@ export class IssuesPage implements ViewWillEnter {
     }
   }
 
-  private loadYears() {
-    return loadIssueYears(this.api, this.years);
-  }
-
   search(value: string | null | undefined) {
     this.query.set((value ?? '').trim());
     this.issues.reset();
@@ -146,7 +147,6 @@ export class IssuesPage implements ViewWillEnter {
 
   refresh(event: Parameters<PagedList<BookIssue>['refresh']>[0]) {
     this.loadCounts();
-    this.loadYears();
     this.issues.refresh(event);
   }
 

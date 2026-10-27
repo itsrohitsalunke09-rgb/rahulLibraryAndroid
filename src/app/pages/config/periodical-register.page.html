@@ -29,11 +29,7 @@
     }
 
     @if (loading()) {
-      <div class="card">
-        @for (i of [1, 2, 3, 4]; track i) {
-          <ion-skeleton-text [animated]="true" style="height: 44px; margin: 8px 0"></ion-skeleton-text>
-        }
-      </div>
+      <app-page-skeleton kind="register" />
     } @else if (lines().length) {
       @for (group of groups(); track group.frequency) {
       <h2 class="group-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>

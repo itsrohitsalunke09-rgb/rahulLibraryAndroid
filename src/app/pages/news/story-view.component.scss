@@ -1,6 +1,6 @@
 @use 'paper';
 
-// The full story on newsprint (same look as the story page); the template only changes the layout.
+// The full story in the app's simple style; the template only changes the layout.
 @include paper.tokens;
 @include paper.figure;
 @include paper.body-text;
@@ -12,24 +12,49 @@
 
 .headline {
   @include paper.headline;
-  font-size: clamp(26px, 7.2vw, 36px);
-  letter-spacing: -0.01em;
+  font-size: clamp(24px, 6.6vw, 30px);
 }
 
+/* Initials circle in the accent colour, name over the date. */
 .byline {
-  margin: 12px 0 0;
-  padding: 8px 0;
-  border-block: 1px solid var(--paper-rule);
-  font-family: paper.$serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--paper-rule);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.author {
   font-size: 14px;
-  font-style: italic;
-  color: var(--paper-muted);
+  font-weight: 600;
+  color: var(--paper-ink);
+  overflow-wrap: anywhere;
 }
 
 .date {
   @include paper.kicker;
-  margin-inline-end: 6px;
-  font-style: normal;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .text {
@@ -39,11 +64,11 @@
 
 /* ---- Classic: photo on top ---- */
 .view-classic figure {
-  margin-top: 0;
+  margin: 0 0 18px;
 }
 
 .view-classic .photo {
-  max-height: 240px;
+  max-height: 260px;
 }
 
 /* ---- Side photo: text wraps a small photo on the right ---- */
@@ -54,6 +79,7 @@ figure.side {
 
   .photo {
     aspect-ratio: 1;
+    border-radius: 10px;
   }
 
   figcaption {
@@ -66,21 +92,11 @@ figure.side {
   text-align: start;
 }
 
-/* ---- Notice: centred inside a warning-coloured box, no photo ---- */
+/* ---- Notice: outlined in the warning colour, no photo ---- */
 .box {
-  padding: 22px 18px 8px;
-  border: 2px solid var(--ion-color-warning);
-  border-radius: 14px;
-  text-align: center;
-
-  .byline {
-    border-color: transparent;
-  }
-
-  .text p {
-    text-align: center;
-    hyphens: manual;
-  }
+  padding: 18px 16px 6px;
+  border: 1px solid var(--ion-color-warning);
+  border-radius: var(--app-radius-sheet);
 }
 
 .tag {
@@ -91,23 +107,23 @@ figure.side {
   background: var(--app-rust-soft);
   color: var(--app-rust);
   font-family: paper.$sans;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-/* ---- Photo banner: headline on a dark band across the photo ---- */
+/* ---- Photo banner: the headline sits on a soft dark fade at the foot of the photo ---- */
 .view-photo-banner figure {
-  margin-top: 0;
+  margin: 0 0 4px;
 }
 
-// The photo fills the box behind the headline; a very long headline grows the banner instead of spilling out.
+// A very long headline grows the banner instead of spilling out.
 .banner {
   position: relative;
   display: flex;
   align-items: flex-end;
-  min-height: 240px;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 14px;
   background: var(--paper-blank);
 
   .photo {
@@ -115,16 +131,16 @@ figure.side {
     inset: 0;
     height: 100%;
     aspect-ratio: auto;
+    border-radius: 0;
   }
 
-  // Near-black band stays dark in both themes, so white type always reads.
-  // Positioned so it paints above the photo (whose filter puts it on its own layer).
+  // The fade stays dark in both themes, so the white headline always reads.
   .headline {
     position: relative;
     width: 100%;
-    padding: 12px 16px 14px;
-    background: rgba(12, 12, 12, 0.72);
+    padding: 48px 16px 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
     color: #fff;
-    font-size: clamp(22px, 6.4vw, 30px);
+    font-size: clamp(22px, 6.2vw, 28px);
   }
 }

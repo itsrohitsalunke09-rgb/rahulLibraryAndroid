@@ -5,6 +5,7 @@ import {
 import { ApiService } from '../../core/api.service';
 import { NewsStory } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { NewsCardComponent } from './news-card.component';
 import { StoryModal } from './story.modal';
 
@@ -13,7 +14,7 @@ import { StoryModal } from './story.modal';
   selector: 'app-newspaper',
   templateUrl: 'news.page.html',
   styleUrls: ['news.page.scss'],
-  imports: [IonContent, IonRefresher, IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent, NewsCardComponent],
+  imports: [IonContent, IonRefresher, IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent, NewsCardComponent, PageSkeletonComponent],
 })
 export class NewspaperPage implements ViewWillEnter {
   private api = inject(ApiService);

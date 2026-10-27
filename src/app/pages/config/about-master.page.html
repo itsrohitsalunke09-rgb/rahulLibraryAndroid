@@ -14,7 +14,7 @@
 
 <ion-content class="ion-padding">
   @if (loading()) {
-    <div class="loading"><ion-spinner name="crescent" aria-label="Loading"></ion-spinner></div>
+    <app-page-skeleton kind="form" [rows]="7" />
   } @else {
     <form class="form" (ngSubmit)="save()">
       <p class="lead">This text appears on the About us page, which opens from the login screen.</p>

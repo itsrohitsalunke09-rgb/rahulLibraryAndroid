@@ -1,5 +1,5 @@
 import { Component, Input, inject, signal } from '@angular/core';
-import { IonContent, ModalController } from '@ionic/angular';
+import { IonContent, IonHeader, IonToolbar, ModalController } from '@ionic/angular';
 import { NewsStory } from '../../core/models';
 import { StoryViewComponent } from './story-view.component';
 
@@ -8,7 +8,7 @@ import { StoryViewComponent } from './story-view.component';
   selector: 'app-story',
   templateUrl: 'story.modal.html',
   styleUrls: ['story.modal.scss'],
-  imports: [IonContent, StoryViewComponent],
+  imports: [IonHeader, IonToolbar, IonContent, StoryViewComponent],
 })
 export class StoryModal {
   private modals = inject(ModalController);

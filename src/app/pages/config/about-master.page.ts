@@ -6,6 +6,7 @@ import {
 import { AboutContent, DEFAULT_ABOUT, withDefaults } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
 import { UiService, errorMessage } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 /** Configuration → About us page: edit the text of the About Us page (opened from the login screen). */
 @Component({
@@ -13,8 +14,7 @@ import { UiService, errorMessage } from '../../core/ui.service';
   templateUrl: 'about-master.page.html',
   styleUrls: ['about-master.page.scss'],
   imports: [
-    FormsModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonContent, IonSpinner
-  ],
+    FormsModule, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonContent, IonSpinner, PageSkeletonComponent],
 })
 export class AboutMasterPage implements OnInit {
   private api = inject(ApiService);

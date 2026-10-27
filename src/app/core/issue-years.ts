@@ -1,24 +1,25 @@
-import { WritableSignal } from '@angular/core';
-import { IonSelect } from '@ionic/angular';
-import { ApiService } from './api.service';
+/** The app started recording issues in 2025; earlier years have nothing to show. */
+export const FIRST_ISSUE_YEAR = 2025;
 
-/** Fetches the years that have issues into `years`. On failure keeps the last list, or offers this year if there was none. */
-export function loadIssueYears(api: ApiService, years: WritableSignal<number[]>): Promise<void> {
-  return new Promise(resolve => api.issueYears().subscribe({
-    next: list => { years.set(list); resolve(); },
-    error: () => {
-      if (!years().length) {
-        years.set([new Date().getFullYear()]);
-      }
-      resolve();
-    }
-  }));
+/** This year back to the first year of issues, newest first. Built here, so the dropdown opens at once. */
+export function issueYears(today = new Date()): number[] {
+  const latest = Math.max(today.getFullYear(), FIRST_ISSUE_YEAR);
+  return Array.from({ length: latest - FIRST_ISSUE_YEAR + 1 }, (_, i) => latest - i);
 }
 
-/** Fetches the years fresh (so new issues show up), then opens the year dropdown. */
-export async function openYearSelect(api: ApiService, years: WritableSignal<number[]>, select: () => IonSelect | undefined) {
-  await loadIssueYears(api, years);
-  // Let the year options render before the dropdown reads them.
-  await new Promise(resolve => setTimeout(resolve));
-  await select()?.open();
+/**
+ * Opens the (hidden) year select as a dropdown under the chip or tab that was tapped.
+ * Ionic places a select's popover under the select itself, so the select is moved over the tapped
+ * element first; the tap event is still needed, or Ionic falls back to a centred dialog.
+ */
+export function openYearSelect(select: HTMLIonSelectElement | undefined, event: Event) {
+  if (!select) {
+    return;
+  }
+  const anchor = event.currentTarget;
+  if (anchor instanceof HTMLElement) {
+    const r = anchor.getBoundingClientRect();
+    Object.assign(select.style, { top: `${r.top}px`, left: `${r.left}px`, width: `${r.width}px`, height: `${r.height}px` });
+  }
+  return select.open(event as UIEvent);
 }

@@ -1,30 +1,52 @@
-/* Layout on top of the login styles (login.page.scss): the stage fills the screen and stays
-   still; only the text column below the masthead scrolls. */
-.stage {
+/* On top of login.page.scss (colours, back arrow look): the screen fills the height and stays
+   still under a fixed top bar; only the text column scrolls. */
+.about-screen {
   height: 100%;
   min-height: 0;
+  padding: calc(8px + var(--ion-safe-area-top, 0px)) 0 0;
 }
 
-/* Starts just under "शिंदेवाडी", so scrolled text slides under nothing and stays readable. */
-.scroller {
-  position: absolute;
-  inset: calc(var(--safe-top) + 110 * var(--s)) 0 0;
+.top {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 24px 8px 12px;
+  border-bottom: 1px solid var(--auth-border);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--auth-ink);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.top-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .about-body {
-  flex: none;
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: calc(14 * var(--s));
-  margin: calc(55 * var(--s)) calc(20 * var(--s)) 0;
-  font-size: calc(15 * var(--s));
+  gap: 14px;
+  padding: 20px 24px calc(24px + var(--ion-safe-area-bottom, 0px));
+  font-size: 15px;
   line-height: 1.6;
-  color: var(--login-ink);
 
   p,
   ul li {
@@ -40,41 +62,36 @@
 .intro {
   display: flex;
   flex-direction: column;
-  gap: calc(6 * var(--s));
-  padding: 0 calc(4 * var(--s));
+  gap: 6px;
 }
 
 .title {
   margin: 0;
-  font-size: calc(22 * var(--s));
+  font-size: 22px;
   font-weight: 600;
   line-height: 1.3;
-  color: var(--login-teal);
 }
 
 .motto {
-  font-size: calc(17 * var(--s));
+  font-size: 17px;
   font-weight: 600;
-  color: var(--login-teal);
 }
 
 .meta {
-  font-size: calc(13 * var(--s));
-  color: var(--login-muted);
+  font-size: 13px;
+  color: var(--auth-muted);
 }
 
-/* White boxes like the login inputs. */
+/* Outlined boxes like the sign-in fields. */
 .card {
-  padding: calc(16 * var(--s));
-  border: 1px solid var(--login-border);
-  border-radius: calc(16 * var(--s));
-  background: var(--login-input);
+  padding: 16px;
+  border: 1px solid var(--auth-border);
+  border-radius: 12px;
 
   h3 {
-    margin: 0 0 calc(10 * var(--s));
-    font-size: calc(17 * var(--s));
+    margin: 0 0 10px;
+    font-size: 17px;
     font-weight: 600;
-    color: var(--login-teal);
   }
 
   ul {
@@ -83,7 +100,7 @@
   }
 
   li + li {
-    margin-top: calc(6 * var(--s));
+    margin-top: 6px;
   }
 }
 
@@ -94,67 +111,48 @@
 
   li {
     display: grid;
-    grid-template-columns: calc(78 * var(--s)) 1fr;
-    gap: calc(10 * var(--s));
+    grid-template-columns: 78px 1fr;
+    gap: 10px;
   }
 
   .year {
     font-weight: 600;
-    color: var(--login-teal);
+    color: var(--auth-accent);
   }
 }
 
 .address {
-  color: var(--login-muted);
+  color: var(--auth-muted);
 }
 
 .contacts {
   display: flex;
   flex-direction: column;
-  gap: calc(8 * var(--s));
-  margin-top: calc(14 * var(--s));
+  gap: 8px;
+  margin-top: 14px;
 }
 
-/* 48px tall, full-width links so they are easy to tap. */
+/* Outlined blue pills, like the "About us" button: 48px tall and easy to tap. */
 .contact {
   display: flex;
   align-items: center;
-  gap: calc(10 * var(--s));
+  gap: 10px;
   min-height: 48px;
-  padding: 0 calc(14 * var(--s));
-  border: 1px solid var(--login-border);
-  border-radius: 100px;
-  color: var(--login-teal);
+  padding: 0 16px;
+  border: 1px solid var(--auth-accent);
+  border-radius: 999px;
+  color: var(--auth-accent);
   font-weight: 500;
   text-decoration: none;
   overflow-wrap: anywhere;
 
   ion-icon {
     flex: 0 0 auto;
-    font-size: calc(20 * var(--s));
+    font-size: 20px;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--login-teal);
+    outline: 2px solid var(--auth-accent);
     outline-offset: 2px;
   }
-}
-
-.actions {
-  position: relative;
-  inset: auto;
-  margin: auto calc(28 * var(--s)) 0;
-  padding: calc(24 * var(--s)) 0 calc(var(--safe-bottom) + 21 * var(--s));
-}
-
-.about-back {
-  min-height: 40px;
-  padding: 0 8px;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  font-size: calc(14 * var(--s));
-  font-weight: 500;
-  color: var(--login-teal);
-  cursor: pointer;
 }

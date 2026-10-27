@@ -1,5 +1,6 @@
+/* Soft circle in the person's own hue (--hue, from their username), darker initials on top. */
 .avatar {
-  --avatar-rgb: var(--ion-color-medium-rgb);
+  --hue: 210;
   width: 44px;
   height: 44px;
   margin-inline-end: 14px;
@@ -8,22 +9,19 @@
   place-items: center;
   font-weight: 700;
   font-size: 0.9375rem;
-  background: rgba(var(--avatar-rgb), 0.14);
-  color: rgb(var(--avatar-rgb));
-
-  &.role-admin { --avatar-rgb: var(--ion-color-primary-rgb); }
-  &.role-librarian { --avatar-rgb: var(--ion-color-warning-rgb); }
+  background: hsl(var(--hue) 70% 91%);
+  color: hsl(var(--hue) 45% 32%);
 
   &.inactive {
     opacity: 0.45;
   }
 }
 
-.avatar-skeleton {
-  width: 44px;
-  height: 44px;
-  margin-inline-end: 14px;
-  --border-radius: 50%;
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    background: hsl(var(--hue) 28% 24%);
+    color: hsl(var(--hue) 70% 80%);
+  }
 }
 
 .end {

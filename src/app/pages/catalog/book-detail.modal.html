@@ -4,11 +4,12 @@
 -->
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
     <ion-title>Book details</ion-title>
-    <button slot="end" class="close" (click)="close()">
-      Close
-      <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 16px" aria-hidden="true"></span>
-    </button>
   </ion-toolbar>
 </ion-header>
 

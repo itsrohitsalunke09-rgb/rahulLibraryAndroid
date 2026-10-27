@@ -1,21 +1,5 @@
 /* Values from Figma "rahul-library" › Book details (15:1072) and its menu / expanded / delete states. */
 
-.close {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 40px;
-  margin-inline-end: 12px;
-  padding: 0 4px;
-  border: 0;
-  background: transparent;
-  color: var(--app-ink);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
 button {
   font: inherit;
   cursor: pointer;
@@ -217,8 +201,8 @@ button {
     height: 44px;
     border: 0;
     border-radius: 14px;
-    background: var(--app-ink);
-    color: var(--app-on-ink);
+    background: var(--app-accent);
+    color: var(--app-on-accent);
     font-size: 14px;
     font-weight: 600;
 
@@ -263,8 +247,8 @@ button {
   height: 48px;
   border: 0;
   border-radius: 100px;
-  background: var(--app-ink);
-  color: var(--app-on-ink);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.2px;

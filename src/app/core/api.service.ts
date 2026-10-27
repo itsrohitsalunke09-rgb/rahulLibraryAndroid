@@ -25,9 +25,10 @@ export class ApiService {
 
   // ---- Books ----
   /** Catalog page in registration-number order (1, 2, 10…); books without one come last. */
+  /** Newest registration numbers first. */
   books(q: string, page: number, size = 20) {
     let params = new HttpParams()
-      .set('page', page).set('size', size).set('sort', 'registrationNumber').set('direction', 'asc');
+      .set('page', page).set('size', size).set('sort', 'registrationNumber').set('direction', 'desc');
     if (q) {
       params = params.set('q', q);
     }
@@ -102,11 +103,6 @@ export class ApiService {
       params = params.set('status', status);
     }
     return this.http.get<Page<BookIssue>>(`${this.base}/issues`, { params });
-  }
-
-  /** Years that have issues, latest first, for the Issues year filter. */
-  issueYears() {
-    return this.http.get<number[]>(`${this.base}/issues/years`);
   }
 
   /** Every copy currently out (not returned), overdue ones included. */

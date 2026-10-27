@@ -4,11 +4,15 @@
       <ion-back-button defaultHref="/tabs/profile/masters" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Papers &amp; magazines</ion-title>
-    <ion-buttons slot="end">
+  </ion-toolbar>
+  <ion-toolbar class="with-actions">
+    <ion-searchbar placeholder="Search name or language" [debounce]="200"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+    <div slot="end" class="search-actions">
       <button class="heading-action" aria-label="Add newspaper or magazine" (click)="edit()">
         <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
       </button>
-    </ion-buttons>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -48,10 +52,6 @@
       </div>
     }
   } @else {
-    <ion-list inset="true" lines="full">
-      @for (i of [1, 2, 3]; track i) {
-        <ion-item><ion-label><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></ion-label></ion-item>
-      }
-    </ion-list>
+    <app-page-skeleton [count]="false" [chip]="true" />
   }
 </ion-content>

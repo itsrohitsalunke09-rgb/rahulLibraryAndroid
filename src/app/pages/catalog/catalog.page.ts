@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
-  IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSkeletonText, IonTitle,
+  IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
@@ -10,6 +10,7 @@ import { Book, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../co
 import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
 import { errorMessage } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
 import { ImportBooksModal } from './import-books.modal';
@@ -20,7 +21,8 @@ import { ImportBooksModal } from './import-books.modal';
   styleUrls: ['catalog.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonSegment, IonSegmentButton, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText, MarathiPipe
+    IonSegment, IonSegmentButton, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe,
+    PageSkeletonComponent
   ],
 })
 export class CatalogPage implements ViewWillEnter {

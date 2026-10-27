@@ -61,7 +61,7 @@ body {
   mask: var(--icon) center / contain no-repeat;
 }
 
-/* ---- Header band: compact cyan band, square corners, 22px teal title ---- */
+/* ---- Header: flat on the page colour, square corners, 22px title ---- */
 ion-header {
   background: var(--app-band);
   overflow: hidden;
@@ -126,6 +126,14 @@ ion-toolbar ion-button.button-strong {
   font-weight: 700;
 }
 
+/* The one way to close a popup: a plain X at the top left. */
+ion-toolbar ion-button.close-x {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --color: var(--app-ink);
+  margin-inline-start: 4px;
+}
+
 /* Round 34px button at the end of a page heading (add book). */
 .heading-action {
   display: grid;
@@ -136,8 +144,8 @@ ion-toolbar ion-button.button-strong {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--app-ink);
-  color: var(--app-on-ink);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
   cursor: pointer;
 }
 
@@ -153,7 +161,9 @@ ion-searchbar.md.sc-ion-searchbar-md-h {
   padding: 0 20px 4px;
   min-height: 42px;
 
+  /* Outlined, like the sign-in fields: the page and the box are both white. */
   .searchbar-input {
+    border: 1px solid var(--app-rule-strong);
     font-size: 13px;
   }
 }
@@ -173,6 +183,7 @@ ion-searchbar.md.sc-ion-searchbar-md-h {
   }
 
   .heading-action.secondary {
+    border: 1px solid var(--app-rule-strong);
     background: var(--app-surface);
     color: var(--app-ink);
   }
@@ -192,10 +203,12 @@ ion-segment {
 
 ion-segment-button {
   --background: var(--app-surface);
-  --background-checked: var(--app-ink);
+  /* Unselected chips are outlined; the selected one is filled blue. */
+  border: 1px solid var(--app-rule-strong);
+  --background-checked: var(--app-accent);
   --background-hover: transparent;
   --color: var(--app-ink);
-  --color-checked: var(--app-on-ink);
+  --color-checked: var(--app-on-accent);
   --indicator-height: 0;
   --indicator-color: transparent;
   --border-radius: 999px;
@@ -212,7 +225,11 @@ ion-segment-button {
   transition: background-color 160ms ease, color 160ms ease;
 }
 
-/* ---- Bottom tab bar: cyan pill behind the active icon ---- */
+ion-segment-button.segment-button-checked {
+  border-color: var(--app-accent);
+}
+
+/* ---- Bottom tab bar: blue icon on a soft blue pill when selected ---- */
 ion-tab-bar {
   --background: var(--app-surface);
   --border: 1px solid var(--app-rule);
@@ -222,7 +239,7 @@ ion-tab-bar {
 
 ion-tab-button {
   --color: var(--app-muted);
-  --color-selected: var(--app-ink);
+  --color-selected: var(--app-accent);
   --ripple-color: transparent;
   --padding-start: 2px;
   --padding-end: 2px;
@@ -265,7 +282,7 @@ ion-tab-button {
     font-weight: 600;
 
     .tab-symbol {
-      background: var(--app-band);
+      background: var(--app-accent-soft);
     }
   }
 
@@ -666,6 +683,12 @@ ion-skeleton-text {
   --border-radius: 6px;
   --background-rgb: var(--ion-text-color-rgb);
   --background: rgba(var(--ion-text-color-rgb), 0.07);
+}
+
+/* Year dropdown (Dashboard, Issues): a short list under the chip that scrolls when it grows. */
+ion-popover.year-popover {
+  --width: 160px;
+  --max-height: 50vh;
 }
 
 /* ---- Dialogs, toasts, modals ---- */

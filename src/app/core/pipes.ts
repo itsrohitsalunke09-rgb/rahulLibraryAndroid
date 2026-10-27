@@ -69,3 +69,22 @@ export class InitialsPipe implements PipeTransform {
     return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 }
+
+/** Soft hues for initials circles, spaced so neighbours in a list look different. */
+const AVATAR_HUES = [0, 25, 45, 95, 145, 175, 200, 225, 265, 310];
+
+/** A hue picked from the key (a username), so each person keeps their colour across visits. */
+export function avatarHue(key: string): number {
+  let hash = 0;
+  for (const ch of key) {
+    hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  }
+  return AVATAR_HUES[hash % AVATAR_HUES.length];
+}
+
+@Pipe({ name: 'avatarHue' })
+export class AvatarHuePipe implements PipeTransform {
+  transform(key: string) {
+    return avatarHue(key);
+  }
+}

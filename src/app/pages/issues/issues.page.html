@@ -11,11 +11,11 @@
       <ion-segment [value]="filter()" (ionChange)="setFilter($event.detail.value)" [scrollable]="true">
         <ion-segment-button value="OUT">Out{{ count('OUT') !== null ? ' (' + count('OUT') + ')' : '' }}</ion-segment-button>
         <ion-segment-button value="OVERDUE">Overdue{{ count('OVERDUE') !== null ? ' (' + count('OVERDUE') + ')' : '' }}</ion-segment-button>
-        <ion-segment-button value="RETURNED">Returned</ion-segment-button>
-        <ion-segment-button value="ALL">All</ion-segment-button>
-        <ion-segment-button value="YEAR" (click)="openYears()">
+        <ion-segment-button value="RETURNED">Returned{{ count('RETURNED') !== null ? ' (' + count('RETURNED') + ')' : '' }}</ion-segment-button>
+        <ion-segment-button value="ALL">All{{ count('ALL') !== null ? ' (' + count('ALL') + ')' : '' }}</ion-segment-button>
+        <ion-segment-button value="YEAR" (click)="openYears($event)">
           <span class="year-label">
-            {{ filter() === 'YEAR' && year() ? year() : 'Year' }}
+            {{ year() ?? 'Year' }}
             <span class="icon year-caret" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           </span>
         </ion-segment-button>
@@ -27,9 +27,10 @@
 <ion-content>
   <!-- Opened by the Year tab; kept outside the header so focusing it never
        scrolls the tab row out of sight. Picks which year's issues (by issued date) to show. -->
-  <ion-select #yearSelect class="year-select" interface="alert" aria-label="Issue year"
-              [interfaceOptions]="{ header: 'Issued in year' }" [value]="year()"
+  <ion-select #yearSelect class="year-select" interface="popover" aria-label="Issue year"
+              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year() ?? 0"
               (ionChange)="setYear($event.detail.value)" (ionCancel)="yearCancelled()">
+    <ion-select-option [value]="0">All years</ion-select-option>
     @for (y of years(); track y) {
       <ion-select-option [value]="y">{{ y }}</ion-select-option>
     }
@@ -106,16 +107,7 @@
       </div>
     }
   } @else {
-    <ion-list inset="true" lines="full">
-      @for (i of [1, 2, 3, 4, 5]; track i) {
-        <ion-item class="spine">
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 65%"></ion-skeleton-text></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 45%"></ion-skeleton-text></p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <app-page-skeleton [chip]="true" />
   }
 
   <ion-infinite-scroll [disabled]="issues.finished()" (ionInfinite)="issues.more($event)">

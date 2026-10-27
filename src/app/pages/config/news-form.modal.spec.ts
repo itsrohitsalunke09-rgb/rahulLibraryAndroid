@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ModalController } from '@ionic/angular';
 import { NEVER, of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
+import { AuthService } from '../../core/auth.service';
 import { PHOTO_DECODE_ERROR } from '../../core/image-resize';
 import { NewsStory } from '../../core/models';
 import { UiService } from '../../core/ui.service';
@@ -27,6 +28,7 @@ describe('NewsFormModal', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ApiService, useValue: api },
+        { provide: AuthService, useValue: { profile: () => ({ fullName: 'Admin User' }) } },
         { provide: ModalController, useValue: modals },
         { provide: UiService, useValue: { toast: vi.fn(), error: vi.fn(), confirm: vi.fn(async () => true) } },
       ],

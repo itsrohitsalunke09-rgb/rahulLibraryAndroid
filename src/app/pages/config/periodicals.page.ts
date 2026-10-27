@@ -1,11 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
-  IonSkeletonText, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
+  IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { FREQUENCY_LABELS, Periodical, byFrequency, rupees } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PeriodicalFormModal } from './periodical-form.modal';
 
 /** Configuration → Newspapers & magazines: the list the daily register is filled from. */
@@ -14,8 +15,9 @@ import { PeriodicalFormModal } from './periodical-form.modal';
   templateUrl: 'periodicals.page.html',
   styleUrls: ['categories.page.scss', 'periodicals.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    IonList, IonItem, IonLabel, IonSkeletonText
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent,
+    IonList, IonItem, IonLabel,
+    PageSkeletonComponent
   ],
 })
 export class PeriodicalsPage implements ViewWillEnter {
@@ -26,12 +28,20 @@ export class PeriodicalsPage implements ViewWillEnter {
   readonly loaded = signal(false);
   readonly error = signal('');
   readonly labels = FREQUENCY_LABELS;
-  /** A card per frequency, daily first. */
-  readonly groups = computed(() => byFrequency(this.items()));
+  readonly query = signal('');
+  /** A card per frequency, daily first, narrowed by the search box (name or language). */
+  readonly groups = computed(() => {
+    const q = this.query().toLowerCase();
+    return byFrequency(q ? this.items().filter(p => `${p.name} ${p.language ?? ''}`.toLowerCase().includes(q)) : this.items());
+  });
   readonly rupees = rupees;
 
   ionViewWillEnter() {
     this.load();
+  }
+
+  search(value: string | null | undefined) {
+    this.query.set((value ?? '').trim());
   }
 
   refresh(event: RefresherCustomEvent) {

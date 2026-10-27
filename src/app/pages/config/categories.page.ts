@@ -1,11 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSkeletonText, IonTitle, IonToolbar, ModalController, RefresherCustomEvent
+  IonRefresherContent, IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { CategoriesStore } from '../../core/categories.store';
 import { BookCategory, UnlinkedCategory } from '../../core/models';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { CategoryFormModal } from './category-form.modal';
 
 /** Book category master: list, search, add, edit and delete. */
@@ -15,7 +16,8 @@ import { CategoryFormModal } from './category-form.modal';
   styleUrls: ['categories.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher,
-    IonRefresherContent, IonList, IonItem, IonLabel, IonSkeletonText
+    IonRefresherContent, IonList, IonItem, IonLabel,
+    PageSkeletonComponent
   ],
 })
 export class CategoriesPage {

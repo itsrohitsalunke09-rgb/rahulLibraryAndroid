@@ -1,170 +1,101 @@
-/* Values from Figma "rahul-library" › Airy aqua modernism (393 × 852 frame, node 68:1608).
-   The layout keeps the design's proportions on every phone: one design pixel is
-   --s wide (393 design px = the screen width, capped for tablets). Vertical positions
-   are measured from below the 59px status bar, so they start at the safe area.
-   Fonts are the phone's own (the design uses Rubik and Inter). */
+/* Simple sign-in look (also used by forgot-password): plain background, one column,
+   outlined fields, and a single blue accent (from the book logo) for actions only.
+   Follows the phone's light/dark setting. */
 :host {
-  --s: calc(min(100vw, 480px) / 393);
-  --safe-top: var(--ion-safe-area-top, 0px);
-  --safe-bottom: var(--ion-safe-area-bottom, 0px);
-
-  --login-bg: #f5fcfa;
-  --login-teal: #16665d;
-  --login-ink: #172e2a;
-  --login-muted: #657773;
-  --login-input: #ffffff;
-  --login-border: #d8e6e0;
-  --login-on-teal: #ffffff;
-  --login-shape-opacity: 1;
+  --auth-bg: #ffffff;
+  --auth-ink: #121212;
+  --auth-muted: #737373;
+  --auth-border: #d4d4d4;
+  --auth-accent: #1f63d6;
+  --auth-on-accent: #ffffff;
 }
 
-/* No dark version in the design; the same layout in night colours. */
 @media (prefers-color-scheme: dark) {
   :host {
-    --login-bg: #0f1c1a;
-    --login-teal: #8fe0d2;
-    --login-ink: #e3efec;
-    --login-muted: #9fb3ae;
-    --login-input: #172826;
-    --login-border: #2c4642;
-    --login-on-teal: #0f1c1a;
-    --login-shape-opacity: 0.14;
+    --auth-bg: #121212;
+    --auth-ink: #f5f5f5;
+    --auth-muted: #a3a3a3;
+    --auth-border: #3a3a3a;
+    --auth-accent: #3b7cf0;
   }
 }
 
 ion-content {
-  --background: var(--login-bg);
+  --background: var(--auth-bg);
 }
 
-/* Design canvas: tall enough for everything, never shorter than the screen. */
-.stage {
-  position: relative;
-  max-width: 480px;
-  min-height: max(100%, calc(var(--safe-top) + 756 * var(--s) + var(--safe-bottom)));
+/* Main block in the middle, About us and the name pinned to the bottom. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  max-width: 420px;
+  min-height: 100%;
   margin: 0 auto;
-  /* Visible, not hidden: on screens wider than 480px the shapes run on to the screen edges
-     (ion-content clips them there) instead of stopping at the centred column. */
-  overflow: visible;
-  font-family: var(--ion-font-family);
-  letter-spacing: 0.2px;
-  color: var(--login-ink);
+  padding: calc(48px + var(--ion-safe-area-top, 0px)) 24px calc(20px + var(--ion-safe-area-bottom, 0px));
+  color: var(--auth-ink);
 }
 
-/* Design y (from the frame top) → position below the status bar. */
-@function top-at($y) {
-  @return calc(var(--safe-top) + #{$y - 59} * var(--s));
-}
-
-.backdrop,
-.accent,
-.host {
-  position: absolute;
-  display: block;
-  max-width: none;
-  pointer-events: none;
-  user-select: none;
-}
-
-.backdrop {
-  left: calc(-183 * var(--s));
-  top: top-at(205);
-  width: calc(485 * var(--s));
-  height: calc(423 * var(--s));
-  opacity: var(--login-shape-opacity);
-}
-
-.accent {
-  left: calc(334 * var(--s));
-  top: top-at(139);
-  width: calc(106 * var(--s));
-  height: calc(106 * var(--s));
-  opacity: var(--login-shape-opacity);
-}
-
-/* The host fills a 280 × 511 slot in the design (measured from the updated frame with
-   the current photo: head at y≈112, hand at x≈283, feet at y≈609). */
-.host {
-  left: calc(12.4 * var(--s));
-  top: top-at(115);
-  width: calc(280.2 * var(--s));
-  height: calc(510.6 * var(--s));
-}
-
-.masthead {
-  position: absolute;
-  inset: 0 0 auto;
-  pointer-events: none;
-
-  h1 {
-    position: absolute;
-    left: 0;
-    right: 0;
-    /* The phone's Devanagari font is wider than the design's: 56px here spans the
-       same ~370px as the design's 62px title. */
-    top: top-at(50);
-    margin: 0;
-    font-size: calc(56 * var(--s));
-    font-weight: 600;
-    line-height: normal;
-    letter-spacing: 0;
-    text-align: center;
-    white-space: nowrap;
-    color: var(--login-teal);
-  }
-
-  .place {
-    position: absolute;
-    right: calc(18 * var(--s));
-    top: top-at(118);
-    margin: 0;
-    font-size: calc(29 * var(--s));
-    font-weight: 500;
-    line-height: 1.18;
-    letter-spacing: 0;
-    color: var(--login-teal);
-  }
-}
-
-/* Username / password column beside the host's extended hand. */
-.credentials {
-  position: absolute;
-  left: calc(164 * var(--s));
-  top: top-at(293);
-  width: calc(215 * var(--s));
+.body {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  margin: auto 0;
 }
 
-.field {
+.logo {
+  width: 96px;
+  height: auto;
+}
+
+.name {
+  margin: 14px 0 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.place {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: var(--auth-muted);
+}
+
+.form {
   display: flex;
   flex-direction: column;
-  gap: calc(7 * var(--s));
-
-  & + .field {
-    margin-top: calc(20.4 * var(--s));
-  }
+  gap: 12px;
+  width: 100%;
+  margin-top: 36px;
 }
 
-.field-label {
-  font-size: calc(14 * var(--s));
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--login-ink);
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
+/* Outlined field with its icon on the right. */
 .input {
   display: flex;
   align-items: center;
-  gap: calc(8 * var(--s));
-  height: calc(52 * var(--s));
-  padding: 0 calc(14 * var(--s));
-  border: 1px solid var(--login-border);
-  border-radius: calc(16 * var(--s));
-  background: var(--login-input);
+  gap: 8px;
+  height: 52px;
+  padding: 0 6px 0 14px;
+  border: 1px solid var(--auth-border);
+  border-radius: 10px;
+  color: var(--auth-muted);
   transition: border-color 150ms ease;
 
   &:focus-within {
-    border-color: var(--login-teal);
+    border-color: var(--auth-accent);
+  }
+
+  > .icon {
+    flex: 0 0 auto;
+    margin-right: 8px;
   }
 
   input {
@@ -176,157 +107,126 @@ ion-content {
     outline: none;
     background: transparent;
     font: inherit;
-    font-size: calc(16 * var(--s));
-    line-height: 1.4;
-    color: var(--login-ink);
+    font-size: 15px;
+    color: var(--auth-ink);
 
     &::placeholder {
-      color: var(--login-muted);
+      color: var(--auth-muted);
       opacity: 1;
     }
   }
 }
 
-/* 24 × 44 touch area with the 16px icon, as in the design. */
+/* 44px touch target around the 18px eye. */
 .eye {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: calc(24 * var(--s));
-  height: calc(44 * var(--s));
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--login-muted);
+  color: var(--auth-muted);
   cursor: pointer;
 
   img {
-    width: calc(16 * var(--s));
-    height: calc(16 * var(--s));
+    width: 18px;
+    height: 18px;
   }
 
   ion-icon {
-    font-size: calc(16 * var(--s));
+    font-size: 18px;
   }
 }
 
-.forgot {
-  align-self: flex-end;
-  /* Text sits 32px under the password box; the padding gives a 40px touch target. */
-  margin: calc(22 * var(--s)) calc(5 * var(--s)) 0 0;
-  min-height: 40px;
-  padding: 0 2px;
-  border: 0;
-  background: transparent;
+@media (prefers-color-scheme: dark) {
+  /* The eye-off asset is dark; lighten it on the dark background. */
+  .eye img {
+    filter: invert(1);
+    opacity: 0.7;
+  }
+}
+
+.primary,
+.outline {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
   font: inherit;
-  font-size: calc(14 * var(--s));
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--login-teal);
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
 }
 
+.primary {
+  margin-top: 6px;
+  border: 0;
+  background: var(--auth-accent);
+  color: var(--auth-on-accent);
+
+  &:disabled {
+    opacity: 0.7;
+  }
+
+  ion-spinner {
+    width: 22px;
+    height: 22px;
+    color: var(--auth-on-accent);
+  }
+}
+
+.outline {
+  border: 1px solid var(--auth-accent);
+  background: transparent;
+  color: var(--auth-accent);
+}
+
+.link {
+  align-self: center;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--auth-ink);
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--auth-muted);
+    cursor: default;
+  }
+}
+
+.error,
+.notice {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .error {
-  margin: calc(4 * var(--s)) 0 0;
-  font-size: calc(12 * var(--s));
-  line-height: 1.35;
-  text-align: right;
   color: var(--ion-color-danger);
 }
 
 .notice {
-  margin: calc(4 * var(--s)) 0 0;
-  font-size: calc(12 * var(--s));
-  line-height: 1.35;
-  text-align: right;
-  color: var(--login-teal);
+  color: var(--auth-accent);
 }
 
-/* Login button and links, kept at the bottom of the screen. */
-.actions {
-  position: absolute;
-  left: calc(28 * var(--s));
-  right: calc(28 * var(--s));
-  bottom: calc(var(--safe-bottom) + 21 * var(--s));
+.foot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: calc(60 * var(--s));
-}
-
-.login {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  height: calc(58 * var(--s));
-  padding: 0 calc(22 * var(--s));
-  border: 0;
-  border-radius: 100px;
-  background: var(--login-teal);
-  color: var(--login-on-teal);
-  font: inherit;
-  font-size: calc(18 * var(--s));
-  font-weight: 600;
-  line-height: 1.4;
-  cursor: pointer;
-
-  img {
-    width: calc(22 * var(--s));
-    height: calc(22 * var(--s));
-  }
-
-  /* The arrow asset is white; on the light button at night it follows the dark label. */
-  @media (prefers-color-scheme: dark) {
-    img {
-      filter: brightness(0);
-      opacity: 0.85;
-    }
-  }
-
-  &:disabled {
-    justify-content: center;
-    opacity: 0.75;
-  }
-
-  ion-spinner {
-    color: var(--login-on-teal);
-  }
+  margin-top: 32px;
 }
 
-.links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: calc(22 * var(--s));
-}
-
-.about {
-  /* 32px touch target without moving the text off the design spacing. */
-  min-height: 32px;
-  margin: calc((19.6 * var(--s) - 32px) / 2) 0;
-  padding: 0 4px;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  font-size: calc(14 * var(--s));
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--login-teal);
-  cursor: pointer;
-}
-
-.switch {
+.brand {
   margin: 0;
-  font-size: calc(16 * var(--s));
-  line-height: 1.4;
-  text-align: center;
-  color: var(--login-muted);
-
-  a {
-    font-weight: 600;
-    color: var(--login-teal);
-    text-decoration: none;
-  }
+  font-size: 13px;
+  color: var(--auth-muted);
 }
-

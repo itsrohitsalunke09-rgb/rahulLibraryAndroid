@@ -1,41 +1,48 @@
-// Design tokens from Figma "rahul-library" (Login, Dashboard, Catalog, Book details).
-// Peach page, cyan header band, teal text, soft pill badges.
+// Simple theme: plain white (or near-black at night) pages, neutral text, thin grey borders,
+// and one blue accent (from the book logo) used only for actions and the selected state.
 // https://ionicframework.com/docs/theming/colors
 :root {
-  // Typography: the phone's own fonts (the design uses Rubik; Devanagari falls back to Noto Sans Devanagari).
+  // Typography: the phone's own fonts (Devanagari falls back to Noto Sans Devanagari).
   --ion-font-family: Roboto, "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  // Surfaces and text
-  --app-paper: #fef6ef;
-  --app-paper-rgb: 254, 246, 239;
-  --app-band: #ccfaff;
-  --app-surface: #fffcf8;
-  --app-rule: #e6e8df;
-  --app-rule-strong: #c9cdc1;
-  --app-ink: #1d6273;
-  --app-ink-rgb: 29, 98, 115;
-  --app-on-ink: #fef6ef;
-  --app-muted: #6f8b90;
+  // Surfaces and text. The header band is the page colour, so headers sit flat on the page.
+  --app-paper: #ffffff;
+  --app-paper-rgb: 255, 255, 255;
+  --app-band: #ffffff;
+  --app-surface: #ffffff;
+  --app-rule: #e5e5e5;
+  --app-rule-strong: #cfcfcf;
+  --app-ink: #121212;
+  --app-ink-rgb: 18, 18, 18;
+  --app-on-ink: #ffffff;
+  --app-muted: #737373;
 
-  // Soft fills behind status text
-  --app-rust: #af5642;
-  --app-rust-soft: #f9e9de;
-  --app-mint-soft: #e8f5f3;
-  --app-disabled: #e1e7e3;
-  --app-disabled-text: #7b8d8c;
-  --app-track: #e8e9db;
+  // The one accent: buttons, links, selected tab and chips.
+  --app-accent: #1f63d6;
+  --app-on-accent: #ffffff;
+  --app-accent-soft: #e8effc;
+  --app-success-soft: #e6f4ea;
+  --app-yellow-soft: #fdf6dc;
 
-  // Shape
-  --app-radius-sheet: 24px;
-  --app-radius-band: 40px;
+  // Soft fills behind status text and icon tiles
+  --app-rust: #b4441f;
+  --app-rust-soft: #fbece6;
+  --app-mint-soft: #f2f2f2;
+  --app-disabled: #ececec;
+  --app-disabled-text: #8a8a8a;
+  --app-track: #e5e5e5;
+
+  // Shape: pill buttons, softly rounded cards, flat headers.
+  --app-radius-sheet: 14px;
+  --app-radius-band: 0px;
   --app-radius-control: 100px;
 
   --app-brand-dark: var(--app-ink);
 
   --ion-background-color: var(--app-paper);
   --ion-background-color-rgb: var(--app-paper-rgb);
-  --ion-text-color: #1d6273;
-  --ion-text-color-rgb: 29, 98, 115;
+  --ion-text-color: #121212;
+  --ion-text-color-rgb: 18, 18, 18;
   --ion-border-color: var(--app-rule);
   --ion-item-background: var(--app-surface);
   --ion-card-background: var(--app-surface);
@@ -43,87 +50,91 @@
   --ion-tab-bar-background: var(--app-surface);
   --ion-placeholder-color: var(--app-muted);
 
-  --ion-color-primary: #1d6273;
-  --ion-color-primary-rgb: 29, 98, 115;
-  --ion-color-primary-contrast: #fef6ef;
-  --ion-color-primary-contrast-rgb: 254, 246, 239;
-  --ion-color-primary-shade: #1a5665;
-  --ion-color-primary-tint: #347281;
+  --ion-color-primary: #1f63d6;
+  --ion-color-primary-rgb: 31, 99, 214;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #1b57bc;
+  --ion-color-primary-tint: #3573da;
 
-  --ion-color-secondary: #ccfaff;
-  --ion-color-secondary-rgb: 204, 250, 255;
-  --ion-color-secondary-contrast: #1d6273;
-  --ion-color-secondary-contrast-rgb: 29, 98, 115;
-  --ion-color-secondary-shade: #b4dce0;
-  --ion-color-secondary-tint: #d1fbff;
+  --ion-color-secondary: #e8effc;
+  --ion-color-secondary-rgb: 232, 239, 252;
+  --ion-color-secondary-contrast: #1f63d6;
+  --ion-color-secondary-contrast-rgb: 31, 99, 214;
+  --ion-color-secondary-shade: #ccd2de;
+  --ion-color-secondary-tint: #eaf1fc;
 
-  // Available / returned: teal on mint, as in the design.
-  --ion-color-success: #1d6273;
-  --ion-color-success-rgb: 29, 98, 115;
-  --ion-color-success-contrast: #fef6ef;
-  --ion-color-success-contrast-rgb: 254, 246, 239;
-  --ion-color-success-shade: #1a5665;
-  --ion-color-success-tint: #347281;
+  // Available / returned
+  --ion-color-success: #1e7b3c;
+  --ion-color-success-rgb: 30, 123, 60;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #1a6c35;
+  --ion-color-success-tint: #358850;
 
-  // Out with a student: rust, as in the design.
-  --ion-color-warning: #af5642;
-  --ion-color-warning-rgb: 175, 86, 66;
+  // Out with a student
+  --ion-color-warning: #b4441f;
+  --ion-color-warning-rgb: 180, 68, 31;
   --ion-color-warning-contrast: #ffffff;
   --ion-color-warning-contrast-rgb: 255, 255, 255;
-  --ion-color-warning-shade: #9a4c3a;
-  --ion-color-warning-tint: #b76755;
+  --ion-color-warning-shade: #9e3c1b;
+  --ion-color-warning-tint: #bc5735;
 
-  // Overdue and destructive actions: a deeper red so it reads apart from "out".
-  --ion-color-danger: #b3261e;
-  --ion-color-danger-rgb: 179, 38, 30;
+  // Overdue and destructive actions
+  --ion-color-danger: #c62828;
+  --ion-color-danger-rgb: 198, 40, 40;
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #9e211a;
-  --ion-color-danger-tint: #bb3c35;
+  --ion-color-danger-shade: #ae2323;
+  --ion-color-danger-tint: #cc3e3e;
 
-  --ion-color-medium: #6f8b90;
-  --ion-color-medium-rgb: 111, 139, 144;
+  --ion-color-medium: #737373;
+  --ion-color-medium-rgb: 115, 115, 115;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #627a7f;
-  --ion-color-medium-tint: #7d979b;
+  --ion-color-medium-shade: #656565;
+  --ion-color-medium-tint: #818181;
 
-  --ion-color-light: #e8f5f3;
-  --ion-color-light-rgb: 232, 245, 243;
-  --ion-color-light-contrast: #1d6273;
-  --ion-color-light-contrast-rgb: 29, 98, 115;
-  --ion-color-light-shade: #ccd8d6;
-  --ion-color-light-tint: #eaf6f4;
+  --ion-color-light: #f2f2f2;
+  --ion-color-light-rgb: 242, 242, 242;
+  --ion-color-light-contrast: #121212;
+  --ion-color-light-contrast-rgb: 18, 18, 18;
+  --ion-color-light-shade: #d5d5d5;
+  --ion-color-light-tint: #f3f3f3;
 }
 
 // Dark mode follows the phone setting (dark.system.css, imported in global.scss).
-// The design has no dark version; these keep the same teal-and-peach feel at night.
 // The .md/.ios selectors match the specificity Ionic uses for its own dark colours.
 @media (prefers-color-scheme: dark) {
   :root,
   :root.md,
   :root.ios {
-    --app-paper: #0f1a1d;
-    --app-paper-rgb: 15, 26, 29;
-    --app-band: #15434b;
-    --app-surface: #16262a;
-    --app-rule: #24383c;
-    --app-rule-strong: #35494d;
-    --app-ink: #bfeff4;
-    --app-ink-rgb: 191, 239, 244;
-    --app-on-ink: #0f1a1d;
-    --app-muted: #8fa6aa;
-    --app-rust: #e8957f;
-    --app-rust-soft: #3a2621;
-    --app-mint-soft: #18343a;
-    --app-disabled: #22312f;
-    --app-disabled-text: #6f807f;
-    --app-track: #2a3b3e;
+    --app-paper: #121212;
+    --app-paper-rgb: 18, 18, 18;
+    --app-band: #121212;
+    --app-surface: #1a1a1a;
+    --app-rule: #2e2e2e;
+    --app-rule-strong: #444444;
+    --app-ink: #f5f5f5;
+    --app-ink-rgb: 245, 245, 245;
+    --app-on-ink: #121212;
+    --app-muted: #a3a3a3;
+    --app-accent: #3b7cf0;
+    --app-on-accent: #ffffff;
+    --app-accent-soft: #1c2a42;
+    --app-success-soft: #172a1e;
+    --app-yellow-soft: #2b2614;
+    --app-rust: #f0916f;
+    --app-rust-soft: #3a231b;
+    --app-mint-soft: #262626;
+    --app-disabled: #262626;
+    --app-disabled-text: #7a7a7a;
+    --app-track: #2e2e2e;
 
     --ion-background-color: var(--app-paper);
     --ion-background-color-rgb: var(--app-paper-rgb);
-    --ion-text-color: #bfeff4;
-    --ion-text-color-rgb: 191, 239, 244;
+    --ion-text-color: #f5f5f5;
+    --ion-text-color-rgb: 245, 245, 245;
     --ion-border-color: var(--app-rule);
     --ion-item-background: var(--app-surface);
     --ion-card-background: var(--app-surface);
@@ -131,33 +142,33 @@
     --ion-tab-bar-background: var(--app-surface);
     --ion-placeholder-color: var(--app-muted);
 
-    --ion-color-primary: #8fdde8;
-    --ion-color-primary-rgb: 143, 221, 232;
-    --ion-color-primary-contrast: #0f1a1d;
-    --ion-color-primary-contrast-rgb: 15, 26, 29;
-    --ion-color-primary-shade: #7ec2cc;
-    --ion-color-primary-tint: #9ae0ea;
+    --ion-color-primary: #3b7cf0;
+    --ion-color-primary-rgb: 59, 124, 240;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #346dd3;
+    --ion-color-primary-tint: #4f89f2;
 
-    --ion-color-secondary: #15434b;
-    --ion-color-secondary-rgb: 21, 67, 75;
-    --ion-color-secondary-contrast: #bfeff4;
-    --ion-color-secondary-contrast-rgb: 191, 239, 244;
-    --ion-color-secondary-shade: #133b42;
-    --ion-color-secondary-tint: #2c565d;
+    --ion-color-secondary: #1c2a42;
+    --ion-color-secondary-rgb: 28, 42, 66;
+    --ion-color-secondary-contrast: #f5f5f5;
+    --ion-color-secondary-contrast-rgb: 245, 245, 245;
+    --ion-color-secondary-shade: #19253a;
+    --ion-color-secondary-tint: #333f55;
 
-    --ion-color-success: #8fdde8;
-    --ion-color-success-rgb: 143, 221, 232;
-    --ion-color-success-contrast: #0f1a1d;
-    --ion-color-success-contrast-rgb: 15, 26, 29;
-    --ion-color-success-shade: #7ec2cc;
-    --ion-color-success-tint: #9ae0ea;
+    --ion-color-success: #5ccf86;
+    --ion-color-success-rgb: 92, 207, 134;
+    --ion-color-success-contrast: #0b1f12;
+    --ion-color-success-contrast-rgb: 11, 31, 18;
+    --ion-color-success-shade: #51b676;
+    --ion-color-success-tint: #6cd492;
 
-    --ion-color-warning: #e8957f;
-    --ion-color-warning-rgb: 232, 149, 127;
+    --ion-color-warning: #f0916f;
+    --ion-color-warning-rgb: 240, 145, 111;
     --ion-color-warning-contrast: #2a120c;
     --ion-color-warning-contrast-rgb: 42, 18, 12;
-    --ion-color-warning-shade: #cc8370;
-    --ion-color-warning-tint: #eaa08c;
+    --ion-color-warning-shade: #d38062;
+    --ion-color-warning-tint: #f29c7d;
 
     --ion-color-danger: #ff8a7e;
     --ion-color-danger-rgb: 255, 138, 126;
@@ -166,18 +177,18 @@
     --ion-color-danger-shade: #e07a6f;
     --ion-color-danger-tint: #ff968b;
 
-    --ion-color-medium: #8fa6aa;
-    --ion-color-medium-rgb: 143, 166, 170;
-    --ion-color-medium-contrast: #0f1a1d;
-    --ion-color-medium-contrast-rgb: 15, 26, 29;
-    --ion-color-medium-shade: #7e9296;
-    --ion-color-medium-tint: #9aafb3;
+    --ion-color-medium: #a3a3a3;
+    --ion-color-medium-rgb: 163, 163, 163;
+    --ion-color-medium-contrast: #121212;
+    --ion-color-medium-contrast-rgb: 18, 18, 18;
+    --ion-color-medium-shade: #8f8f8f;
+    --ion-color-medium-tint: #acacac;
 
-    --ion-color-light: #18343a;
-    --ion-color-light-rgb: 24, 52, 58;
-    --ion-color-light-contrast: #bfeff4;
-    --ion-color-light-contrast-rgb: 191, 239, 244;
-    --ion-color-light-shade: #152e33;
-    --ion-color-light-tint: #2f484e;
+    --ion-color-light: #262626;
+    --ion-color-light-rgb: 38, 38, 38;
+    --ion-color-light-contrast: #f5f5f5;
+    --ion-color-light-contrast-rgb: 245, 245, 245;
+    --ion-color-light-shade: #212121;
+    --ion-color-light-tint: #3c3c3c;
   }
 }

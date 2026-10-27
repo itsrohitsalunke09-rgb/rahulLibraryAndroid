@@ -58,12 +58,6 @@
   </ion-infinite-scroll>
 
   @if (!stories.loaded() && !stories.error()) {
-    <ion-list inset="true" lines="full">
-      @for (i of [1, 2, 3, 4]; track i) {
-        <ion-item>
-          <ion-label><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <app-page-skeleton [count]="false" [avatar]="true" [chip]="true" />
   }
 </ion-content>

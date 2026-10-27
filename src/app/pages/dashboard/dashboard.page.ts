@@ -1,16 +1,17 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent, IonHeader, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSkeletonText, IonTitle,
   IonToolbar, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { AuthService } from '../../core/auth.service';
+import { localIsoDate } from '../../core/dates';
 import { Freshness } from '../../core/freshness';
-import { openYearSelect } from '../../core/issue-years';
-import { Dashboard } from '../../core/models';
+import { issueYears, openYearSelect } from '../../core/issue-years';
+import { Dashboard, DayRegister, IssueCounts, MonthReport } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 interface Tile {
   label: string;
@@ -18,8 +19,8 @@ interface Tile {
   /** Icon file from the Figma design (assets/icons). */
   symbol: string;
   tone: 'primary' | 'success' | 'warning' | 'danger' | 'medium';
-  /** attention = the two big numbers; shelf = the stock bar; more = the list underneath. */
-  group: 'attention' | 'shelf' | 'more';
+  /** attention = the two big numbers; more = the list underneath. */
+  group: 'attention' | 'more';
   link?: string;
   query?: Record<string, string>;
 }
@@ -30,13 +31,11 @@ interface Tile {
   styleUrls: ['dashboard.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText, IonSelect,
-    IonSelectOption
-  ],
+    IonSelectOption, PageSkeletonComponent],
 })
 export class DashboardPage implements ViewWillEnter {
   private api = inject(ApiService);
   private router = inject(Router);
-  protected auth = inject(AuthService);
 
   readonly stats = signal<Dashboard | null>(null);
   private readonly tiles = computed(() => {
@@ -44,25 +43,27 @@ export class DashboardPage implements ViewWillEnter {
     return s ? toTiles(s) : [];
   });
   readonly attention = computed(() => this.tiles().filter(t => t.group === 'attention'));
-  readonly shelf = computed(() => this.tiles().find(t => t.group === 'shelf'));
   readonly more = computed(() => this.tiles().filter(t => t.group === 'more'));
-  /** Share of copies on the shelf, for the stock bar. */
-  readonly shelfPercent = computed(() => {
-    const s = this.stats();
-    return s && s.totalCopies ? Math.round((s.availableCopies / s.totalCopies) * 100) : 0;
+  /** Issue transactions for the chosen year (all years when none), for the blue card. */
+  readonly counts = signal<IssueCounts | null>(null);
+  /** Share of those transactions already returned, for the card's bar. */
+  readonly returnedPercent = computed(() => {
+    const c = this.counts();
+    return c && c.all ? Math.round((c.returned / c.all) * 100) : 0;
   });
-  readonly today = signal(todayText());
   readonly error = signal('');
-  /** Year for the issue numbers; null = all years. */
-  readonly year = signal<number | null>(null);
-  readonly years = signal<number[]>([]);
-  private readonly yearSelect = viewChild<IonSelect>('yearSelect');
+  /** Newspapers received today and magazines that came this month; null until loaded. */
+  readonly papers = signal<PaperSummary | null>(null);
+  readonly papersError = signal('');
+  /** Year for the issue numbers; starts on the current year, null = all years. */
+  readonly year = signal<number | null>(new Date().getFullYear());
+  readonly years = signal(issueYears());
+  private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
   private request?: Subscription;
+  private papersRequest?: Subscription;
   private freshness = new Freshness();
 
   ionViewWillEnter() {
-    // Tab pages stay alive in the background, so refresh the date on every visit.
-    this.today.set(todayText());
     if (this.freshness.isStale()) {
       this.load();
     }
@@ -72,9 +73,9 @@ export class DashboardPage implements ViewWillEnter {
     this.load(() => event.target.complete());
   }
 
-  /** Opens the year list, fetched fresh so it matches the issues on the server. */
-  openYears() {
-    return openYearSelect(this.api, this.years, this.yearSelect);
+  /** Opens the year list under the chip; the years are built in the app, so it opens at once. */
+  openYears(event: Event) {
+    return openYearSelect(this.yearSelect()?.nativeElement, event);
   }
 
   setYear(value: unknown) {
@@ -86,11 +87,21 @@ export class DashboardPage implements ViewWillEnter {
     this.load();
   }
 
+  /** Issues on its All tab, narrowed to the year chosen here (no year = every year). */
+  openTransactions() {
+    const year = this.year();
+    this.router.navigate(['/tabs/issues'], { queryParams: year ? { status: 'ALL', year } : { status: 'ALL' } });
+  }
+
+  go(link: string) {
+    this.router.navigate([link]);
+  }
+
   open(tile: Tile) {
     if (tile.link) {
-      // Issue tiles open Issues for the year chosen here (no year = all years).
+      // "Out with students" opens Issues for the year chosen here; Overdue always covers every year.
       const year = this.year();
-      const queryParams = tile.query?.['status'] && year ? { ...tile.query, year } : tile.query;
+      const queryParams = tile.query?.['status'] === 'OUT' && year ? { ...tile.query, year } : tile.query;
       this.router.navigate([tile.link], { queryParams });
     }
   }
@@ -99,10 +110,17 @@ export class DashboardPage implements ViewWillEnter {
     // Drop an older request so a quick year change never shows stale numbers.
     this.request?.unsubscribe();
     this.freshness.mark();
-    this.request = this.api.dashboard(this.year()).subscribe({
-      next: stats => {
+    const year = this.year();
+    this.request = forkJoin([
+      this.api.dashboard(year),
+      this.api.issueCounts(year),
+      // Overdue copies need chasing whenever they were issued, so that number ignores the year.
+      year ? this.api.issueCounts(null) : of(null),
+    ]).subscribe({
+      next: ([stats, yearCounts, allCounts]) => {
         this.error.set('');
-        this.stats.set(stats);
+        this.stats.set(allCounts ? { ...stats, overdueCopies: allCounts.overdue } : stats);
+        this.counts.set(yearCounts);
         done?.();
       },
       error: err => {
@@ -111,21 +129,48 @@ export class DashboardPage implements ViewWillEnter {
         done?.();
       }
     });
+    this.loadPapers();
   }
+
+  /** Separate from the book numbers, so a newspaper error never hides the rest of the dashboard. */
+  private loadPapers() {
+    this.papersRequest?.unsubscribe();
+    const today = localIsoDate();
+    this.papersRequest = forkJoin([this.api.periodicalRegister(today), this.api.periodicalReport(today.slice(0, 7))]).subscribe({
+      next: ([day, month]) => {
+        this.papersError.set('');
+        this.papers.set(paperSummary(day, month));
+      },
+      error: err => this.papersError.set(errorMessage(err, 'Could not load the newspaper register.')),
+    });
+  }
+}
+
+export interface PaperSummary {
+  /** Subscribed dailies, and how many are ticked as received today. */
+  newspapers: { received: number; total: number };
+  /** Subscribed weeklies, fortnightlies and monthlies, and how many came at least once this month. */
+  magazines: { received: number; total: number };
+}
+
+/** Today's register lists every subscribed paper; the month's report says which magazines have come. */
+export function paperSummary(day: DayRegister, month: MonthReport): PaperSummary {
+  const dailies = day.rows.filter(r => r.frequency === 'DAILY');
+  const magazines = day.rows.filter(r => r.frequency !== 'DAILY');
+  const cameThisMonth = new Set(month.rows.filter(r => r.issues > 0).map(r => r.periodicalId));
+  return {
+    newspapers: { received: dailies.filter(r => r.arrived).length, total: dailies.length },
+    magazines: { received: magazines.filter(r => cameThisMonth.has(r.periodicalId)).length, total: magazines.length },
+  };
 }
 
 function toTiles(s: Dashboard): Tile[] {
   return [
     { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/issues', query: { status: 'OVERDUE' } },
     { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/issues', query: { status: 'OUT' } },
-    { label: 'On the shelf', value: s.availableCopies, symbol: 'assets/icons/book.svg', tone: 'success', group: 'shelf', link: '/tabs/catalog' },
     { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/catalog' },
     { label: 'Total copies', value: s.totalCopies, symbol: 'assets/icons/copies.svg', tone: 'medium', group: 'more', link: '/tabs/catalog' },
-    { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/people', query: { role: 'STUDENT' } },
-    { label: 'Librarians', value: s.librarians, symbol: 'assets/icons/user.svg', tone: 'medium', group: 'more', link: '/tabs/people', query: { role: 'LIBRARIAN' } },
+    { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/people' },
   ];
 }
 
-function todayText(): string {
-  return new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
-}

@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
-  IonLabel, IonList, IonRefresher, IonRefresherContent, IonSkeletonText,
+  IonLabel, IonList, IonRefresher, IonRefresherContent, 
   IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -10,6 +10,7 @@ import { ApiService } from '../../core/api.service';
 import { BookIssue } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 @Component({
   selector: 'app-my-books',
@@ -17,8 +18,9 @@ import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../
   styleUrls: ['my-books.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSkeletonText,
-    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe
+    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
+    DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe,
+    PageSkeletonComponent
   ],
 })
 export class MyBooksPage implements ViewWillEnter {

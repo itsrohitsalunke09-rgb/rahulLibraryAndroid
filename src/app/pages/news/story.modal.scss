@@ -2,40 +2,48 @@
 
 @include paper.tokens;
 
-.sheet {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: calc(var(--ion-safe-area-top, 0px) + 8px) 20px calc(var(--ion-safe-area-bottom, 0px) + 32px);
-  color: var(--paper-ink);
-}
-
-/* Running head: the library's name and the close button above a thin rule. */
-.folio {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 4px 0 4px;
-  margin-bottom: 20px;
+/* Top bar: back arrow and the library's name, flat on the page with a thin rule under it. */
+ion-header ion-toolbar {
+  --min-height: 52px;
   border-bottom: 1px solid var(--paper-rule);
 }
 
-.nameplate {
-  font-family: paper.$serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--paper-muted);
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
 }
 
-.close {
+.back {
   display: grid;
   place-items: center;
+  flex: 0 0 auto;
   width: 44px;
   height: 44px;
-  margin-inline-end: -10px;
+  padding: 0;
   border: 0;
   border-radius: 50%;
   background: none;
   color: var(--paper-ink);
+  font-size: 22px;
   cursor: pointer;
 }
+
+.nameplate {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--paper-ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sheet {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 20px calc(var(--ion-safe-area-bottom, 0px) + 28px);
+  color: var(--paper-ink);
+}
+

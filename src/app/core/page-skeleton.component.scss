@@ -1,0 +1,124 @@
+/* Grey shapes in the page's layout with a soft light sweeping across them.
+   Colours come from the theme, so light and dark mode both work. */
+:host {
+  --sk-base: rgba(var(--app-ink-rgb), 0.07);
+  --sk-shine: rgba(var(--app-ink-rgb), 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* A list sits where an inset ion-list would: 24px in from the screen edges. */
+:host(.kind-list) {
+  margin: 8px 24px 16px;
+}
+
+:host(.kind-list.flush) {
+  margin: 20px 0 0;
+}
+
+.sk {
+  display: block;
+  flex: none;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--sk-base) 0%, var(--sk-base) 40%, var(--sk-shine) 50%, var(--sk-base) 60%, var(--sk-base) 100%);
+  background-size: 300% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+  }
+}
+
+/* ---- Building blocks ---- */
+.line { height: 12px; }
+.line.big { height: 16px; }
+.line.small { height: 9px; }
+.heading { height: 15px; margin-top: 6px; }
+.count { width: 22%; margin-left: 2px; }
+.label { margin: 6px 2px 0; }
+.amount { width: 52px; margin-left: auto; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; }
+.dot { width: 22px; height: 22px; border-radius: 6px; }
+.box { width: 24px; height: 24px; border-radius: 5px; }
+.pill { width: 64px; height: 22px; border-radius: 100px; }
+.pill.wide { width: 86px; height: 40px; border-radius: var(--app-radius-control); }
+.button { height: 44px; border-radius: var(--app-radius-control); }
+.field { height: 48px; border-radius: 12px; }
+.field.tall { height: 96px; }
+.tile { height: 110px; border-radius: var(--app-radius-sheet); }
+.banner { height: 96px; border-radius: var(--app-radius-sheet); }
+.photo { height: 140px; border-radius: 0; }
+
+/* ---- Cards and rows, drawn like the real ones ---- */
+.card {
+  overflow: hidden;
+  border: 1px solid var(--app-rule);
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-surface);
+}
+
+.card.flat {
+  border: 0;
+  background: rgba(var(--app-ink-rgb), 0.03);
+}
+
+.rows {
+  padding: 0 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+
+  & + & {
+    border-top: 1px solid var(--app-rule);
+  }
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pad {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2px 4px;
+}
+
+/* The news list shows two cards side by side on wide screens, like the real one. */
+:host(.kind-cards) {
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

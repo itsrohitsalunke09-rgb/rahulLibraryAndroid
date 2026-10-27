@@ -31,10 +31,10 @@ describe('NewspaperPage', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('rendersSlimHeaderWithNameAndDate', () => {
+  it('rendersNewsTitleAndDate', () => {
     const el = render(of(page([story(1)])));
     const header = el.querySelector('.header')?.textContent ?? '';
-    expect(header).toContain('राहुल सार्वजनिक वाचनालय');
+    expect(header).toContain('News');
     expect(header).toContain(new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
   });
 

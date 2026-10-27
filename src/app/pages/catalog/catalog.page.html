@@ -75,16 +75,7 @@
         </div>
       }
     } @else if (!papersError()) {
-      <ion-list inset="true" lines="full">
-        @for (i of [1, 2, 3, 4]; track i) {
-          <ion-item>
-            <ion-label>
-              <h2><ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text></h2>
-              <p><ion-skeleton-text [animated]="true" style="width: 30%"></ion-skeleton-text></p>
-            </ion-label>
-          </ion-item>
-        }
-      </ion-list>
+      <app-page-skeleton [count]="false" />
     }
   } @else {
 
@@ -128,16 +119,7 @@
       </div>
     }
   } @else {
-    <ion-list inset="true" lines="full">
-      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-        <ion-item>
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 70%"></ion-skeleton-text></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 40%"></ion-skeleton-text></p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <app-page-skeleton [count]="false" [chip]="true" />
   }
 
   <ion-infinite-scroll [disabled]="books.finished()" (ionInfinite)="books.more($event)">

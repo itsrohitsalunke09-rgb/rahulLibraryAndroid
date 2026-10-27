@@ -1,0 +1,100 @@
+@switch (kind()) {
+  @case ('cards') {
+    @for (row of items(); track $index) {
+      <div class="card">
+        <span class="sk photo"></span>
+        <div class="pad">
+          <span class="sk line big" [style.width.%]="row.title"></span>
+          <span class="sk line small" style="width: 26%"></span>
+          <span class="sk line" style="width: 94%"></span>
+          <span class="sk line" [style.width.%]="row.title - 8"></span>
+        </div>
+      </div>
+    }
+  }
+
+  @case ('register') {
+    @for (group of [3, 2]; track $index) {
+      <span class="sk heading" [style.width.%]="$first ? 22 : 30"></span>
+      <div class="card rows">
+        @for (row of items().slice(0, group); track $index) {
+          <div class="row">
+            <span class="sk box"></span>
+            <span class="text">
+              <span class="sk line" [style.width.%]="row.title"></span>
+              <span class="sk line small" [style.width.%]="row.sub"></span>
+            </span>
+            <span class="sk pill wide"></span>
+          </div>
+        }
+      </div>
+    }
+    <div class="summary"><span class="sk line" style="width: 34%"></span><span class="sk line big" style="width: 18%"></span></div>
+    <span class="sk button"></span>
+  }
+
+  @case ('report') {
+    @for (group of [items().length, 2]; track $index) {
+      <span class="sk heading" [style.width.%]="$first ? 22 : 30"></span>
+      <div class="card rows">
+        @for (row of items().slice(0, group); track $index) {
+          <div class="row">
+            <span class="text">
+              <span class="sk line" [style.width.%]="row.title"></span>
+              <span class="sk line small" [style.width.%]="row.sub"></span>
+            </span>
+            <span class="sk line big amount"></span>
+          </div>
+        }
+      </div>
+      <div class="summary"><span class="sk line" style="width: 24%"></span><span class="sk line" style="width: 16%"></span></div>
+      <span class="sk button"></span>
+    }
+  }
+
+  @case ('dashboard') {
+    <div class="tiles"><span class="sk tile"></span><span class="sk tile"></span></div>
+    <span class="sk banner"></span>
+    <span class="sk heading" style="width: 52%"></span>
+    <div class="tiles"><span class="sk tile"></span><span class="sk tile"></span></div>
+    <span class="sk heading" style="width: 22%"></span>
+    <div class="card rows flat">
+      @for (row of items(); track $index) {
+        <div class="row">
+          <span class="sk dot"></span>
+          <span class="text"><span class="sk line" [style.width.%]="row.title - 20"></span></span>
+          <span class="sk line amount"></span>
+        </div>
+      }
+    </div>
+  }
+
+  @case ('form') {
+    @for (row of items(); track $index) {
+      <span class="sk line small label" [style.width.%]="row.sub - 10"></span>
+      <span class="sk field" [class.tall]="$index === 2"></span>
+    }
+  }
+
+  @default {
+    @if (count()) {
+      <span class="sk line small count"></span>
+    }
+    <div class="card rows">
+      @for (row of items(); track $index) {
+        <div class="row">
+          @if (avatar()) {
+            <span class="sk avatar"></span>
+          }
+          <span class="text">
+            <span class="sk line" [style.width.%]="row.title"></span>
+            <span class="sk line small" [style.width.%]="row.sub"></span>
+          </span>
+          @if (chip()) {
+            <span class="sk pill"></span>
+          }
+        </div>
+      }
+    </div>
+  }
+}

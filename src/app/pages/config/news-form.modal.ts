@@ -4,6 +4,7 @@ import {
   IonButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
+import { AuthService } from '../../core/auth.service';
 import { localIsoDate } from '../../core/dates';
 import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
 import { NewsStory, NewsStoryRequest, NewsTemplate } from '../../core/models';
@@ -36,6 +37,7 @@ export class NewsFormModal implements OnInit, OnDestroy {
   private api = inject(ApiService);
   private modals = inject(ModalController);
   private ui = inject(UiService);
+  private auth = inject(AuthService);
 
   form: NewsStoryRequest = { headline: '', body: '', eventDate: localIsoDate(), photoCaption: '', removePhoto: false,
     template: 'CLASSIC' };
@@ -75,7 +77,8 @@ export class NewsFormModal implements OnInit, OnDestroy {
       hasPhoto,
       photoVersion: this.story?.photoVersion ?? 0,
       template: f.template,
-      createdByName: this.story?.createdByName ?? '',
+      // A new story will be signed by whoever saves it, so the preview shows their name.
+      createdByName: this.story?.createdByName ?? this.auth.profile()?.fullName ?? '',
       createdAt: this.story?.createdAt ?? '',
       updatedAt: this.story?.updatedAt ?? '',
     };

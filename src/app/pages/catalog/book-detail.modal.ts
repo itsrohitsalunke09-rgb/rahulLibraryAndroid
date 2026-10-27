@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonBadge, IonContent, IonHeader, IonIcon, IonSpinner, IonTitle, IonToolbar, ModalController
+  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonSpinner, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -28,7 +28,7 @@ type Section = 'none' | 'details' | 'history' | 'edit';
   templateUrl: 'book-detail.modal.html',
   styleUrls: ['book-detail.modal.scss'],
   imports: [
-    FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonBadge, IonIcon, IonSpinner,
+    FormsModule, IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonBadge, IonIcon, IonSpinner,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe
   ],
 })

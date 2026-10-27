@@ -1,46 +1,23 @@
 /* Values from Figma "rahul-library" › Dashboard - Mobile (9:280). */
 
-/* Book emblem: 38px circle at the end of the heading. */
-.emblem {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  margin-inline-end: 12px;
-  border-radius: 50%;
-  background: var(--app-paper);
-  color: var(--app-ink);
-}
-
 /* The library name in Marathi is the page heading. */
+/* Shrinks a little on narrow phones so the logo and the whole name stay on one line. */
 ion-header ion-toolbar ion-title.library-name {
-  font-size: 24px;
+  font-size: clamp(19px, 6vw, 24px);
   font-weight: 600;
   line-height: 1.4;
 }
 
-/* Greeting inside the cyan band. */
-.greeting {
-  padding: 10px 24px 28px;
-  color: var(--app-ink);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  .salutation {
-    margin: 0;
-    font-size: 14px;
-  }
-
-  h2 {
-    margin: 5px 0 0;
-    font-size: 22px;
-    font-weight: 500;
-    line-height: 1.2;
-  }
-
-  .date {
-    margin: 5px 0 0;
-    font-size: 13px;
-    opacity: 0.7;
-  }
+.logo {
+  flex: 0 0 auto;
+  width: clamp(36px, 11vw, 44px);
+  height: auto;
 }
 
 .overview {
@@ -64,8 +41,22 @@ button {
   gap: 12px;
 }
 
+/* Section headings: Books, Newspapers & magazines, Library. */
+.section {
+  margin: 8px 0 -4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--app-ink);
+}
+
+.filter-row .section {
+  margin: 0;
+}
+
 .filter-text {
+  margin-inline-start: 4px;
   font-size: 13px;
+  font-weight: 400;
   color: var(--app-muted);
 }
 
@@ -84,9 +75,9 @@ button {
   white-space: nowrap;
 
   &.active {
-    border-color: var(--app-ink);
-    background: var(--app-ink);
-    color: var(--app-on-ink);
+    border-color: var(--app-accent);
+    background: var(--app-accent);
+    color: var(--app-on-accent);
   }
 
   .icon {
@@ -118,7 +109,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 13px;
-  height: 110px;
+  min-height: 110px;
   padding: 16px;
   border: 0;
   border-radius: var(--app-radius-sheet);
@@ -148,23 +139,58 @@ button {
     font-weight: 500;
   }
 
+  /* Soft-tinted like Overdue: newspapers in blue, magazines in green. */
+  &.paper {
+    --tone: var(--app-ink);
+    --paper-tone: var(--app-accent);
+    background: var(--app-accent-soft);
+
+    .value,
+    .metric-top .icon {
+      color: var(--paper-tone);
+    }
+
+    .mini-track span {
+      background: var(--paper-tone);
+    }
+  }
+
+  &.magazines {
+    --paper-tone: var(--ion-color-success);
+    background: var(--app-success-soft);
+  }
+
+  .value small {
+    font-size: 18px;
+    color: var(--app-muted);
+  }
+
+  /* "Newspapers" over a smaller muted "received today". */
+  .sub {
+    display: block;
+    margin-top: 1px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--app-muted);
+  }
+
   &.skeleton ion-skeleton-text {
     width: 40%;
     height: 34px;
   }
 }
 
-/* Teal card with the share of copies on the shelf. */
+/* Blue card: total issue transactions and the share already returned. */
 .shelf {
   display: flex;
   flex-direction: column;
-  gap: 13px;
-  height: 90px;
+  gap: 10px;
+  min-height: 90px;
   padding: 18px;
   border: 0;
   border-radius: var(--app-radius-sheet);
-  background: var(--app-ink);
-  color: var(--app-on-ink);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
 }
 
 .shelf-head {
@@ -177,10 +203,15 @@ button {
     font-weight: 600;
   }
 
+  .big {
+    margin-inline-end: 4px;
+    font-size: 26px;
+    line-height: 1;
+  }
+
   .percent {
     font-size: 18px;
     font-weight: 600;
-    color: var(--app-band);
   }
 }
 
@@ -188,35 +219,42 @@ button {
   display: block;
   height: 8px;
   border-radius: 100px;
-  background: var(--app-track);
+  background: rgba(255, 255, 255, 0.3);
   overflow: hidden;
 
   span {
     display: block;
     height: 100%;
     border-radius: 100px;
-    background: var(--app-band);
+    background: var(--app-on-accent);
   }
 }
 
-/* At night the inverted card would put a dark fill on a dark track; keep the bar readable. */
-@media (prefers-color-scheme: dark) {
-  .shelf {
-    background: var(--app-band);
-    color: var(--app-ink);
-  }
+/* Thin bar under "Received today". */
+.mini-track {
+  display: block;
+  height: 4px;
+  margin-top: -6px;
+  border-radius: 100px;
+  background: rgba(var(--app-ink-rgb), 0.1);
+  overflow: hidden;
 
-  .shelf-head .percent {
-    color: var(--app-ink);
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 100px;
   }
+}
 
-  .track {
-    background: rgba(var(--app-ink-rgb), 0.18);
+.papers-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}
 
-    span {
-      background: var(--app-ink);
-    }
-  }
+.shelf-foot {
+  font-size: 12px;
+  opacity: 0.85;
 }
 
 .shelf-skeleton {
@@ -224,11 +262,11 @@ button {
   --border-radius: var(--app-radius-sheet);
 }
 
-/* Book titles / total copies / students / librarians. */
+/* Book titles / total copies / students. */
+/* Soft yellow, no outline, like the other soft cards. */
 .records {
-  border: 1px solid var(--app-rule);
   border-radius: var(--app-radius-sheet);
-  background: var(--app-surface);
+  background: var(--app-yellow-soft);
   overflow: hidden;
 }
 
@@ -240,7 +278,7 @@ button {
   height: 54px;
   padding: 0 16px;
   border: 0;
-  border-bottom: 1px solid var(--app-rule);
+  border-bottom: 1px solid rgba(var(--app-ink-rgb), 0.08);
   background: transparent;
   color: var(--app-ink);
 
@@ -249,7 +287,7 @@ button {
   }
 
   &:active {
-    background: var(--app-mint-soft);
+    background: rgba(var(--app-ink-rgb), 0.06);
   }
 
   .record-label {

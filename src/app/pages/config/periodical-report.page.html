@@ -26,11 +26,7 @@
     }
 
     @if (loading() && !report()) {
-      <div class="card">
-        @for (i of [1, 2, 3]; track i) {
-          <ion-skeleton-text [animated]="true" style="height: 44px; margin: 8px 0"></ion-skeleton-text>
-        }
-      </div>
+      <app-page-skeleton kind="report" />
     } @else if (report(); as r) {
       @if (r.rows.length) {
         @for (group of groups(); track group.frequency) {

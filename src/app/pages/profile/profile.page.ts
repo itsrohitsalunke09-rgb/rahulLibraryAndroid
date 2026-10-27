@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { IonContent, IonIcon, IonSkeletonText, IonSpinner } from '@ionic/angular';
+import { IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
@@ -10,12 +10,13 @@ import { formatDate, localIsoDate } from '../../core/dates';
 import { ProfileUpdate, roleLabel } from '../../core/models';
 import { InitialsPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
+import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 @Component({
   selector: 'app-profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
-  imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSpinner, IonSkeletonText, InitialsPipe],
+  imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSpinner, InitialsPipe, PageSkeletonComponent],
 })
 export class ProfilePage {
   private api = inject(ApiService);

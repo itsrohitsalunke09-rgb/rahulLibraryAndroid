@@ -1,12 +1,17 @@
-<ion-content>
-  <div class="sheet">
-    <div class="folio">
-      <span class="nameplate">राहुल सार्वजनिक वाचनालय</span>
-      <button type="button" class="close" aria-label="Close story" (click)="close()">
+<!-- Fixed top bar (X to close, library name); only the story scrolls. -->
+<ion-header>
+  <ion-toolbar>
+    <div class="bar">
+      <button type="button" class="back" aria-label="Close" (click)="close()">
         <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
       </button>
+      <span class="nameplate marathi" lang="mr">राहुल सार्वजनिक वाचनालय</span>
     </div>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content>
+  <div class="sheet">
     <app-story-view [story]="story" [previewPhoto]="previewPhoto" />
   </div>
 </ion-content>

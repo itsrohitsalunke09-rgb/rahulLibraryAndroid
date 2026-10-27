@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent, IonIcon, IonSpinner
 } from '@ionic/angular';
@@ -13,7 +13,7 @@ import { errorMessage } from '../../core/ui.service';
   selector: 'app-login',
   templateUrl: 'login.page.html',
   styleUrls: ['login.page.scss'],
-  imports: [FormsModule, RouterLink, IonContent, IonIcon, IonSpinner],
+  imports: [FormsModule, IonContent, IonIcon, IonSpinner],
 })
 export class LoginPage {
   private auth = inject(AuthService);

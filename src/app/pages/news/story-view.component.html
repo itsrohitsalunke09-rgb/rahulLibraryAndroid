@@ -16,13 +16,20 @@
   <h1 class="headline">{{ story().headline }}</h1>
 </ng-template>
 
+<!-- Author row: initials circle, then "By name" over the date. -->
 <ng-template #byline>
-  <p class="byline"><span class="date">{{ story().eventDate | shortDate }}</span> By {{ story().createdByName }}</p>
+  <div class="byline">
+    <span class="avatar" aria-hidden="true">{{ author() | initials }}</span>
+    <span class="who">
+      <span class="author">By {{ author() }}</span>
+      <span class="date">{{ story().eventDate | shortDate }}</span>
+    </span>
+  </div>
 </ng-template>
 
 <ng-template #paras>
   @for (p of paragraphs(); track $index) {
-    <p [class.cap]="$first && capAllowed() && hasDropCap(p)">{{ p }}</p>
+    <p>{{ p }}</p>
   }
 </ng-template>
 

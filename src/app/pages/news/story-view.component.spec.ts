@@ -23,17 +23,21 @@ describe('StoryViewComponent', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('rendersOneParagraphEachWithDropCapOnALatinOpening', () => {
+  it('rendersOneParagraphPerBlankLineBlock', () => {
     const el = render(story());
-    const ps = el.querySelectorAll('.text p');
-    expect(ps.length).toBe(3);
-    expect(ps[0].classList.contains('cap')).toBe(true);
-    expect(ps[1].classList.contains('cap')).toBe(false);
+    expect(el.querySelectorAll('.text p').length).toBe(3);
   });
 
-  it('noDropCapForADevanagariOpening', () => {
-    const el = render(story({ body: 'डॉ. आंबेडकर जयंती' }));
-    expect(el.querySelector('.text p')?.classList.contains('cap')).toBe(false);
+  it('authorRowShowsInitialsAndName', () => {
+    const el = render(story({ createdByName: 'Asha Patil' }));
+    expect(el.querySelector('.byline .avatar')?.textContent?.trim()).toBe('AP');
+    expect(el.querySelector('.byline .author')?.textContent).toContain('By Asha Patil');
+  });
+
+  it('storyWithoutAnAuthorIsSignedByTheLibrary', () => {
+    const el = render(story({ createdByName: '' }));
+    expect(el.querySelector('.byline .author')?.textContent).toContain('By Rahul Library');
+    expect(el.querySelector('.byline .avatar')?.textContent?.trim()).toBe('RL');
   });
 
   it('classicShowsPhotoCaptionHeadlineAndByline', () => {
@@ -69,17 +73,6 @@ describe('StoryViewComponent', () => {
     expect(el.querySelector('figcaption')).toBeNull();
     expect(el.querySelector('.tag')?.textContent?.trim()).toBe('Notice');
     expect(storyPhoto).not.toHaveBeenCalled();
-  });
-
-  it('noticeHasNoDropCap', () => {
-    const el = render(story({ template: 'NOTICE' }));
-    expect(el.querySelector('.text p')?.classList.contains('cap')).toBe(false);
-  });
-
-  it('sidePhotoHasNoDropCap', () => {
-    const el = render(story({ template: 'SIDE_PHOTO', body: 'The fair opened.\n\nSecond part.' }));
-    expect(el.querySelector('article.view-side-photo')).not.toBeNull();
-    expect(el.querySelector('.text p')?.classList.contains('cap')).toBe(false);
   });
 
   it('previewPhotoUsedInsteadOfServer', () => {

@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { logoInstagram, mailOutline } from 'ionicons/icons';
+import { arrowBack, logoInstagram, mailOutline } from 'ionicons/icons';
 import { DEFAULT_ABOUT, aboutBlocks, instagramHandle, withDefaults } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
 
@@ -25,7 +25,7 @@ export class AboutPage implements OnInit {
   readonly instagramHandle = computed(() => instagramHandle(this.content().instagram));
 
   constructor() {
-    addIcons({ logoInstagram, mailOutline });
+    addIcons({ arrowBack, logoInstagram, mailOutline });
   }
 
   ngOnInit() {

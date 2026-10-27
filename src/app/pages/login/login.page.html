@@ -1,36 +1,28 @@
-<!-- Built from Figma "rahul-library" › Airy aqua modernism (node 68:1608). -->
+<!-- Simple dark/light sign-in: one column, one blue accent for actions, outlined fields. -->
 <ion-content [fullscreen]="true">
-  <div class="stage">
-    <!-- Decoration: soft aqua shapes behind the host. -->
-    <img class="backdrop" src="assets/login/sculptural-backdrop.svg" width="485" height="423" alt="" />
-    <img class="accent" src="assets/login/floating-accent.svg" width="106" height="106" alt="" />
-
-    <header class="masthead">
-      <h1 class="marathi" lang="mr">राहुल वाचनालय</h1>
+  <div class="screen">
+    <main class="body">
+      <img class="logo" src="assets/logo.svg" width="521" height="327" alt="" />
+      <h1 class="name marathi" lang="mr">राहुल वाचनालय</h1>
       <p class="place marathi" lang="mr">शिंदेवाडी</p>
-    </header>
 
-    <img class="host" src="assets/login/papa.png" width="1024" height="1536" alt="" />
-
-    <form id="login-form" class="credentials" (ngSubmit)="submit()">
-      <label class="field">
-        <span class="field-label">Username</span>
-        <span class="input">
+      <form class="form" (ngSubmit)="submit()">
+        <label class="input">
+          <span class="sr-only">Username</span>
           <input
             name="username"
-            placeholder="username"
+            placeholder="Username"
             autocomplete="username"
             autocapitalize="off"
             [(ngModel)]="username" />
-        </span>
-      </label>
+          <span class="icon" style="--icon: url(assets/icons/field-user.svg); --icon-size: 18px" aria-hidden="true"></span>
+        </label>
 
-      <label class="field">
-        <span class="field-label">Password</span>
-        <span class="input">
+        <label class="input">
+          <span class="sr-only">Password</span>
           <input
             name="password"
-            placeholder="Enter your password"
+            placeholder="Password"
             autocomplete="current-password"
             [type]="showPassword() ? 'text' : 'password'"
             [(ngModel)]="password" />
@@ -43,37 +35,27 @@
             @if (showPassword()) {
               <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
             } @else {
-              <img src="assets/login/eye-off.svg" width="16" height="16" alt="" />
+              <img src="assets/login/eye-off.svg" width="18" height="18" alt="" />
             }
           </button>
-        </span>
-      </label>
+        </label>
 
-      <button type="button" class="forgot" (click)="forgotPassword()">Forgot Password</button>
-
-      @if (error()) {
-        <p class="error" role="alert">{{ error() }}</p>
-      } @else if (notice()) {
-        <p class="notice" role="status">{{ notice() }}</p>
-      }
-
-    </form>
-
-    <div class="actions">
-      <!-- Sits in the bottom group but submits the form above (so Enter works too). -->
-      <button type="submit" form="login-form" class="login" [disabled]="loading()">
-        @if (loading()) {
-          <ion-spinner name="crescent"></ion-spinner>
-        } @else {
-          <span>Login</span>
-          <img src="assets/login/arrow-right.svg" width="22" height="22" alt="" />
+        @if (error()) {
+          <p class="error" role="alert">{{ error() }}</p>
+        } @else if (notice()) {
+          <p class="notice" role="status">{{ notice() }}</p>
         }
-      </button>
 
-      <footer class="links">
-        <button type="button" class="about" (click)="aboutUs()">About us</button>
-        <!-- <p class="switch">Don’t have an account? <a routerLink="/register">Sign up</a></p> -->
-      </footer>
-    </div>
+        <button type="submit" class="primary" [disabled]="loading()">
+          @if (loading()) { <ion-spinner name="crescent"></ion-spinner> } @else { Log in }
+        </button>
+        <button type="button" class="link" (click)="forgotPassword()">Forgot password?</button>
+      </form>
+    </main>
+
+    <footer class="foot">
+      <button type="button" class="outline" (click)="aboutUs()">About us</button>
+      <p class="brand marathi" lang="mr">राहुल सार्वजनिक वाचनालय</p>
+    </footer>
   </div>
 </ion-content>

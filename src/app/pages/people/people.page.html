@@ -2,17 +2,14 @@
   <ion-toolbar>
     <ion-title>People</ion-title>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar class="with-actions">
     <ion-searchbar placeholder="Search people" [debounce]="350"
                    (ionInput)="search($event.detail.value)"></ion-searchbar>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-segment [value]="filter()" (ionChange)="setFilter($event.detail.value)" [scrollable]="true">
-      <ion-segment-button value="ALL">All</ion-segment-button>
-      <ion-segment-button value="STUDENT">Students</ion-segment-button>
-      <ion-segment-button value="LIBRARIAN">Librarians</ion-segment-button>
-      <ion-segment-button value="ADMIN">Admins</ion-segment-button>
-    </ion-segment>
+    <div slot="end" class="search-actions">
+      <button class="heading-action" aria-label="Add person" (click)="open()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -28,12 +25,12 @@
   @if (people.loaded()) {
     @if (people.items().length) {
       <p class="list-count">
-        {{ people.total() }} account{{ people.total() === 1 ? '' : 's' }}
+        {{ people.total() }} student{{ people.total() === 1 ? '' : 's' }}
       </p>
       <ion-list inset="true" lines="full">
         @for (user of people.items(); track user.id) {
           <ion-item [button]="canEdit(user)" detail="false" (click)="open(user)">
-            <div slot="start" class="avatar" [class]="'role-' + user.role.toLowerCase()" [class.inactive]="!user.active" aria-hidden="true">{{ user.fullName | initials }}</div>
+            <div slot="start" class="avatar" [style.--hue]="user.username | avatarHue" [class.inactive]="!user.active" aria-hidden="true">{{ user.fullName | initials }}</div>
             <ion-label>
               <h2>{{ user.fullName }}</h2>
               <p>{{ user.username }}{{ user.phone ? ' · ' + user.phone : '' }}</p>
@@ -41,12 +38,11 @@
                 <p class="item-meta">{{ user.email }}</p>
               }
             </ion-label>
-            <div slot="end" class="end">
-              <ion-badge class="chip" [color]="user.role | roleColor">{{ user.role | roleLabel }}</ion-badge>
-              @if (!user.active) {
+            @if (!user.active) {
+              <div slot="end" class="end">
                 <ion-badge class="chip" color="medium">Inactive</ion-badge>
-              }
-            </div>
+              </div>
+            }
           </ion-item>
         }
       </ion-list>
@@ -54,35 +50,20 @@
       <div class="empty-state">
         <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
         @if (query()) {
-          <h2>No account matches "{{ query() }}"</h2>
+          <h2>No student matches "{{ query() }}"</h2>
           <p>Search uses the start of the name, username, email or phone number.</p>
         } @else {
-          <h2>No accounts here yet</h2>
-          <p>Add one with the button below.</p>
+          <h2>No students yet</h2>
+          <p>Add one with the + button.</p>
         }
       </div>
     }
   } @else {
-    <ion-list inset="true" lines="full">
-      @for (i of [1, 2, 3, 4, 5]; track i) {
-        <ion-item>
-          <ion-skeleton-text slot="start" [animated]="true" class="avatar-skeleton"></ion-skeleton-text>
-          <ion-label>
-            <h2><ion-skeleton-text [animated]="true" style="width: 50%"></ion-skeleton-text></h2>
-            <p><ion-skeleton-text [animated]="true" style="width: 30%"></ion-skeleton-text></p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <app-page-skeleton [avatar]="true" />
   }
 
   <ion-infinite-scroll [disabled]="people.finished()" (ionInfinite)="people.more($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="open()" aria-label="Add person">
-      <ion-icon name="person-add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>

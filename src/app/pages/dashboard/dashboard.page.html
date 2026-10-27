@@ -1,22 +1,17 @@
 <!-- Built from Figma "rahul-library" › Dashboard - Mobile (node 9:280). -->
 <ion-header class="band-rounded">
   <ion-toolbar>
-    <ion-title class="library-name marathi" lang="mr">राहुल सार्वजनिक वाचनालय</ion-title>
-    <span slot="end" class="emblem" aria-hidden="true">
-      <span class="icon" style="--icon: url(assets/icons/book.svg)"></span>
-    </span>
+    <!-- The app icon's open book in front of the library name. -->
+    <ion-title class="library-name marathi" lang="mr">
+      <span class="brand"><img class="logo" src="assets/logo.svg" width="521" height="327" alt="" />राहुल सार्वजनिक वाचनालय</span>
+    </ion-title>
   </ion-toolbar>
-  <div class="greeting">
-    <p class="salutation">Namaskar,</p>
-    <h2>{{ auth.profile()?.fullName }}</h2>
-    <p class="date">{{ today() }}</p>
-  </div>
 </ion-header>
 
 <ion-content>
   <!-- Opened by the year chip; kept out of the header so focusing it never scrolls anything. -->
-  <ion-select #yearSelect class="year-select" interface="alert" aria-label="Dashboard year"
-              [interfaceOptions]="{ header: 'Issues from' }" [value]="year() ?? 0"
+  <ion-select #yearSelect class="year-select" interface="popover" aria-label="Dashboard year"
+              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year() ?? 0"
               (ionChange)="setYear($event.detail.value)">
     <ion-select-option [value]="0">All years</ion-select-option>
     @for (y of years(); track y) {
@@ -33,10 +28,10 @@
   }
 
   <div class="overview">
-    <!-- Year filter: applies to the issue numbers (overdue, out with students). -->
+    <!-- Books: the year filter applies to the issue numbers (overdue, out with students). -->
     <div class="filter-row">
-      <span class="filter-text">{{ year() ? 'Issues made in ' + year() : 'Issues from all years' }}</span>
-      <button type="button" class="year-chip" [class.active]="year()" (click)="openYears()" aria-label="Choose year">
+      <h2 class="section">Books <span class="filter-text">{{ year() ? 'issued in ' + year() : 'all years' }}</span></h2>
+      <button type="button" class="year-chip" [class.active]="year()" (click)="openYears($event)" aria-label="Choose year">
         {{ year() ?? 'All years' }}
         <span class="icon" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
       </button>
@@ -50,21 +45,72 @@
               <span class="value">{{ tile.value }}</span>
               <span class="icon" [style.--icon]="'url(' + tile.symbol + ')'" aria-hidden="true"></span>
             </span>
-            <span class="label">{{ tile.label }}</span>
+            <span class="label">
+              {{ tile.label }}
+              @if (tile.query?.['status'] === 'OVERDUE' && year()) { <span class="sub">all years</span> }
+            </span>
           </button>
         }
       </div>
 
-      <button class="shelf" (click)="open(shelf()!)">
-        <span class="shelf-head">
-          <span><strong>{{ s.availableCopies }}</strong> of <strong>{{ s.totalCopies }}</strong> copies on the shelf</span>
-          <span class="percent">{{ shelfPercent() }}%</span>
-        </span>
-        <span class="track" aria-hidden="true">
-          <span [style.width.%]="shelfPercent()"></span>
-        </span>
-      </button>
+      <!-- Every issue made (in the chosen year), and how many have come back. -->
+      @if (counts(); as c) {
+        <button class="shelf" (click)="openTransactions()">
+          <span class="shelf-head">
+            <span><strong class="big">{{ c.all }}</strong> total transaction{{ c.all === 1 ? '' : 's' }}</span>
+            <span class="percent">{{ returnedPercent() }}%</span>
+          </span>
+          <span class="track" aria-hidden="true">
+            <span [style.width.%]="returnedPercent()"></span>
+          </span>
+          <span class="shelf-foot">{{ c.returned }} returned</span>
+        </button>
+      }
 
+      <!-- Newspapers: dailies received today. Magazines: the others that came at least once this month. -->
+      <h2 class="section">Newspapers &amp; magazines</h2>
+      @if (papers(); as p) {
+        @if (p.newspapers.total || p.magazines.total) {
+          <div class="circulation">
+            @if (p.newspapers.total) {
+              <button class="metric paper" (click)="go('/tabs/config/periodicals/register')">
+                <span class="metric-top">
+                  <span class="value">{{ p.newspapers.received }}<small>/{{ p.newspapers.total }}</small></span>
+                  <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+                </span>
+                <span class="label">Newspapers<span class="sub">received today</span></span>
+                <span class="mini-track" aria-hidden="true">
+                  <span [style.width.%]="p.newspapers.received / p.newspapers.total * 100"></span>
+                </span>
+              </button>
+            }
+            @if (p.magazines.total) {
+              <button class="metric paper magazines" (click)="go('/tabs/config/periodicals/report')">
+                <span class="metric-top">
+                  <span class="value">{{ p.magazines.received }}<small>/{{ p.magazines.total }}</small></span>
+                  <span class="icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
+                </span>
+                <span class="label">Magazines<span class="sub">came this month</span></span>
+                <span class="mini-track" aria-hidden="true">
+                  <span [style.width.%]="p.magazines.received / p.magazines.total * 100"></span>
+                </span>
+              </button>
+            }
+          </div>
+        } @else {
+          <p class="papers-empty">No newspapers or magazines are subscribed yet.</p>
+        }
+      } @else if (papersError()) {
+        <p class="papers-empty">{{ papersError() }}</p>
+      } @else {
+        <div class="circulation">
+          @for (i of [1, 2]; track i) {
+            <div class="metric skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
+          }
+        </div>
+      }
+
+      <h2 class="section">Library</h2>
       <div class="records">
         @for (tile of more(); track tile.label) {
           <button class="record" (click)="open(tile)">
@@ -76,17 +122,7 @@
         }
       </div>
     } @else if (!error()) {
-      <div class="circulation">
-        @for (i of [1, 2]; track i) {
-          <div class="metric skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
-        }
-      </div>
-      <ion-skeleton-text [animated]="true" class="shelf-skeleton"></ion-skeleton-text>
-      <div class="records">
-        @for (i of [1, 2, 3, 4]; track i) {
-          <div class="record"><ion-skeleton-text [animated]="true" style="width: 50%"></ion-skeleton-text></div>
-        }
-      </div>
+      <app-page-skeleton kind="dashboard" />
     }
   </div>
 </ion-content>

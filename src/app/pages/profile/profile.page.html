@@ -135,9 +135,7 @@
     } @else if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     } @else {
-      @for (i of [1, 2, 3]; track i) {
-        <ion-skeleton-text [animated]="true" class="skeleton"></ion-skeleton-text>
-      }
+      <app-page-skeleton [count]="false" [flush]="true" [rows]="7" />
     }
 
     @if (!editing()) {

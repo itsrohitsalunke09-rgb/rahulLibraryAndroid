@@ -5,7 +5,7 @@
 
   <!-- The header is fixed text, so it shows at once; only the stories wait for the server. -->
   <header class="header">
-    <h1 class="name">राहुल सार्वजनिक वाचनालय</h1>
+    <h1 class="name">News</h1>
     <p class="date">{{ today }}</p>
   </header>
 
@@ -27,10 +27,7 @@
         <p class="empty">No news yet — the librarian's stories will appear here.</p>
       }
     } @else if (!stories.error()) {
-      <div class="cards" role="status" aria-label="Loading the news">
-        <span class="skeleton"></span>
-        <span class="skeleton"></span>
-      </div>
+      <app-page-skeleton kind="cards" />
     }
   </div>
 
