@@ -42,7 +42,7 @@ describe('PeriodicalRegisterPage', () => {
 
   it('sends every line: ticked with its price, unticked without', () => {
     const page = create();
-    page.tickAll();
+    page.lines().forEach(l => (l.arrived = true));
     page.lines()[1].priceText = '25';
     page.save();
     expect(api.savePeriodicalRegister).toHaveBeenCalledWith(localIsoDate(), [

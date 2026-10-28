@@ -27,7 +27,7 @@
       }
       <ion-list inset="true" lines="full">
         @for (v of group.items; track v.card.periodicalId) {
-          <!-- One line per magazine; tap for its year strip, issues and Mark received. -->
+          <!-- One line per magazine; tap to mark an issue received (its cells and issues are there too). -->
           <ion-item button detail="false" (click)="open(v.card)">
             <ion-label>
               <h2 class="marathi">{{ v.card.name }}</h2>

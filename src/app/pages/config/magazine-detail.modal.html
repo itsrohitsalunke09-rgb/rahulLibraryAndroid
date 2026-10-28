@@ -11,6 +11,7 @@
 
 <ion-content>
   <div class="wrap">
+    @if (!issuesOnly) {
     <section class="magazine">
       <header class="head">
         <span class="title">
@@ -43,6 +44,7 @@
         <p class="missing">{{ missing() }} {{ card.frequency === 'MONTHLY' ? 'month' : card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}{{ missing() === 1 ? '' : 's' }} missing so far</p>
       }
     </section>
+    }
 
     <h2 class="issues-title">Issues received <span class="group-count">{{ receipts().length }}</span></h2>
     @if (sorted().length) {
@@ -65,6 +67,7 @@
   </div>
 </ion-content>
 
+@if (!issuesOnly) {
 <ion-footer>
   <div class="bar" [class.two]="card.contactNumber">
     @if (card.contactNumber) {
@@ -76,3 +79,4 @@
     <button type="button" class="primary" (click)="markReceived()">Mark received</button>
   </div>
 </ion-footer>
+}

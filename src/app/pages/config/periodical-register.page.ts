@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
-  IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ViewWillEnter
+  IonBackButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
@@ -20,7 +20,7 @@ type Line = RegisterRow & { priceText: string };
   templateUrl: 'periodical-register.page.html',
   styleUrls: ['periodical-register.page.scss'],
   imports: [
-    FormsModule, RouterLink, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonButton, IonContent, IonSpinner,
+    FormsModule, RouterLink, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonSpinner,
     PageSkeletonComponent
   ],
 })
@@ -83,11 +83,6 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
     const d = new Date(this.date() + 'T00:00:00');
     d.setDate(d.getDate() + days);
     this.goTo(localIsoDate(d));
-  }
-
-  tickAll() {
-    this.lines().forEach(l => (l.arrived = true));
-    this.changed();
   }
 
   changed() {

@@ -1,24 +1,27 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
-import { defaultPeriod, weekStartDay } from '../../core/magazine-periods';
-import { MagazineCard } from '../../core/models';
+import { defaultPeriod, magazinePeriods, weekStartDay } from '../../core/magazine-periods';
+import { MagazineCard, MagazineReceipt, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 /**
  * Records one magazine issue by its number (अंक). Monthly: the date it was published.
- * Weekly/fortnightly: the from–to dates it covers.
+ * Weekly/fortnightly: the from–to dates it covers. Shows the year's cells above, with the issues
+ * so far one tap away.
  */
 @Component({
   selector: 'app-magazine-receipt',
   templateUrl: 'magazine-receipt.modal.html',
-  styleUrls: ['magazine-receipt.modal.scss'],
+  styleUrls: ['magazine-strip.scss', 'magazine-receipt.modal.scss'],
   imports: [FormsModule, IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonFooter, IonSpinner],
 })
 export class MagazineReceiptModal implements OnInit {
   @Input({ required: true }) card!: MagazineCard;
+  /** Told when an issue is removed from the list, so the register behind updates too. */
+  @Input() onChange?: (receipts: MagazineReceipt[]) => void;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
@@ -34,12 +37,18 @@ export class MagazineReceiptModal implements OnInit {
   periodTo = '';
   readonly saving = signal(false);
   readonly error = signal('');
+  readonly tel = tel;
+  readonly receipts = signal<MagazineReceipt[]>([]);
+  readonly periods = computed(() => magazinePeriods({ ...this.card, receipts: this.receipts() }));
+  readonly received = computed(() => this.periods().filter(p => p.state === 'received').length);
+  readonly missing = computed(() => this.periods().filter(p => p.state === 'missing').length);
 
   get monthly() {
     return this.card.frequency === 'MONTHLY';
   }
 
   ngOnInit() {
+    this.receipts.set(this.card.receipts);
     const last = Math.max(0, ...this.card.receipts.map(r => r.issueNo ?? 0));
     this.issueNo = last + 1;
     const period = defaultPeriod(this.card.frequency, this.today, weekStartDay(this.card.receipts));
@@ -54,6 +63,23 @@ export class MagazineReceiptModal implements OnInit {
     }
     const [y, m, d] = this.periodFrom.split('-').map(Number);
     this.periodTo = localIsoDate(new Date(y, m - 1, d + (this.card.frequency === 'WEEKLY' ? 6 : 14)));
+  }
+
+  /** The issues so far, to check one or remove one marked by mistake. */
+  async showIssues() {
+    const { MagazineDetailModal } = await import('./magazine-detail.modal');
+    const modal = await this.modals.create({
+      component: MagazineDetailModal,
+      componentProps: {
+        card: { ...this.card, receipts: this.receipts() },
+        issuesOnly: true,
+        onChange: (receipts: MagazineReceipt[]) => {
+          this.receipts.set(receipts);
+          this.onChange?.(receipts);
+        },
+      },
+    });
+    await modal.present();
   }
 
   cancel() {

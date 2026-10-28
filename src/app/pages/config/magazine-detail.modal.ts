@@ -14,13 +14,15 @@ import { MagazineReceiptModal } from './magazine-receipt.modal';
 @Component({
   selector: 'app-magazine-detail',
   templateUrl: 'magazine-detail.modal.html',
-  styleUrls: ['magazine-detail.modal.scss'],
+  styleUrls: ['magazine-strip.scss', 'magazine-detail.modal.scss'],
   imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonFooter],
 })
 export class MagazineDetailModal implements OnInit {
   @Input({ required: true }) card!: MagazineCard;
   /** Told after each change, so the row behind updates its count at once. */
   @Input() onChange?: (receipts: MagazineReceipt[]) => void;
+  /** Opened from Mark received: just the list of issues, no year strip or footer. */
+  @Input() issuesOnly = false;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);

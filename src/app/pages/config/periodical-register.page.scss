@@ -63,3 +63,11 @@ ion-back-button { --color: var(--app-ink); --icon-font-size: 22px; }
 }
 .unsaved { margin: 10px 2px 0; font-size: 13px; color: var(--app-rust); }
 .empty-state .link { margin-top: 12px; }
+
+/* Mark received: saves the day, a full-width blue pill. */
+.mark {
+  display: grid; place-items: center; width: 100%; height: 50px; border: 0; border-radius: 100px;
+  background: var(--app-accent); color: var(--app-on-accent); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.mark:disabled { opacity: 0.6; }
+.mark ion-spinner { width: 20px; height: 20px; color: var(--app-on-accent); }

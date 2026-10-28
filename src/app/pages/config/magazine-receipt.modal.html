@@ -14,6 +14,23 @@
     <section class="magazine">
       <span class="name marathi">{{ card.name }}</span>
       <span class="meta">{{ monthly ? 'Monthly' : card.frequency === 'WEEKLY' ? 'Weekly' : 'Fortnightly' }}{{ card.language ? ' · ' + card.language : '' }}</span>
+      <!-- The year at a glance: green came, red missing, grey not due yet. -->
+      <span class="year">
+        <span class="strip" [class.weekly]="!monthly" role="list" [attr.aria-label]="received() + ' received, ' + missing() + ' missing'">
+          @for (p of periods(); track p.from) {
+            <span class="cell" [class]="p.state" role="listitem" [attr.aria-label]="p.label + ', ' + p.state">
+              @if (monthly) { {{ p.label }} }
+            </span>
+          }
+        </span>
+        <span class="year-foot">
+          <span class="tally" [class.short]="missing()"><strong>{{ received() }}</strong>/{{ periods().length }}</span>
+          @if (missing()) {
+            <span class="missing">{{ missing() }} missing</span>
+          }
+          <button type="button" class="issues-link" (click)="showIssues()">Issues received ({{ receipts().length }})</button>
+        </span>
+      </span>
     </section>
 
     <label class="field">
@@ -52,8 +69,16 @@
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
-    <button type="button" class="primary" [disabled]="saving()" (click)="save()">
-      @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
-    </button>
+    <div class="actions" [class.two]="card.contactNumber">
+      @if (card.contactNumber) {
+        <a class="call" [href]="tel(card.contactNumber)" [attr.aria-label]="'Call about ' + card.name + ', ' + card.contactNumber">
+          <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Call
+        </a>
+      }
+      <button type="button" class="primary" [disabled]="saving()" (click)="save()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </button>
+    </div>
   </div>
 </ion-footer>

@@ -124,3 +124,60 @@ ion-footer {
     color: var(--app-on-accent);
   }
 }
+
+/* The year's cells under the name, with the tally and the way to the issues so far. */
+.year {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.year-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+
+  .tally strong {
+    font-size: 18px;
+  }
+
+  .issues-link {
+    margin-left: auto;
+    padding: 6px 12px;
+    border: 1px solid var(--app-accent);
+    border-radius: 100px;
+    background: var(--app-surface);
+    color: var(--app-accent);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+/* Call beside Save, when the magazine has a contact number. */
+.actions {
+  display: grid;
+  gap: 10px;
+
+  &.two {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+.call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 50px;
+  padding: 0 20px;
+  border: 1px solid var(--ion-color-success);
+  border-radius: 100px;
+  color: var(--ion-color-success);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}

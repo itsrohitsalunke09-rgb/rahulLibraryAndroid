@@ -10,12 +10,12 @@ import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency, byFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
-import { MagazineDetailModal } from './magazine-detail.modal';
+import { MagazineReceiptModal } from './magazine-receipt.modal';
 
 /**
  * Weekly, fortnightly and monthly magazines, paid for a year at a time: one line each, grouped by
- * frequency, with issues received out of the year and how many are missing. A tap opens the year's
- * strip and issues, so a missing one can be chased with the vendor.
+ * frequency, with issues received out of the year and how many are missing. A tap opens Mark
+ * received, with the year's cells and the issues so far.
  */
 @Component({
   selector: 'app-magazine-register',
@@ -72,13 +72,18 @@ export class MagazineRegisterPage implements ViewWillEnter {
     this.load(() => event.target.complete());
   }
 
-  /** The magazine's year and issues in a popup; changes there update its line here straight away. */
+  /** Mark received for the magazine (its cells and issues are on that screen); its line here updates straight away. */
   async open(card: MagazineCard) {
     const modal = await this.modals.create({
-      component: MagazineDetailModal,
+      component: MagazineReceiptModal,
       componentProps: { card, onChange: (receipts: MagazineReceipt[]) => this.update(card.periodicalId, receipts) },
     });
     await modal.present();
+    const { data, role } = await modal.onWillDismiss<MagazineReceipt>();
+    if (role === 'saved' && data) {
+      const current = this.cards()?.find(c => c.periodicalId === card.periodicalId)?.receipts ?? [];
+      this.update(card.periodicalId, [...current, data]);
+    }
   }
 
   private update(periodicalId: number, receipts: MagazineReceipt[]) {

@@ -23,7 +23,7 @@ import { MagazineDetailModal } from '../config/magazine-detail.modal';
 @Component({
   selector: 'app-magazine-report',
   templateUrl: 'magazine-report.page.html',
-  styleUrls: ['../config/magazine-detail.modal.scss', 'magazine-report.page.scss'],
+  styleUrls: ['../config/magazine-strip.scss', '../config/magazine-detail.modal.scss', 'magazine-report.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent, PageSkeletonComponent,
   ],

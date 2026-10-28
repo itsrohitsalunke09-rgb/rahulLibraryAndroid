@@ -4,11 +4,6 @@
       <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Newspaper register</ion-title>
-    <ion-buttons slot="end">
-      <ion-button strong (click)="save()" [disabled]="saving() || loading() || !lines().length">
-        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -65,9 +60,12 @@
         <span>{{ ticked() }} of {{ lines().length }} received</span>
         <strong>{{ rupees(total()) }}</strong>
       </div>
-      <button type="button" class="secondary" (click)="tickAll()">Tick all</button>
+      <!-- Saves the day's ticks and prices. -->
+      <button type="button" class="mark" [disabled]="saving()" (click)="save()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Mark received }
+      </button>
       @if (dirty()) {
-        <p class="unsaved" role="status">Not saved yet. Tap Save at the top.</p>
+        <p class="unsaved" role="status">Not saved yet. Tap Mark received.</p>
       }
     } @else if (!error()) {
       <div class="empty-state">
