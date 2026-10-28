@@ -1,0 +1,218 @@
+.wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px 20px 24px;
+}
+
+/* One soft-green card per magazine, like the dashboard's Magazines tile. */
+.magazine {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--app-radius-sheet);
+  background: var(--app-success-soft);
+  color: var(--app-ink);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  .name {
+    font-size: 17px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    font-size: 13px;
+    color: var(--app-muted);
+  }
+}
+
+/* "8/12": issues received out of the year. */
+.tally {
+  flex: none;
+  font-size: 14px;
+  color: var(--app-muted);
+
+  strong {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--ion-color-success);
+  }
+
+  &.short strong {
+    color: var(--app-rust);
+  }
+}
+
+.subscription,
+.missing {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--app-muted);
+
+  strong {
+    color: var(--app-ink);
+  }
+}
+
+.missing {
+  color: var(--app-rust);
+  font-weight: 500;
+}
+
+/* The year: 12 labelled months, or 52 small squares for weekly magazines. */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+
+  &.weekly {
+    grid-template-columns: repeat(13, 1fr);
+    gap: 4px;
+  }
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+
+  .weekly & {
+    height: 16px;
+    border-radius: 4px;
+  }
+
+  &.received {
+    background: var(--ion-color-success);
+    color: #fff;
+  }
+
+  &.missing {
+    background: var(--app-rust-soft);
+    color: var(--app-rust);
+    box-shadow: inset 0 0 0 1px var(--app-rust);
+  }
+
+  &.upcoming {
+    background: var(--app-surface);
+    color: var(--app-muted);
+  }
+}
+
+.issues-title {
+  margin: 20px 2px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--app-ink);
+}
+
+.issues {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--app-rule);
+  border-radius: 12px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 6px 0 14px;
+
+    & + li {
+      border-top: 1px solid var(--app-rule);
+    }
+  }
+
+  .no {
+    min-width: 64px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--app-ink);
+  }
+
+  .when {
+    flex: 1;
+    font-size: 13px;
+    color: var(--app-muted);
+  }
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--app-muted);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+  }
+}
+
+.hint {
+  margin: 12px 2px 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+ion-footer {
+  border-top: 1px solid var(--app-rule);
+  box-shadow: none;
+}
+
+.bar {
+  display: grid;
+  gap: 10px;
+  padding: 12px 20px calc(12px + var(--ion-safe-area-bottom, 0px));
+  background: var(--app-paper);
+
+  .form-error {
+    margin: 0;
+  }
+}
+
+.primary {
+  display: grid;
+  place-items: center;
+  height: 50px;
+  border: 0;
+  border-radius: 100px;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+
+  ion-spinner {
+    width: 22px;
+    height: 22px;
+    color: var(--app-on-accent);
+  }
+}

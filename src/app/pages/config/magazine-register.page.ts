@@ -1,29 +1,28 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-  IonBackButton, IonButtons, IonContent, IonHeader, IonRefresher, IonRefresherContent, IonTitle, IonToolbar,
-  ModalController, RefresherCustomEvent, ViewWillEnter,
+  IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
+  IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
-import { formatDate, localIsoDate } from '../../core/dates';
-import { magazinePeriods } from '../../core/magazine-periods';
-import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, rupees } from '../../core/models';
+import { localIsoDate } from '../../core/dates';
+import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
+import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, byFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
-import { MagazineIssuesModal } from './magazine-issues.modal';
-import { MagazineReceiptModal } from './magazine-receipt.modal';
+import { MagazineDetailModal } from './magazine-detail.modal';
 
 /**
- * Weekly, fortnightly and monthly magazines, paid for a year at a time. Each card shows the
- * subscription year as a strip of months/weeks (received, missing, still to come) and the issues
- * recorded, so a missing issue can be chased with the vendor.
+ * Weekly, fortnightly and monthly magazines, paid for a year at a time: one line each, grouped by
+ * frequency, with issues received out of the year and how many are missing. A tap opens the year's
+ * strip and issues, so a missing one can be chased with the vendor.
  */
 @Component({
   selector: 'app-magazine-register',
   templateUrl: 'magazine-register.page.html',
-  styleUrls: ['magazine-register.page.scss'],
+  styleUrls: ['categories.page.scss', 'magazine-register.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    PageSkeletonComponent,
+    IonSearchbar, IonList, IonItem, IonLabel, PageSkeletonComponent,
   ],
 })
 export class MagazineRegisterPage implements ViewWillEnter {
@@ -32,53 +31,53 @@ export class MagazineRegisterPage implements ViewWillEnter {
 
   readonly cards = signal<MagazineCard[] | null>(null);
   readonly error = signal('');
+  readonly query = signal('');
   readonly labels = FREQUENCY_LABELS;
-  readonly rupees = rupees;
-  readonly formatDate = formatDate;
+  readonly receiptLabel = receiptLabel;
 
-  /** Each card with its year strip and counts, worked out once per load. */
-  readonly view = computed(() => {
+  /** Each magazine's counts and latest issue, grouped by frequency and narrowed by the search box. */
+  readonly groups = computed(() => {
     const today = localIsoDate();
-    return (this.cards() ?? []).map(card => {
-      const periods = magazinePeriods(card, today);
-      return {
-        card,
-        periods,
-        received: periods.filter(p => p.state === 'received').length,
-        missing: periods.filter(p => p.state === 'missing').length,
-      };
-    });
+    const q = this.query().toLowerCase();
+    const rows = (this.cards() ?? [])
+      .filter(card => !q || `${card.name} ${card.language ?? ''}`.toLowerCase().includes(q))
+      .map(card => {
+        const periods = magazinePeriods(card, today);
+        return {
+          card,
+          frequency: card.frequency,
+          periods: periods.length,
+          received: periods.filter(p => p.state === 'received').length,
+          missing: periods.filter(p => p.state === 'missing').length,
+          last: [...card.receipts].sort((a, b) => b.periodFrom.localeCompare(a.periodFrom))[0],
+        };
+      });
+    return byFrequency(rows);
   });
 
   ionViewWillEnter() {
     this.load();
   }
 
+  search(value: string | null | undefined) {
+    this.query.set((value ?? '').trim());
+  }
+
   refresh(event: RefresherCustomEvent) {
     this.load(() => event.target.complete());
   }
 
-  async markReceived(card: MagazineCard) {
-    const modal = await this.modals.create({ component: MagazineReceiptModal, componentProps: { card } });
-    await modal.present();
-    const { data, role } = await modal.onWillDismiss<MagazineReceipt>();
-    if (role === 'saved' && data) {
-      this.update(card.periodicalId, receipts => [...receipts, data]);
-    }
-  }
-
-  /** Every issue in a popup; a removal there updates this card's strip straight away. */
-  async showIssues(card: MagazineCard) {
+  /** The magazine's year and issues in a popup; changes there update its line here straight away. */
+  async open(card: MagazineCard) {
     const modal = await this.modals.create({
-      component: MagazineIssuesModal,
-      componentProps: { card, onChange: (receipts: MagazineReceipt[]) => this.update(card.periodicalId, () => receipts) },
+      component: MagazineDetailModal,
+      componentProps: { card, onChange: (receipts: MagazineReceipt[]) => this.update(card.periodicalId, receipts) },
     });
     await modal.present();
   }
 
-  /** Changes one card's receipts in place, so the strip updates without reloading the page. */
-  private update(periodicalId: number, change: (receipts: MagazineReceipt[]) => MagazineReceipt[]) {
-    this.cards.update(cards => (cards ?? []).map(c => c.periodicalId === periodicalId ? { ...c, receipts: change(c.receipts) } : c));
+  private update(periodicalId: number, receipts: MagazineReceipt[]) {
+    this.cards.update(cards => (cards ?? []).map(c => c.periodicalId === periodicalId ? { ...c, receipts } : c));
   }
 
   private load(done?: () => void) {

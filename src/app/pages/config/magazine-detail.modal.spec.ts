@@ -3,10 +3,10 @@ import { ModalController } from '@ionic/angular';
 import { of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { UiService } from '../../core/ui.service';
-import { MagazineIssuesModal } from './magazine-issues.modal';
+import { MagazineDetailModal } from './magazine-detail.modal';
 
-describe('MagazineIssuesModal', () => {
-  it('listsNewestIssueFirstAndRemovingOneTellsTheCard', async () => {
+describe('MagazineDetailModal', () => {
+  it('listsIssuesInAnkOrderAndRemovingOneRecolorsTheStripAndTellsTheRow', async () => {
     const deleteMagazineReceipt = vi.fn(() => of(undefined));
     TestBed.configureTestingModule({
       providers: [
@@ -15,7 +15,7 @@ describe('MagazineIssuesModal', () => {
         { provide: UiService, useValue: { confirm: vi.fn(async () => true), toast: vi.fn(), error: vi.fn() } },
       ],
     });
-    const fixture = TestBed.createComponent(MagazineIssuesModal);
+    const fixture = TestBed.createComponent(MagazineDetailModal);
     const modal = fixture.componentInstance;
     const onChange = vi.fn();
     modal.card = {
@@ -27,11 +27,12 @@ describe('MagazineIssuesModal', () => {
     };
     modal.onChange = onChange;
     fixture.detectChanges();
-    expect(modal.sorted().map(r => r.issueNo)).toEqual([2, 1]);
+    expect(modal.sorted().map(r => r.issueNo)).toEqual([1, 2]);
 
-    await modal.remove(modal.sorted()[0]);
+    await modal.remove(modal.sorted()[1]);
     expect(deleteMagazineReceipt).toHaveBeenCalledWith(2);
     expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ id: 1 })]);
     expect(modal.sorted().length).toBe(1);
+    expect(modal.received()).toBe(1);
   });
 });

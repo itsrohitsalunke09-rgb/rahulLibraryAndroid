@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="marathi">{{ card.name }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <section class="magazine">
+      <header class="head">
+        <span class="title">
+          <span class="meta">{{ labels[card.frequency] }}{{ card.language ? ' · ' + card.language : '' }}</span>
+          <span class="subscription">
+            @if (card.subscriptionStart) {
+              @if ((card.subscriptionAmount ?? null) !== null) { <strong>{{ rupees(card.subscriptionAmount ?? 0) }}</strong> a year · }
+              {{ formatDate(card.subscriptionStart) }} – {{ formatDate(card.subscriptionEnd ?? undefined) }}
+            } @else {
+              No subscription dates yet: showing this calendar year.
+            }
+          </span>
+        </span>
+        <span class="tally" [class.short]="missing()">
+          <strong>{{ received() }}</strong>/{{ periods().length }}
+        </span>
+      </header>
+
+      <!-- The year at a glance: green came, red missing, grey not due yet. -->
+      <div class="strip" [class.weekly]="card.frequency !== 'MONTHLY'" role="list"
+           [attr.aria-label]="received() + ' received, ' + missing() + ' missing'">
+        @for (p of periods(); track p.from) {
+          <span class="cell" [class]="p.state" role="listitem" [attr.title]="p.label + ': ' + p.state"
+                [attr.aria-label]="p.label + ', ' + p.state">
+            @if (card.frequency === 'MONTHLY') { {{ p.label }} }
+          </span>
+        }
+      </div>
+      @if (missing()) {
+        <p class="missing">{{ missing() }} {{ card.frequency === 'MONTHLY' ? 'month' : card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}{{ missing() === 1 ? '' : 's' }} missing so far</p>
+      }
+    </section>
+
+    <h2 class="issues-title">Issues received <span class="group-count">{{ receipts().length }}</span></h2>
+    @if (sorted().length) {
+      <ul class="issues">
+        @for (r of sorted(); track r.id) {
+          <li>
+            <span class="no marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
+            <span class="when">{{ label(r) }}</span>
+            <button type="button" class="remove" [disabled]="removing() === r.id"
+                    [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : label(r))" (click)="remove(r)">
+              <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
+            </button>
+          </li>
+        }
+      </ul>
+      <p class="hint">Tap × on an issue marked by mistake.</p>
+    } @else {
+      <p class="hint">No issues recorded yet.</p>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="bar">
+    <button type="button" class="primary" (click)="markReceived()">Mark received</button>
+  </div>
+</ion-footer>

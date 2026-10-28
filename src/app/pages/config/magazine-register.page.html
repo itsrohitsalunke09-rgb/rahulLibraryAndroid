@@ -5,6 +5,10 @@
     </ion-buttons>
     <ion-title>Magazine register</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Search name or language" [debounce]="200"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -12,63 +16,48 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="wrap">
-    @if (error()) {
-      <p class="page-error" role="alert">{{ error() }}</p>
-    }
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
 
-    @if (cards()) {
-      @for (v of view(); track v.card.periodicalId) {
-        <section class="magazine">
-          <header class="head">
-            <span class="title">
-              <span class="name marathi">{{ v.card.name }}</span>
-              <span class="meta">{{ labels[v.card.frequency] }}{{ v.card.language ? ' · ' + v.card.language : '' }}</span>
+  @if (cards()) {
+    @for (group of groups(); track group.frequency) {
+      <h2 class="section-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
+      <ion-list inset="true" lines="full">
+        @for (v of group.items; track v.card.periodicalId) {
+          <!-- One line per magazine; tap for its year strip, issues and Mark received. -->
+          <ion-item button detail="false" (click)="open(v.card)">
+            <ion-label>
+              <h2 class="marathi">{{ v.card.name }}</h2>
+              <p>
+                @if (v.last; as last) {
+                  Last <span class="marathi">{{ last.issueNo ? 'अंक ' + last.issueNo : '' }}</span> · {{ receiptLabel(last) }}
+                } @else {
+                  No issues yet
+                }
+              </p>
+            </ion-label>
+            <span slot="end" class="tally">
+              <span class="count"><strong>{{ v.received }}</strong>/{{ v.periods }}</span>
+              @if (v.missing) {
+                <span class="missing">{{ v.missing }} missing</span>
+              }
             </span>
-            <span class="tally" [class.short]="v.missing">
-              <strong>{{ v.received }}</strong>/{{ v.periods.length }}
-            </span>
-          </header>
-
-          <p class="subscription">
-            @if (v.card.subscriptionStart) {
-              @if ((v.card.subscriptionAmount ?? null) !== null) { <strong>{{ rupees(v.card.subscriptionAmount ?? 0) }}</strong> a year · }
-              {{ formatDate(v.card.subscriptionStart) }} – {{ formatDate(v.card.subscriptionEnd ?? undefined) }}
-            } @else {
-              No subscription dates yet: showing this calendar year. An admin can add them in the master.
-            }
-          </p>
-
-          <!-- The year at a glance: green came, red missing, grey not due yet. -->
-          <div class="strip" [class.weekly]="v.card.frequency !== 'MONTHLY'" role="list"
-               [attr.aria-label]="v.received + ' received, ' + v.missing + ' missing'">
-            @for (p of v.periods; track p.from) {
-              <span class="cell" [class]="p.state" role="listitem" [attr.title]="p.label + ': ' + p.state"
-                    [attr.aria-label]="p.label + ', ' + p.state">
-                @if (v.card.frequency === 'MONTHLY') { {{ p.label }} }
-              </span>
-            }
-          </div>
-          @if (v.missing) {
-            <p class="missing">{{ v.missing }} {{ v.card.frequency === 'MONTHLY' ? 'month' : v.card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}{{ v.missing === 1 ? '' : 's' }} missing so far</p>
-          }
-
-          <div class="actions">
-            <button type="button" class="issues" [disabled]="!v.card.receipts.length" (click)="showIssues(v.card)">
-              Issues ({{ v.card.receipts.length }})
-            </button>
-            <button type="button" class="mark" (click)="markReceived(v.card)">Mark received</button>
-          </div>
-        </section>
-      } @empty {
+          </ion-item>
+        }
+      </ion-list>
+    } @empty {
+      @if (query()) {
+        <p class="no-match">No magazine matches “{{ query() }}”.</p>
+      } @else {
         <div class="empty-state">
           <span class="icon empty-icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
           <h2>No magazines yet</h2>
           <p>Weekly, fortnightly and monthly magazines from the master show here.</p>
         </div>
       }
-    } @else if (!error()) {
-      <app-page-skeleton kind="report" />
     }
-  </div>
+  } @else if (!error()) {
+    <app-page-skeleton [count]="false" [chip]="true" />
+  }
 </ion-content>

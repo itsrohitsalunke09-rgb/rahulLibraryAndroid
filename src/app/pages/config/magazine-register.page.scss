@@ -1,160 +1,33 @@
-.wrap {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 14px 16px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+/* On top of categories.page.scss (back button, item and empty-state styles). */
 
-/* One soft-green card per magazine, like the dashboard's Magazines tile. */
-.magazine {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border-radius: var(--app-radius-sheet);
-  background: var(--app-success-soft);
-  color: var(--app-ink);
-}
-
-.head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.title {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-
-  .name {
-    font-size: 17px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-
-  .meta {
-    font-size: 13px;
-    color: var(--app-muted);
-  }
-}
-
-/* "8/12": issues received out of the year. */
+/* "8/12" issues received out of the year, and how many are missing. */
 .tally {
-  flex: none;
-  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 13px;
   color: var(--app-muted);
 
   strong {
-    font-size: 24px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--ion-color-success);
   }
 
-  &.short strong {
-    color: var(--app-rust);
-  }
-}
-
-.subscription,
-.missing {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--app-muted);
-
-  strong {
-    color: var(--app-ink);
-  }
-}
-
-.missing {
-  color: var(--app-rust);
-  font-weight: 500;
-}
-
-/* The year: 12 labelled months, or 52 small squares for weekly magazines. */
-.strip {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
-
-  &.weekly {
-    grid-template-columns: repeat(13, 1fr);
-    gap: 4px;
-  }
-}
-
-.cell {
-  display: grid;
-  place-items: center;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-
-  .weekly & {
-    height: 16px;
-    border-radius: 4px;
-  }
-
-  &.received {
-    background: var(--ion-color-success);
-    color: #fff;
-  }
-
-  &.missing {
+  .missing {
+    padding: 1px 8px;
+    border-radius: 100px;
     background: var(--app-rust-soft);
     color: var(--app-rust);
-    box-shadow: inset 0 0 0 1px var(--app-rust);
-  }
-
-  &.upcoming {
-    background: var(--app-surface);
-    color: var(--app-muted);
+    font-size: 11px;
+    font-weight: 600;
   }
 }
 
-.actions {
-  display: flex;
-  gap: 10px;
-
-  button {
-    flex: 1;
-  }
-}
-
-/* Outlined blue pill, like the other secondary actions. */
-.mark,
-.issues {
-  height: 44px;
-  border: 1px solid var(--app-accent);
-  border-radius: 100px;
-  background: var(--app-surface);
-  color: var(--app-accent);
-  font: inherit;
+.no-match {
+  margin: 24px;
   font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-}
-
-/* Secondary to Mark received: grey outline. */
-.issues {
-  border-color: var(--app-rule);
-  color: var(--app-ink);
-}
-
-.empty-icon {
-  display: block;
-  margin: 0 auto 16px;
-  --icon-size: 32px;
-  color: var(--app-ink);
+  color: var(--app-muted);
+  text-align: center;
 }
