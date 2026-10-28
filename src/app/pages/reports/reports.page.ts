@@ -11,8 +11,8 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar 
 })
 export class ReportsPage {
   readonly cards = [
-    { title: 'दैनिके', sub: 'Newspapers, day by day', link: '/tabs/config/periodicals/report', tone: 'daily', icon: 'sheet' },
-    { title: 'साप्ताहिक', sub: 'Weekly magazines, week by week', link: '/tabs/reports/WEEKLY', tone: 'weekly', icon: 'book' },
-    { title: 'मासिक', sub: 'Monthly magazines, month by month', link: '/tabs/reports/MONTHLY', tone: 'monthly', icon: 'book' },
+    { title: 'दैनिके', sub: 'Newspapers, day by day', link: '/tabs/dashboard/reports/DAILY', tone: 'daily', icon: 'sheet' },
+    { title: 'साप्ताहिक', sub: 'Weekly magazines, week by week', link: '/tabs/dashboard/reports/WEEKLY', tone: 'weekly', icon: 'book' },
+    { title: 'मासिक', sub: 'Monthly magazines, month by month', link: '/tabs/dashboard/reports/MONTHLY', tone: 'monthly', icon: 'book' },
   ];
 }
