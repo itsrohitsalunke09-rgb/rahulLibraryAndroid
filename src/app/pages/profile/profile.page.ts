@@ -76,6 +76,14 @@ export class ProfilePage {
       this.error.set('Phone must be a 10-digit mobile number.');
       return;
     }
+    if (this.form.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email.trim())) {
+      this.error.set('Enter a valid email address, or leave it empty.');
+      return;
+    }
+    if (this.form.dateOfBirth && this.form.dateOfBirth >= this.today) {
+      this.error.set('Date of birth must be in the past.');
+      return;
+    }
     const update: ProfileUpdate = { ...this.form, fullName: this.form.fullName.trim() };
     this.saving.set(true);
     this.error.set('');

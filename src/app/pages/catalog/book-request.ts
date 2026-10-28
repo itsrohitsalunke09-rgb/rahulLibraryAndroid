@@ -40,8 +40,27 @@ export function toBookRequest(form: BookFormModel): { request: BookRequest } | {
   if (!title || !author) {
     return { error: 'Title and author are required.' };
   }
-  if (!totalCopies || totalCopies < 1) {
-    return { error: 'Total copies must be at least 1.' };
+  if (!totalCopies || !Number.isInteger(totalCopies) || totalCopies < 1 || totalCopies > 10000) {
+    return { error: 'Total copies must be a whole number from 1 to 10,000.' };
+  }
+  // Optional numbers: checked only when filled in.
+  const year = num(form.publicationYear);
+  const thisYear = new Date().getFullYear();
+  if (year !== undefined && (!Number.isInteger(year) || year < 1000 || year > thisYear)) {
+    return { error: `Publication year must be between 1000 and ${thisYear}.` };
+  }
+  const pages = num(form.pageCount);
+  if (pages !== undefined && (!Number.isInteger(pages) || pages < 1 || pages > 100000)) {
+    return { error: 'Pages must be a whole number, 1 or more.' };
+  }
+  const price = num(form.price);
+  if (price !== undefined && (price < 0 || price > 1000000)) {
+    return { error: 'Price must be between 0 and 10,00,000.' };
+  }
+  const notNumber = (['publicationYear', 'pageCount', 'price'] as const)
+    .find(k => text(form[k]) !== undefined && num(form[k]) === undefined);
+  if (notNumber) {
+    return { error: 'Year, pages and price must be numbers.' };
   }
   const choice = form.categoryChoice;
   return {
@@ -56,11 +75,11 @@ export function toBookRequest(form: BookFormModel): { request: BookRequest } | {
       date: text(form.date),
       registrationNumber: text(form.registrationNumber),
       publication: text(form.publication),
-      publicationYear: num(form.publicationYear),
-      pageCount: num(form.pageCount),
+      publicationYear: year,
+      pageCount: pages,
       seller: text(form.seller),
       receiptNumber: text(form.receiptNumber),
-      price: num(form.price),
+      price,
     }
   };
 }

@@ -88,7 +88,7 @@ export class MagazineReceiptModal implements OnInit {
 
   save() {
     const issueNo = Number(this.issueNo);
-    if (!Number.isInteger(issueNo) || issueNo < 1) {
+    if (!Number.isInteger(issueNo) || issueNo < 1 || issueNo > 99999) {
       this.error.set('Enter the issue number (अंक), e.g. 12.');
       return;
     }
@@ -96,6 +96,10 @@ export class MagazineReceiptModal implements OnInit {
     const [from, to] = this.monthly ? [this.publishedOn, this.publishedOn] : [this.periodFrom, this.periodTo];
     if (!from || !to) {
       this.error.set(this.monthly ? 'Enter the published date.' : 'Enter the from and to dates.');
+      return;
+    }
+    if (from > this.today) {
+      this.error.set(this.monthly ? 'The published date can’t be in the future.' : '"From" can’t be in the future.');
       return;
     }
     if (to < from) {

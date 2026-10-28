@@ -6,11 +6,6 @@
       </ion-button>
     </ion-buttons>
     <ion-title>{{ clipping ? 'Edit कात्रण' : 'Add कात्रण' }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button strong (click)="save()" [disabled]="saving() || deleting()">
-        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -32,19 +27,35 @@
       <div class="years">
         <label class="form-field">
           <span class="form-label">From year *</span>
-          <span class="form-box">
-            <input name="yearFrom" type="number" inputmode="numeric" min="1800" [max]="thisYear" placeholder="e.g. 1990" [(ngModel)]="form.yearFrom" />
+          <span class="form-box select">
+            <select name="yearFrom" [(ngModel)]="form.yearFrom" (ngModelChange)="fromChanged()">
+              <option value="">Choose</option>
+              @for (y of years; track y) {
+                <option [ngValue]="y">{{ y }}</option>
+              }
+            </select>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           </span>
         </label>
         <label class="form-field">
           <span class="form-label">To year</span>
-          <span class="form-box">
-            <input name="yearTo" type="number" inputmode="numeric" [min]="form.yearFrom || 1800" [max]="thisYear" placeholder="e.g. 2005" [(ngModel)]="form.yearTo" />
+          <span class="form-box select">
+            <select name="yearTo" [(ngModel)]="form.yearTo">
+              <option value="">Same year</option>
+              @for (y of toYears(); track y) {
+                <option [ngValue]="y">{{ y }}</option>
+              }
+            </select>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           </span>
         </label>
       </div>
-      <span class="form-helper">Leave "To year" empty for clippings from a single year.</span>
+      <span class="form-helper">"To year" lists only years from the "From" year on. Keep "Same year" for clippings from one year.</span>
     </div>
+
+    <button type="submit" class="save" [disabled]="saving() || deleting()">
+      @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+    </button>
 
     @if (clipping) {
       <button type="button" class="delete" [disabled]="saving() || deleting()" (click)="remove()">

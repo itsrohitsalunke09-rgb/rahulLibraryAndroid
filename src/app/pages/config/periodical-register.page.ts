@@ -37,6 +37,8 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
   readonly error = signal('');
   /** Ticks or prices changed since the day was loaded or saved. */
   readonly dirty = signal(false);
+  /** Copies already saved for the day shown; unticking them all clears the day. */
+  private savedCount = 0;
   readonly labels = FREQUENCY_LABELS;
   /** A card per frequency, daily first; same line objects, so ticks still land in lines(). */
   readonly groups = computed(() => byFrequency(this.lines()));
@@ -89,10 +91,20 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
     this.dirty.set(true);
   }
 
-  save() {
-    const bad = this.lines().find(l => l.arrived && !(Number(l.priceText) >= 0 && l.priceText.trim() !== ''));
+  async save() {
+    if (!this.ticked()) {
+      // Nothing ticked: only allowed to clear a day that was saved with copies before.
+      if (!this.savedCount) {
+        this.error.set('Tick at least one newspaper that came.');
+        return;
+      }
+      if (!(await this.ui.confirm('Clear this day?', `No newspapers will be recorded for ${formatDate(this.date())}.`, 'Clear', true))) {
+        return;
+      }
+    }
+    const bad = this.lines().find(l => l.arrived && !(l.priceText.trim() !== '' && Number(l.priceText) >= 0 && Number(l.priceText) <= 10000));
     if (bad) {
-      this.error.set(`Enter the price for ${bad.name}.`);
+      this.error.set(`Enter the price for ${bad.name} (0 to 10,000).`);
       return;
     }
     this.saving.set(true);
@@ -130,6 +142,7 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
   }
 
   private show(rows: RegisterRow[]) {
+    this.savedCount = rows.filter(r => r.arrived).length;
     this.lines.set(rows.map(r => ({ ...r, priceText: String(r.price) })));
     this.dirty.set(false);
   }

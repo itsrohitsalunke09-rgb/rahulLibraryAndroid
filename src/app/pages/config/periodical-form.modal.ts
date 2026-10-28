@@ -70,8 +70,8 @@ export class PeriodicalFormModal implements OnInit {
       return;
     }
     const amount = this.form.subscriptionAmount === '' || this.form.subscriptionAmount === null ? null : Number(this.form.subscriptionAmount);
-    if (!daily && amount !== null && (!Number.isFinite(amount) || amount < 0)) {
-      this.error.set('Enter the yearly amount in rupees, e.g. 1200.');
+    if (!daily && amount !== null && (!Number.isFinite(amount) || amount < 0 || amount > 1000000)) {
+      this.error.set('Enter the yearly amount in rupees (up to 10,00,000), e.g. 1200.');
       return;
     }
     const contactNumber = this.form.contactNumber.trim();

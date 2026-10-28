@@ -56,7 +56,26 @@ describe('PeriodicalRegisterPage', () => {
     const page = create();
     page.lines()[0].priceText = '';
     page.save();
-    expect(page.error()).toBe('Enter the price for सकाळ.');
+    expect(page.error()).toBe('Enter the price for सकाळ (0 to 10,000).');
+    expect(api.savePeriodicalRegister).not.toHaveBeenCalled();
+  });
+
+  it('won’t mark received with nothing ticked on a new day', async () => {
+    const page = create();
+    api.periodicalRegister.mockReturnValue(of({ ...day, rows: day.rows.map(r => ({ ...r, arrived: false })) }));
+    page.ionViewWillEnter();
+    await page.save();
+    expect(page.error()).toBe('Tick at least one newspaper that came.');
+    expect(confirm).not.toHaveBeenCalled();
+    expect(api.savePeriodicalRegister).not.toHaveBeenCalled();
+  });
+
+  it('asks before clearing a day that had copies saved', async () => {
+    const page = create();
+    page.lines().forEach(l => (l.arrived = false));
+    // The loaded day had a saved copy, so clearing it asks first (and the user says no here).
+    await page.save();
+    expect(confirm).toHaveBeenCalled();
     expect(api.savePeriodicalRegister).not.toHaveBeenCalled();
   });
 

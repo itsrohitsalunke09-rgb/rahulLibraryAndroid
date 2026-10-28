@@ -10,8 +10,20 @@ describe('toBookRequest', () => {
 
   it('requires at least one copy', () => {
     const form = { ...bookFormFrom(), title: 'Gitanjali', author: 'Tagore' };
-    expect(toBookRequest({ ...form, totalCopies: '0' })).toEqual({ error: 'Total copies must be at least 1.' });
-    expect(toBookRequest({ ...form, totalCopies: '' })).toEqual({ error: 'Total copies must be at least 1.' });
+    const msg = { error: 'Total copies must be a whole number from 1 to 10,000.' };
+    expect(toBookRequest({ ...form, totalCopies: '0' })).toEqual(msg);
+    expect(toBookRequest({ ...form, totalCopies: '' })).toEqual(msg);
+    expect(toBookRequest({ ...form, totalCopies: '2.5' })).toEqual(msg);
+  });
+
+  it('checks the year, pages and price only when filled in', () => {
+    const form = { ...bookFormFrom(), title: 'Gitanjali', author: 'Tagore' };
+    const year = new Date().getFullYear();
+    expect(toBookRequest({ ...form, publicationYear: String(year + 1) })).toEqual({ error: `Publication year must be between 1000 and ${year}.` });
+    expect(toBookRequest({ ...form, pageCount: '-3' })).toEqual({ error: 'Pages must be a whole number, 1 or more.' });
+    expect(toBookRequest({ ...form, price: '-1' })).toEqual({ error: 'Price must be between 0 and 10,00,000.' });
+    expect(toBookRequest({ ...form, price: 'abc' })).toEqual({ error: 'Year, pages and price must be numbers.' });
+    expect('request' in toBookRequest({ ...form, publicationYear: '1913', pageCount: '', price: '' })).toBe(true);
   });
 
   it('sends a master category by id, trims text and turns number fields into numbers', () => {

@@ -160,6 +160,10 @@ export class UserFormModal implements OnInit, OnDestroy {
       this.error.set('Password must be at least 6 characters.');
       return;
     }
+    if (f.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
+      this.error.set('Enter a valid email address, or leave it empty.');
+      return;
+    }
     // Only check numbers being entered or changed, so old records with other formats can still be edited.
     if (f.phone && f.phone !== this.user?.phone && !/^\d{10}$/.test(f.phone)) {
       this.error.set('Phone must be a 10-digit mobile number.');
