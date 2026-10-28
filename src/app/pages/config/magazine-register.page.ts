@@ -47,8 +47,8 @@ export class MagazineRegisterPage implements ViewWillEnter {
         periods,
         received: periods.filter(p => p.state === 'received').length,
         missing: periods.filter(p => p.state === 'missing').length,
-        // Newest first; the last few are enough to spot a mistake.
-        recent: [...card.receipts].sort((a, b) => b.periodFrom.localeCompare(a.periodFrom)).slice(0, 4),
+        // Newest अंक first; the last few are enough to spot a mistake.
+        recent: [...card.receipts].sort((a, b) => (b.issueNo ?? 0) - (a.issueNo ?? 0) || b.periodFrom.localeCompare(a.periodFrom)).slice(0, 4),
       };
     });
   });
@@ -71,8 +71,8 @@ export class MagazineRegisterPage implements ViewWillEnter {
   }
 
   async remove(card: MagazineCard, receipt: MagazineReceipt) {
-    const label = receiptLabel(receipt, card.frequency);
-    if (!(await this.ui.confirm(`Remove ${label}?`, `The ${card.name} issue for ${label} will be marked as not received.`, 'Remove', true))) {
+    const label = receipt.issueNo ? `अंक ${receipt.issueNo}` : receiptLabel(receipt);
+    if (!(await this.ui.confirm(`Remove ${label}?`, `${card.name} ${label} (${receiptLabel(receipt)}) will be marked as not received.`, 'Remove', true))) {
       return;
     }
     this.api.deleteMagazineReceipt(receipt.id).subscribe({

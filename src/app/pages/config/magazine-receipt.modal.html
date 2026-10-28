@@ -13,45 +13,36 @@
   <div class="wrap">
     <section class="magazine">
       <span class="name marathi">{{ card.name }}</span>
-      <span class="meta">{{ card.frequency === 'MONTHLY' ? 'Monthly' : card.frequency === 'WEEKLY' ? 'Weekly' : 'Fortnightly' }}{{ card.language ? ' · ' + card.language : '' }}</span>
+      <span class="meta">{{ monthly ? 'Monthly' : card.frequency === 'WEEKLY' ? 'Weekly' : 'Fortnightly' }}{{ card.language ? ' · ' + card.language : '' }}</span>
     </section>
 
     <label class="field">
-      <span class="label">Came on</span>
-      <span class="box">
-        <span class="icon" style="--icon: url(assets/icons/field-calendar.svg); --icon-size: 18px" aria-hidden="true"></span>
-        <input type="date" name="receivedOn" [max]="today" [(ngModel)]="receivedOn"
-               (ngModelChange)="card.frequency !== 'MONTHLY' && fillPeriod()" />
+      <span class="label marathi">अंक (issue number)</span>
+      <span class="box issue">
+        <span class="prefix marathi" aria-hidden="true">अंक</span>
+        <input type="number" inputmode="numeric" min="1" step="1" name="issueNo" [(ngModel)]="issueNo" />
       </span>
     </label>
 
-    @if (card.frequency === 'MONTHLY') {
-      <h3 class="step">Issue for</h3>
-      <p class="hint">Tick more than one month for a combined issue.</p>
-      <div class="months" role="group" aria-label="Months this issue covers">
-        @for (m of months(); track m.from) {
-          <button type="button" class="month" [class.on]="picked().has(m.from)" [class.had]="m.state === 'received'"
-                  [attr.aria-pressed]="picked().has(m.from)" (click)="toggle(m)">
-            {{ m.label }}<small>{{ m.from.slice(2, 4) }}</small>
-          </button>
-        }
-      </div>
-      @if (pickedLabel()) {
-        <p class="covers">Covers <strong>{{ pickedLabel() }}</strong></p>
-      }
+    @if (monthly) {
+      <label class="field">
+        <span class="label">Published on</span>
+        <span class="box">
+          <span class="icon" style="--icon: url(assets/icons/field-calendar.svg); --icon-size: 18px" aria-hidden="true"></span>
+          <input type="date" name="publishedOn" [max]="today" [(ngModel)]="publishedOn" />
+        </span>
+      </label>
     } @else {
-      <h3 class="step">Issue for</h3>
       <div class="range">
         <label class="field">
           <span class="label">From</span>
-          <span class="box"><input type="date" name="periodFrom" [(ngModel)]="periodFrom" /></span>
+          <span class="box"><input type="date" name="periodFrom" [max]="today" [(ngModel)]="periodFrom" /></span>
         </label>
         <label class="field">
           <span class="label">To</span>
           <span class="box"><input type="date" name="periodTo" [min]="periodFrom" [(ngModel)]="periodTo" /></span>
         </label>
       </div>
-      <p class="hint">Filled in from the day it came; change it if the issue is for another {{ card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}.</p>
     }
   </div>
 </ion-content>

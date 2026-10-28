@@ -76,15 +76,12 @@ function covered(period: { from: string; to: string }, receipts: MagazineReceipt
   return receipts.some(r => r.periodFrom <= period.to && r.periodTo >= period.from);
 }
 
-/** "Oct 2026", or "Oct – Nov 2026" for a combined issue (any span longer than a month shows both ends). */
-export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>, frequency: PeriodicalFrequency): string {
+/** "5 Oct 2026" for a monthly issue's published day, or "26 Oct – 1 Nov 2026" for the week a weekly one covers. */
+export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>): string {
   const from = parse(r.periodFrom);
   const to = parse(r.periodTo);
-  if (frequency === 'MONTHLY') {
-    const sameMonth = from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth();
-    return sameMonth
-      ? `${MONTHS[from.getMonth()]} ${from.getFullYear()}`
-      : `${MONTHS[from.getMonth()]}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${MONTHS[to.getMonth()]} ${to.getFullYear()}`;
-  }
-  return `${from.getDate()} ${MONTHS[from.getMonth()]} – ${to.getDate()} ${MONTHS[to.getMonth()]} ${to.getFullYear()}`;
+  const day = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  return r.periodFrom === r.periodTo
+    ? `${day(from)} ${from.getFullYear()}`
+    : `${day(from)}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${day(to)} ${to.getFullYear()}`;
 }

@@ -226,9 +226,11 @@ export interface Periodical {
 
 export type PeriodicalRequest = Omit<Periodical, 'id'>;
 
-/** One magazine issue received and the period it covers (a week, a month, or several months combined). */
+/** One magazine issue received: its number (अंक), and its published date (monthly) or from–to week. */
 export interface MagazineReceipt {
   id: number;
+  /** The issue number (अंक) printed on it. */
+  issueNo?: number | null;
   receivedOn: string;
   periodFrom: string;
   periodTo: string;

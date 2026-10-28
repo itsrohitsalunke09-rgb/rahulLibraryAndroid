@@ -23,27 +23,33 @@ describe('MagazineReceiptModal', () => {
     return { modal: fixture.componentInstance, addMagazineReceipt, dismiss };
   }
 
-  it('savesACombinedIssueAsOneSpanOverTheTickedMonths', () => {
+  it('monthlyIssueIsItsNumberAndPublishedDateSuggestingTheNextNumber', () => {
     const { modal, addMagazineReceipt, dismiss } = render({
       periodicalId: 4, name: 'लोकराज्य', frequency: 'MONTHLY',
-      subscriptionStart: '2026-01-01', subscriptionEnd: '2026-12-31', receipts: [],
+      receipts: [{ id: 1, issueNo: 11, receivedOn: '2026-09-05', periodFrom: '2026-09-05', periodTo: '2026-09-05' }],
     });
-    modal.picked.set(new Set());
-    for (const m of modal.months().filter(m => m.from === '2026-10-01' || m.from === '2026-11-01')) {
-      modal.toggle(m);
-    }
-    expect(modal.pickedLabel()).toBe('Oct – Nov 2026');
-    modal.receivedOn = '2026-10-20';
+    expect(modal.issueNo).toBe(12);
+    modal.publishedOn = '2026-10-05';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { receivedOn: '2026-10-20', periodFrom: '2026-10-01', periodTo: '2026-11-30' });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-05' });
     expect(dismiss).toHaveBeenCalledWith(expect.objectContaining({ id: 9 }), 'saved');
   });
 
-  it('fillsAWeeklyIssueWithTheWeekItCameIn', () => {
+  it('weeklyIssueIsItsNumberAndFromToDates', () => {
     const { modal, addMagazineReceipt } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
-    modal.receivedOn = '2026-10-28';
-    modal.fillPeriod();
+    expect(modal.issueNo).toBe(1);
+    modal.issueNo = 43;
+    modal.periodFrom = '2026-10-19';
+    modal.periodTo = '2026-10-25';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { receivedOn: '2026-10-28', periodFrom: '2026-10-26', periodTo: '2026-11-01' });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25' });
+  });
+
+  it('needsAnIssueNumber', () => {
+    const { modal, addMagazineReceipt } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
+    modal.issueNo = '';
+    modal.save();
+    expect(modal.error()).toContain('अंक');
+    expect(addMagazineReceipt).not.toHaveBeenCalled();
   });
 });

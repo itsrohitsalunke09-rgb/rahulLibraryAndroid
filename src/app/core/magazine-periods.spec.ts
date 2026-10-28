@@ -46,10 +46,15 @@ describe('magazine periods', () => {
       .toEqual({ from: '2026-04-01', to: '2027-03-31' });
   });
 
-  it('labelsCombinedIssuesWithBothMonths', () => {
-    expect(receiptLabel({ periodFrom: '2026-10-01', periodTo: '2026-10-31' }, 'MONTHLY')).toBe('Oct 2026');
-    expect(receiptLabel({ periodFrom: '2026-10-01', periodTo: '2026-11-30' }, 'MONTHLY')).toBe('Oct – Nov 2026');
-    expect(receiptLabel({ periodFrom: '2026-12-01', periodTo: '2027-01-31' }, 'MONTHLY')).toBe('Dec 2026 – Jan 2027');
-    expect(receiptLabel({ periodFrom: '2026-10-26', periodTo: '2026-11-01' }, 'WEEKLY')).toBe('26 Oct – 1 Nov 2026');
+  it('labelsAPublishedDayOrTheWeekCovered', () => {
+    expect(receiptLabel({ periodFrom: '2026-10-05', periodTo: '2026-10-05' })).toBe('5 Oct 2026');
+    expect(receiptLabel({ periodFrom: '2026-10-26', periodTo: '2026-11-01' })).toBe('26 Oct – 1 Nov 2026');
+    expect(receiptLabel({ periodFrom: '2026-12-28', periodTo: '2027-01-03' })).toBe('28 Dec 2026 – 3 Jan 2027');
+  });
+
+  it('aMonthlyIssueFillsTheMonthItWasPublishedIn', () => {
+    const periods = magazinePeriods(card({ receipts: [{ id: 1, issueNo: 7, receivedOn: '2026-09-05', periodFrom: '2026-09-05', periodTo: '2026-09-05' }] }), '2026-10-28');
+    expect(periods.find(p => p.from === '2026-09-01')?.state).toBe('received');
+    expect(periods.find(p => p.from === '2026-08-01')?.state).toBe('missing');
   });
 });

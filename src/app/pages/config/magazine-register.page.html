@@ -57,9 +57,9 @@
             <ul class="receipts">
               @for (r of v.recent; track r.id) {
                 <li>
-                  <span class="what">{{ receiptLabel(r, v.card.frequency) }}</span>
-                  <span class="when">came {{ formatDate(r.receivedOn) }}</span>
-                  <button type="button" class="remove" [attr.aria-label]="'Remove ' + receiptLabel(r, v.card.frequency)" (click)="remove(v.card, r)">
+                  <span class="what marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
+                  <span class="when">{{ receiptLabel(r) }}</span>
+                  <button type="button" class="remove" [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : receiptLabel(r))" (click)="remove(v.card, r)">
                     <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
                   </button>
                 </li>
