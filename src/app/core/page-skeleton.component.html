@@ -89,16 +89,14 @@
 
   @case ('moves') {
     <div class="tiles"><span class="sk tile short"></span><span class="sk tile short"></span></div>
-    <div class="card pad">
-      <span class="cells">
-        @for (c of dayCells; track $index) { <span class="sk cell"></span> }
-      </span>
+    <!-- A circle per student, of different sizes. -->
+    <div class="card bubbles">
+      @for (size of bubbleSizes; track $index) { <span class="sk bubble" [style.width.px]="size" [style.height.px]="size"></span> }
     </div>
-    <span class="sk heading" style="width: 22%"></span>
+    <span class="sk heading" style="width: 30%"></span>
     <div class="card rows">
       @for (row of items(); track $index) {
         <div class="row">
-          <span class="sk line small date"></span>
           <span class="text">
             <span class="sk line" [style.width.%]="row.title"></span>
             <span class="sk line small" [style.width.%]="row.sub"></span>

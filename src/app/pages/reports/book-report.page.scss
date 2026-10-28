@@ -30,13 +30,71 @@
   .back { background: var(--app-success-soft); }
 }
 
-.month {
-  padding: 12px 14px;
+/* A circle per student, sized by the books they had this month (initials and count inside). */
+.bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px 10px;
+  padding: 16px 12px;
 }
 
-/* No copy is "missing" here: a quiet day is just a quiet day. */
-.days .cell.active { background: var(--ion-color-success); color: #fff; }
-.days .cell.quiet { background: var(--app-surface); color: var(--app-ink); box-shadow: inset 0 0 0 1px var(--app-rule-strong); }
+.reader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 128px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--app-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &.faded { opacity: 0.4; }
+  &.picked .bubble { box-shadow: 0 0 0 3px var(--app-surface), 0 0 0 5px hsl(var(--hue) 45% 45%); }
+
+  .who {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Soft hues, like the People avatars. */
+.bubble {
+  --hue: 210;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: hsl(var(--hue) 70% 91%);
+  color: hsl(var(--hue) 45% 32%);
+  transition: box-shadow 0.2s;
+
+  .initials { font-size: 15px; font-weight: 700; }
+  .n { font-size: 12px; font-weight: 600; opacity: 0.8; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .bubble {
+    background: hsl(var(--hue) 28% 24%);
+    color: hsl(var(--hue) 70% 80%);
+  }
+}
+
+.hint {
+  margin: 8px 4px 0;
+  font-size: 12px;
+  color: var(--app-muted);
+  text-align: center;
+}
 
 /* One row per book given or returned. */
 .move {
@@ -47,12 +105,6 @@
 
   & + & {
     border-top: 1px solid var(--app-rule);
-  }
-
-  .when {
-    flex: 0 0 52px;
-    font-size: 13px;
-    color: var(--app-muted);
   }
 
   .what {

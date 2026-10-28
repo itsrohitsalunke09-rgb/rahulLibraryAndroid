@@ -7,7 +7,7 @@ import { Component, computed, input } from '@angular/core';
  * - register: the daily newspaper register (one group title, rows with a tick box and a price)
  * - report: the monthly report (group title, rows with an amount and the month's day cells, totals, export)
  * - strips: a magazine report (soft cards with a name, tally and the year's cells, export)
- * - moves: the book transactions report (two totals, a month of day cells, rows with a pill)
+ * - moves: the book transactions report (two totals, a circle per student, rows with a pill)
  * - dashboard: under the real Books row, the tiles, blue card, paper tiles, Reports row and list
  * - form: labelled fields
  */
@@ -56,4 +56,6 @@ export class PageSkeletonComponent {
   /** A month of day cells (two lines of 16) and a year of week cells (two lines of 27). */
   readonly dayCells = Array.from({ length: 31 });
   readonly stripCells = Array.from({ length: 53 });
+  /** Student circles of the books report, busiest first. */
+  readonly bubbleSizes = [120, 96, 84, 72, 64, 56];
 }

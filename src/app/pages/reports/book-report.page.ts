@@ -6,18 +6,18 @@ import {
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
-import { bookMoves, moveDays } from '../../core/book-moves';
+import { bookMoves, bubbleSize, readers } from '../../core/book-moves';
 import { formatDate, localIsoDate } from '../../core/dates';
 import { BookIssue } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
-import { MarathiPipe } from '../../core/pipes';
+import { AvatarHuePipe, InitialsPipe, MarathiPipe } from '../../core/pipes';
 import { bookMovesPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 /**
- * पुस्तकांची देवाण घेवाण: a month of books given and returned, as day cells (green on days books
- * moved) and a list, with the month's register as a PDF.
+ * पुस्तकांची देवाण घेवाण: a month of books given and returned, student by student. Each student is
+ * a circle sized by the books they had; a tap shows just their books. The month's register saves as a PDF.
  */
 @Component({
   selector: 'app-book-report',
@@ -25,7 +25,7 @@ import { UiService, errorMessage } from '../../core/ui.service';
   styleUrls: ['../config/periodical-register.page.scss', '../config/periodical-report.page.scss', 'book-report.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    MarathiPipe, PageSkeletonComponent,
+    MarathiPipe, InitialsPipe, AvatarHuePipe, PageSkeletonComponent,
   ],
 })
 export class BookReportPage implements ViewWillEnter {
@@ -41,10 +41,20 @@ export class BookReportPage implements ViewWillEnter {
   readonly formatDate = formatDate;
 
   readonly moves = computed(() => bookMoves(this.issues() ?? [], this.month()));
-  readonly days = computed(() => moveDays(this.moves(), this.month(), this.today));
   readonly given = computed(() => this.moves().filter(m => m.kind === 'out').length);
-  /** Newest first in the list; the PDF keeps date order. */
-  readonly newestFirst = computed(() => [...this.moves()].reverse());
+  readonly readers = computed(() => readers(this.moves()));
+  /** The student whose circle was tapped; null shows everyone. */
+  readonly selected = signal<number | null>(null);
+  readonly shown = computed(() => this.readers().filter(r => this.selected() === null || r.studentId === this.selected()));
+
+  /** Circle size for a student, against the busiest one this month. */
+  size(books: number) {
+    return bubbleSize(books, this.readers()[0]?.books.length ?? 1);
+  }
+
+  select(studentId: number) {
+    this.selected.update(current => (current === studentId ? null : studentId));
+  }
 
   ionViewWillEnter() {
     this.load();
@@ -76,7 +86,7 @@ export class BookReportPage implements ViewWillEnter {
     this.exporting.set(true);
     try {
       this.ui.toast('Saving PDF… it will appear in Download.');
-      const where = await saveFile(await bookMovesPdf(this.moves(), this.monthName(this.month()), DEFAULT_ABOUT.title),
+      const where = await saveFile(await bookMovesPdf(this.readers(), this.monthName(this.month()), DEFAULT_ABOUT.title),
         `book-transactions-${this.month()}.pdf`, 'application/pdf');
       this.ui.toast(`PDF saved to ${where}`);
     } catch (err) {
@@ -90,6 +100,7 @@ export class BookReportPage implements ViewWillEnter {
   private load(done?: () => void) {
     const month = this.month();
     this.issues.set(null);
+    this.selected.set(null);
     this.error.set('');
     this.api.issuesMovedInMonth(month).subscribe({
       next: list => {

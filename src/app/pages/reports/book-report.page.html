@@ -32,35 +32,51 @@
         <span class="back"><strong>{{ moves().length - given() }}</strong> returned</span>
       </div>
 
-      <!-- The month at a glance: green on days books went out or came back. -->
-      <div class="card month">
-        <div class="days" role="list" [attr.aria-label]="moves().length + ' books given or returned'">
-          @for (c of days(); track c.day) {
-            <span class="cell" [class]="c.state" role="listitem"
-                  [attr.aria-label]="c.day + ', ' + (c.count ? c.count + ' book' + (c.count === 1 ? '' : 's') : c.state)">{{ c.day }}</span>
-          }
-        </div>
-      </div>
-
       @if (moves().length) {
-        <h2 class="group-title">Books <span class="group-count">{{ moves().length }}</span></h2>
-        <div class="card">
-          @for (m of newestFirst(); track m.issue.id + m.kind) {
-            <div class="move">
-              <span class="when">{{ formatDate(m.date).replace(' ' + month().slice(0, 4), '') }}</span>
-              <span class="what">
-                <span class="name" [class.marathi]="m.issue.category | marathi">{{ m.issue.bookTitle }}</span>
-                <span class="meta">{{ m.issue.studentName }}</span>
+        <!-- A circle per student, bigger for more books; tap one to see just their books. -->
+        <div class="card bubbles" role="list" aria-label="Students by books this month">
+          @for (r of readers(); track r.studentId) {
+            <button type="button" class="reader" role="listitem" [class.picked]="selected() === r.studentId"
+                    [class.faded]="selected() !== null && selected() !== r.studentId"
+                    [attr.aria-pressed]="selected() === r.studentId"
+                    [attr.aria-label]="r.studentName + ', ' + r.books.length + ' book' + (r.books.length === 1 ? '' : 's')"
+                    (click)="select(r.studentId)">
+              <span class="bubble" [style.--hue]="r.studentName | avatarHue"
+                    [style.width.px]="size(r.books.length)" [style.height.px]="size(r.books.length)">
+                <span class="initials">{{ r.studentName | initials }}</span>
+                <span class="n">{{ r.books.length }}</span>
               </span>
-              <span class="kind" [class]="m.kind">{{ m.kind === 'out' ? 'Given' : 'Returned' }}</span>
-            </div>
+              <span class="who">{{ r.studentName }}</span>
+            </button>
           }
         </div>
+        <p class="hint">{{ selected() === null ? 'Tap a student to see only their books.' : 'Tap the circle again to see everyone.' }}</p>
+
+        @for (r of shown(); track r.studentId) {
+          <h2 class="group-title">{{ r.studentName }}
+            <span class="group-count">{{ r.books.length }} book{{ r.books.length === 1 ? '' : 's' }} · {{ r.given }} given · {{ r.returned }} returned</span>
+          </h2>
+          <div class="card">
+            @for (b of r.books; track b.issue.id) {
+              <div class="move">
+                <span class="what">
+                  <span class="name" [class.marathi]="b.issue.category | marathi">{{ b.issue.bookTitle }}</span>
+                  <span class="meta">
+                    @for (m of b.moves; track m.kind) {
+                      {{ m.kind === 'out' ? 'Given' : 'Returned' }} {{ formatDate(m.date).replace(' ' + month().slice(0, 4), '') }}@if (!$last) { · }
+                    }
+                  </span>
+                </span>
+                <span class="kind" [class]="b.moves[b.moves.length - 1].kind">{{ b.moves[b.moves.length - 1].kind === 'out' ? 'With student' : 'Returned' }}</span>
+              </div>
+            }
+          </div>
+        }
         <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
           Export PDF…
         </button>
-        <p class="note">The PDF lists every book given or returned in {{ monthName(month()) }}, one row each, with the totals.</p>
+        <p class="note">The PDF lists, student by student, every book given or returned in {{ monthName(month()) }}, with the dates and totals.</p>
       } @else {
         <div class="empty-state">
           <h2>No books given or returned</h2>

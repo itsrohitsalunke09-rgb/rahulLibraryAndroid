@@ -165,4 +165,13 @@
 .tally { width: 40px; }
 .record { height: 54px; border-radius: var(--app-radius-sheet); }
 .tile.short { height: 56px; }
-.date { flex: 0 0 40px; }
+.bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px 10px;
+  padding: 16px 12px;
+}
+
+.bubble { border-radius: 50%; }

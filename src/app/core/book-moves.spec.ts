@@ -1,8 +1,8 @@
 import { BookIssue } from './models';
-import { bookMoves, moveDays } from './book-moves';
+import { bookMoves, bubbleSize, readers } from './book-moves';
 
-const issue = (id: number, issueDate: string, returnDate?: string): BookIssue => ({
-  id, bookId: 1, bookTitle: 'Yayati', author: 'Khandekar', studentId: 2, studentName: 'Asha', issuedByName: 'Admin',
+const issue = (id: number, issueDate: string, returnDate?: string, studentId = 2, studentName = 'Asha'): BookIssue => ({
+  id, bookId: id, bookTitle: 'Book ' + id, author: 'A', studentId, studentName, issuedByName: 'Admin',
   issueDate, dueDate: issueDate, returnDate, status: returnDate ? 'RETURNED' : 'ISSUED',
 });
 
@@ -14,11 +14,20 @@ describe('book moves', () => {
     ]);
   });
 
-  it('marksDaysWithMovesActiveAndTodayOnUpcoming', () => {
-    const days = moveDays(bookMoves([issue(1, '2026-10-02', '2026-10-02')], '2026-10'), '2026-10', '2026-10-03');
-    expect(days.length).toBe(31);
-    expect(days[1]).toEqual({ day: 2, count: 2, state: 'active' });
-    expect(days[0].state).toBe('quiet');
-    expect(days[2].state).toBe('upcoming');
+  it('groupsBooksByStudentBusiestFirstCountingEachBookOnce', () => {
+    const moves = bookMoves([
+      issue(1, '2026-10-02', '2026-10-09', 7, 'Kunal'), issue(2, '2026-10-05', undefined, 7, 'Kunal'),
+      issue(3, '2026-10-06', undefined, 8, 'Aarav'),
+    ], '2026-10');
+    const list = readers(moves);
+    expect(list.map(r => `${r.studentName} ${r.books.length} ${r.given}/${r.returned}`)).toEqual(['Kunal 2 2/1', 'Aarav 1 1/0']);
+    // Kunal's newest move first: book 1 came back on the 9th.
+    expect(list[0].books.map(b => b.issue.id)).toEqual([1, 2]);
+  });
+
+  it('sizesCirclesByBooksTheBusiestBiggest', () => {
+    expect(bubbleSize(4, 4)).toBe(120);
+    expect(bubbleSize(1, 4)).toBe(88);
+    expect(bubbleSize(1, 1)).toBe(120);
   });
 });

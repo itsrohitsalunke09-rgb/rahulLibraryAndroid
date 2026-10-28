@@ -1,4 +1,4 @@
-import { BookMove } from './book-moves';
+import { Reader } from './book-moves';
 import { MagazineCard, MonthReport } from './models';
 
 export type Orientation = 'landscape' | 'portrait';
@@ -521,28 +521,45 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
   return buildPdf(pages);
 }
 
-/** Book moves on one portrait page before the next one starts. */
-const MOVES_PER_PAGE = 40;
+/** Rows on one landscape page of the book transactions register. */
+const BOOK_ROWS_PER_PAGE = 22;
 
-/** The month's book transactions as a table: date, book, student, and whether it was given or returned. */
-export function bookMovesTable(moves: BookMove[]): RegisterTable {
-  const given = moves.filter(m => m.kind === 'out').length;
+/** "5 Oct". */
+function shortDate(iso?: string): string {
+  return iso ? `${Number(iso.slice(8))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}` : '';
+}
+
+/**
+ * The month's book transactions, student by student (busiest first): each book with the day it was
+ * given and the day it came back, when those fall in the month. The name shows on a student's first row.
+ */
+export function bookMovesTable(readers: Reader[]): RegisterTable {
+  const given = readers.reduce((sum, r) => sum + r.given, 0);
+  const returned = readers.reduce((sum, r) => sum + r.returned, 0);
+  const books = readers.reduce((sum, r) => sum + r.books.length, 0);
   return {
-    header: ['Date', 'Book', 'Student', 'Given/Back'],
-    body: moves.map(m => [`${Number(m.date.slice(8))} ${MONTHS[Number(m.date.slice(5, 7)) - 1]}`, m.issue.bookTitle,
-      m.issue.studentName, m.kind === 'out' ? 'Given' : 'Returned']),
-    totals: ['Total', `${given} given`, `${moves.length - given} returned`, String(moves.length)],
+    header: ['Student', 'Book', 'Given', 'Returned'],
+    body: readers.flatMap(r => r.books.map((b, i) => [
+      i === 0 ? `${r.studentName} (${r.books.length})` : '',
+      b.issue.bookTitle,
+      shortDate(b.moves.find(m => m.kind === 'out')?.date),
+      shortDate(b.moves.find(m => m.kind === 'back')?.date),
+    ])),
+    totals: ['Total', `${books} book${books === 1 ? '' : 's'}, ${readers.length} student${readers.length === 1 ? '' : 's'}`,
+      `${given} given`, `${returned}`],
   };
 }
 
-/** A month's book transactions as a portrait A4 PDF, 40 rows a page. Ready to save. */
-export function bookMovesPdf(moves: BookMove[], monthName: string, library: string): Promise<Uint8Array> {
+/** A month's book transactions as a landscape A4 PDF, student by student, 22 rows a page. Ready to save. */
+export function bookMovesPdf(readers: Reader[], monthName: string, library: string): Promise<Uint8Array> {
+  const table = bookMovesTable(readers);
+  const given = readers.reduce((sum, r) => sum + r.given, 0);
+  const returned = readers.reduce((sum, r) => sum + r.returned, 0);
   const pages: PdfPage[] = [];
-  const given = moves.filter(m => m.kind === 'out').length;
-  for (let i = 0; i < Math.max(moves.length, 1); i += MOVES_PER_PAGE) {
-    pages.push(drawTablePage([{ heading: monthName, table: bookMovesTable(moves.slice(i, i + MOVES_PER_PAGE)) }], library, 'portrait',
-      `Book transactions register - ${monthName}`, `Books given: ${given}, returned: ${moves.length - given}`,
-      'One row per book given or returned'));
+  for (let i = 0; i < Math.max(table.body.length, 1); i += BOOK_ROWS_PER_PAGE) {
+    pages.push(drawTablePage([{ heading: monthName, table: { ...table, body: table.body.slice(i, i + BOOK_ROWS_PER_PAGE) } }],
+      library, 'landscape', `Book transactions register - ${monthName}`,
+      `Books given: ${given}, returned: ${returned}`, 'Number after a name = books that month'));
   }
   return buildPdf(pages);
 }

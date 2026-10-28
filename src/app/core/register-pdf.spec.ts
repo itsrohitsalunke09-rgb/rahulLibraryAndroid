@@ -1,5 +1,5 @@
 import { MonthReport } from './models';
-import { PdfPage, buildPdf, deflate, isPlainText, magazineTable, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
+import { PdfPage, bookMovesTable, buildPdf, deflate, isPlainText, magazineTable, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
 
 /** The PDF's objects by number, with stream contents unpacked. */
 function readPdf(pdf: Uint8Array) {
@@ -154,5 +154,22 @@ describe('magazineTable', () => {
     expect(t.totals[1]).toBe('');
     expect(t.totals[0]).toBe('Total');
     expect(t.totals[13]).toBe('1500');
+  });
+});
+
+describe('bookMovesTable', () => {
+  it('lists books student by student, the name once, with given and returned days', () => {
+    const issue = (id: number, studentName: string) => ({ id, bookId: id, bookTitle: 'Book ' + id, author: 'A', studentId: id, studentName,
+      issuedByName: 'Admin', issueDate: '2026-10-02', dueDate: '2026-10-16', status: 'ISSUED' as const });
+    const kunal = issue(1, 'Kunal');
+    const t = bookMovesTable([
+      { studentId: 1, studentName: 'Kunal', given: 2, returned: 1, books: [
+        { issue: kunal, moves: [{ date: '2026-10-02', kind: 'out', issue: kunal }, { date: '2026-10-09', kind: 'back', issue: kunal }] },
+        { issue: issue(2, 'Kunal'), moves: [{ date: '2026-10-05', kind: 'out', issue: issue(2, 'Kunal') }] },
+      ] },
+    ]);
+    expect(t.header).toEqual(['Student', 'Book', 'Given', 'Returned']);
+    expect(t.body).toEqual([['Kunal (2)', 'Book 1', '2 Oct', '9 Oct'], ['', 'Book 2', '5 Oct', '']]);
+    expect(t.totals).toEqual(['Total', '2 books, 1 student', '2 given', '1']);
   });
 });

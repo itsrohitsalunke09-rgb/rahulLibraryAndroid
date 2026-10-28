@@ -21,13 +21,39 @@ export function bookMoves(issues: BookIssue[], month: string): BookMove[] {
   return moves.sort((a, b) => a.date.localeCompare(b.date) || (a.kind === b.kind ? 0 : a.kind === 'out' ? -1 : 1));
 }
 
-/** Day cells for the month: active when a book went out or came back, upcoming from today on, else quiet. */
-export function moveDays(moves: BookMove[], month: string, today: string): { day: number; count: number; state: 'active' | 'quiet' | 'upcoming' }[] {
-  const [y, m] = month.split('-').map(Number);
-  const days = new Date(y, m, 0).getDate();
-  return Array.from({ length: days }, (_, i) => {
-    const date = `${month}-${String(i + 1).padStart(2, '0')}`;
-    const count = moves.filter(mv => mv.date === date).length;
-    return { day: i + 1, count, state: count ? 'active' : date >= today ? 'upcoming' : 'quiet' };
-  });
+/** One student's month: the books they had (given or returned in the month) and the moves. */
+export interface Reader {
+  studentId: number;
+  studentName: string;
+  /** Each book once, newest move first. */
+  books: { issue: BookIssue; moves: BookMove[] }[];
+  given: number;
+  returned: number;
+}
+
+/** Students who had books in the month, the busiest first (then by name). */
+export function readers(moves: BookMove[]): Reader[] {
+  const byStudent = new Map<number, Reader>();
+  for (const move of moves) {
+    const { studentId, studentName } = move.issue;
+    const reader = byStudent.get(studentId)
+      ?? byStudent.set(studentId, { studentId, studentName, books: [], given: 0, returned: 0 }).get(studentId)!;
+    const book = reader.books.find(b => b.issue.id === move.issue.id)
+      ?? (reader.books.push({ issue: move.issue, moves: [] }), reader.books[reader.books.length - 1]);
+    book.moves.push(move);
+    if (move.kind === 'out') {
+      reader.given++;
+    } else {
+      reader.returned++;
+    }
+  }
+  const latest = (b: Reader['books'][number]) => b.moves[b.moves.length - 1].date;
+  return [...byStudent.values()]
+    .map(r => ({ ...r, books: [...r.books].sort((a, b) => latest(b).localeCompare(latest(a))) }))
+    .sort((a, b) => b.books.length - a.books.length || a.studentName.localeCompare(b.studentName));
+}
+
+/** Circle size (px) for a student with this many books: the busiest gets the biggest; area grows with the count. */
+export function bubbleSize(books: number, most: number, min = 56, max = 120): number {
+  return Math.round(min + (max - min) * Math.sqrt(books / Math.max(most, 1)));
 }
