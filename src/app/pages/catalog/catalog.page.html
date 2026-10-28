@@ -87,7 +87,7 @@
         </div>
       }
     } @else if (!clippingsError()) {
-      <app-page-skeleton [count]="false" />
+      <app-page-skeleton [count]="false" [chip]="true" [sub]="false" />
     }
   } @else if (tab() === 'papers') {
     @if (papersError()) {
@@ -118,7 +118,7 @@
         </div>
       }
     } @else if (!papersError()) {
-      <app-page-skeleton [count]="false" />
+      <app-page-skeleton [count]="false" [groups]="[3, 2]" />
     }
   } @else {
 

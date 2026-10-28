@@ -17,11 +17,15 @@ export class MastersPage implements ViewWillEnter {
   protected categories = inject(CategoriesStore);
 
   private api = inject(ApiService);
-  /** Number of news stories; null until loaded, so the count stays hidden. */
+  /** Counts on the right of each master; null until loaded, so the count stays hidden. */
   protected storyCount = signal<number | null>(null);
+  protected periodicalCount = signal<number | null>(null);
+  protected clippingCount = signal<number | null>(null);
 
   ionViewWillEnter() {
     this.categories.revisit();
     this.api.news(0, 1).subscribe({ next: page => this.storyCount.set(page.totalElements), error: () => undefined });
+    this.api.periodicals().subscribe({ next: list => this.periodicalCount.set(list.length), error: () => undefined });
+    this.api.clippings().subscribe({ next: list => this.clippingCount.set(list.length), error: () => undefined });
   }
 }

@@ -50,6 +50,9 @@
         <p>Subscriptions and price per copy, used by the daily register</p>
       </ion-label>
       <div slot="end" class="end">
+        @if (periodicalCount() !== null) {
+          <span class="count">{{ periodicalCount() }}</span>
+        }
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
       </div>
     </ion-item>
@@ -62,6 +65,9 @@
         <p>Newspaper clipping files: title and years, shown in Catalog</p>
       </ion-label>
       <div slot="end" class="end">
+        @if (clippingCount() !== null) {
+          <span class="count">{{ clippingCount() }}</span>
+        }
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
       </div>
     </ion-item>

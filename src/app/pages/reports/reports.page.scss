@@ -26,6 +26,7 @@ ion-back-button {
   &.daily { background: var(--app-accent-soft); }
   &.weekly { background: var(--app-success-soft); }
   &.monthly { background: var(--app-yellow-soft); }
+  &.books { background: var(--app-mint-soft); }
 
   &:active { filter: brightness(0.96); }
 

@@ -122,3 +122,47 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ---- Day and week cells (reports) ---- */
+.row.wrap {
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+}
+
+.cells {
+  display: grid;
+  flex-basis: 100%;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 3px;
+
+  &.strip {
+    grid-template-columns: repeat(27, 1fr);
+  }
+}
+
+.cell {
+  height: 18px;
+  border-radius: 4px;
+
+  .strip & {
+    height: 12px;
+    border-radius: 3px;
+  }
+}
+
+/* The magazine report's soft-green cards. */
+.card.soft {
+  border: 0;
+  background: var(--app-success-soft);
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tally { width: 40px; }
+.record { height: 54px; border-radius: var(--app-radius-sheet); }
+.tile.short { height: 56px; }
+.date { flex: 0 0 40px; }

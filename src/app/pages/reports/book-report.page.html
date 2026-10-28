@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard/reports" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title class="marathi" lang="mr">पुस्तकांची देवाण घेवाण</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="wrap">
+    <div class="day">
+      <button type="button" class="step" aria-label="Previous month" (click)="shift(-1)">‹</button>
+      <span class="month-name" aria-live="polite">
+        {{ monthName(month()) }}
+        @if (month() === thisMonth) { <small>so far</small> }
+      </span>
+      <button type="button" class="step" aria-label="Next month" [disabled]="month() >= thisMonth" (click)="shift(1)">›</button>
+    </div>
+
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (issues()) {
+      <div class="totals">
+        <span class="given"><strong>{{ given() }}</strong> given</span>
+        <span class="back"><strong>{{ moves().length - given() }}</strong> returned</span>
+      </div>
+
+      <!-- The month at a glance: green on days books went out or came back. -->
+      <div class="card month">
+        <div class="days" role="list" [attr.aria-label]="moves().length + ' books given or returned'">
+          @for (c of days(); track c.day) {
+            <span class="cell" [class]="c.state" role="listitem"
+                  [attr.aria-label]="c.day + ', ' + (c.count ? c.count + ' book' + (c.count === 1 ? '' : 's') : c.state)">{{ c.day }}</span>
+          }
+        </div>
+      </div>
+
+      @if (moves().length) {
+        <h2 class="group-title">Books <span class="group-count">{{ moves().length }}</span></h2>
+        <div class="card">
+          @for (m of newestFirst(); track m.issue.id + m.kind) {
+            <div class="move">
+              <span class="when">{{ formatDate(m.date).replace(' ' + month().slice(0, 4), '') }}</span>
+              <span class="what">
+                <span class="name" [class.marathi]="m.issue.category | marathi">{{ m.issue.bookTitle }}</span>
+                <span class="meta">{{ m.issue.studentName }}</span>
+              </span>
+              <span class="kind" [class]="m.kind">{{ m.kind === 'out' ? 'Given' : 'Returned' }}</span>
+            </div>
+          }
+        </div>
+        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
+          <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Export PDF…
+        </button>
+        <p class="note">The PDF lists every book given or returned in {{ monthName(month()) }}, one row each, with the totals.</p>
+      } @else {
+        <div class="empty-state">
+          <h2>No books given or returned</h2>
+          <p>Nothing moved in {{ monthName(month()) }}. Use ‹ to see an earlier month.</p>
+        </div>
+      }
+    } @else if (!error()) {
+      <app-page-skeleton kind="moves" />
+    }
+  </div>
+</ion-content>

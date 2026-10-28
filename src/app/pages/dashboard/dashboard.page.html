@@ -101,7 +101,7 @@
           <div class="records reports">
             <button class="record" (click)="go('/tabs/dashboard/reports')">
               <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
-              <span class="record-label">Reports <span class="sub marathi" lang="mr">दैनिके · साप्ताहिक · मासिक</span></span>
+              <span class="record-label">Reports <span class="sub marathi" lang="mr">दैनिके · साप्ताहिक · मासिक · पुस्तके</span></span>
               <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
             </button>
           </div>
@@ -116,6 +116,8 @@
             <div class="metric skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
           }
         </div>
+        <!-- Where the Reports row will be. -->
+        <div class="records reports skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
       }
 
       <h2 class="section">Library</h2>

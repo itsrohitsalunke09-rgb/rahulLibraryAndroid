@@ -96,6 +96,11 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/periodical-report.page').then(m => m.PeriodicalReportPage),
       },
       {
+        path: 'dashboard/reports/BOOKS',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/reports/book-report.page').then(m => m.BookReportPage),
+      },
+      {
         path: 'dashboard/reports/:frequency',
         ...STAFF_ONLY,
         loadComponent: () => import('../pages/reports/magazine-report.page').then(m => m.MagazineReportPage),

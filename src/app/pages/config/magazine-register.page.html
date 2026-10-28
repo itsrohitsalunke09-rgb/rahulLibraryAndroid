@@ -60,6 +60,6 @@
       }
     }
   } @else if (!error()) {
-    <app-page-skeleton [count]="false" [chip]="true" />
+    <app-page-skeleton [count]="false" [chip]="true" [groups]="frequency ? null : [3, 2]" />
   }
 </ion-content>

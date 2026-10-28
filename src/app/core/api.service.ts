@@ -129,6 +129,11 @@ export class ApiService {
     return this.http.get<Page<BookIssue>>(`${this.base}/issues/issued`, { params });
   }
 
+  /** Book transactions report: issues given or returned in the month (YYYY-MM). */
+  issuesMovedInMonth(month: string) {
+    return this.http.get<BookIssue[]>(`${this.base}/issues/month`, { params: { month } });
+  }
+
   /** Tab counts; with a year, only issues made in that year. */
   issueCounts(year?: number | null) {
     const params = year ? new HttpParams().set('year', year) : undefined;

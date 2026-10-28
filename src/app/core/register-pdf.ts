@@ -1,3 +1,4 @@
+import { BookMove } from './book-moves';
 import { MagazineCard, MonthReport } from './models';
 
 export type Orientation = 'landscape' | 'portrait';
@@ -516,6 +517,32 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
     const table = magazineTable(cards.slice(i, i + MAGAZINES_PER_PAGE), year);
     pages.push(drawTablePage([{ heading: String(year), table }], library, 'landscape', `${title} - ${year}`,
       `Total subscription: Rs. ${subscriptionTotal(cards).toLocaleString('en-IN')}`, 'Cell = issue numbers (अंक) that came; blank = none'));
+  }
+  return buildPdf(pages);
+}
+
+/** Book moves on one portrait page before the next one starts. */
+const MOVES_PER_PAGE = 40;
+
+/** The month's book transactions as a table: date, book, student, and whether it was given or returned. */
+export function bookMovesTable(moves: BookMove[]): RegisterTable {
+  const given = moves.filter(m => m.kind === 'out').length;
+  return {
+    header: ['Date', 'Book', 'Student', 'Given/Back'],
+    body: moves.map(m => [`${Number(m.date.slice(8))} ${MONTHS[Number(m.date.slice(5, 7)) - 1]}`, m.issue.bookTitle,
+      m.issue.studentName, m.kind === 'out' ? 'Given' : 'Returned']),
+    totals: ['Total', `${given} given`, `${moves.length - given} returned`, String(moves.length)],
+  };
+}
+
+/** A month's book transactions as a portrait A4 PDF, 40 rows a page. Ready to save. */
+export function bookMovesPdf(moves: BookMove[], monthName: string, library: string): Promise<Uint8Array> {
+  const pages: PdfPage[] = [];
+  const given = moves.filter(m => m.kind === 'out').length;
+  for (let i = 0; i < Math.max(moves.length, 1); i += MOVES_PER_PAGE) {
+    pages.push(drawTablePage([{ heading: monthName, table: bookMovesTable(moves.slice(i, i + MOVES_PER_PAGE)) }], library, 'portrait',
+      `Book transactions register - ${monthName}`, `Books given: ${given}, returned: ${moves.length - given}`,
+      'One row per book given or returned'));
   }
   return buildPdf(pages);
 }
