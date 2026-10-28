@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Issues received</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <section class="magazine">
+      <span class="name marathi">{{ card.name }}</span>
+      <span class="meta">{{ receipts().length }} issue{{ receipts().length === 1 ? '' : 's' }} recorded</span>
+    </section>
+
+    @if (sorted().length) {
+      <ul class="issues">
+        @for (r of sorted(); track r.id) {
+          <li>
+            <span class="no marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
+            <span class="when">{{ label(r) }}</span>
+            <button type="button" class="remove" [disabled]="removing() === r.id"
+                    [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : label(r))" (click)="remove(r)">
+              <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
+            </button>
+          </li>
+        }
+      </ul>
+      <p class="hint">Tap × on an issue marked by mistake.</p>
+    } @else {
+      <p class="hint">No issues recorded yet. Use Mark received when one comes.</p>
+    }
+  </div>
+</ion-content>

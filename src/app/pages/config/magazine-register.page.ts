@@ -5,10 +5,11 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { formatDate, localIsoDate } from '../../core/dates';
-import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
+import { magazinePeriods } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, rupees } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
-import { UiService, errorMessage } from '../../core/ui.service';
+import { errorMessage } from '../../core/ui.service';
+import { MagazineIssuesModal } from './magazine-issues.modal';
 import { MagazineReceiptModal } from './magazine-receipt.modal';
 
 /**
@@ -28,14 +29,12 @@ import { MagazineReceiptModal } from './magazine-receipt.modal';
 export class MagazineRegisterPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
-  private ui = inject(UiService);
 
   readonly cards = signal<MagazineCard[] | null>(null);
   readonly error = signal('');
   readonly labels = FREQUENCY_LABELS;
   readonly rupees = rupees;
   readonly formatDate = formatDate;
-  readonly receiptLabel = receiptLabel;
 
   /** Each card with its year strip and counts, worked out once per load. */
   readonly view = computed(() => {
@@ -47,8 +46,6 @@ export class MagazineRegisterPage implements ViewWillEnter {
         periods,
         received: periods.filter(p => p.state === 'received').length,
         missing: periods.filter(p => p.state === 'missing').length,
-        // Newest अंक first; the last few are enough to spot a mistake.
-        recent: [...card.receipts].sort((a, b) => (b.issueNo ?? 0) - (a.issueNo ?? 0) || b.periodFrom.localeCompare(a.periodFrom)).slice(0, 4),
       };
     });
   });
@@ -70,18 +67,13 @@ export class MagazineRegisterPage implements ViewWillEnter {
     }
   }
 
-  async remove(card: MagazineCard, receipt: MagazineReceipt) {
-    const label = receipt.issueNo ? `अंक ${receipt.issueNo}` : receiptLabel(receipt);
-    if (!(await this.ui.confirm(`Remove ${label}?`, `${card.name} ${label} (${receiptLabel(receipt)}) will be marked as not received.`, 'Remove', true))) {
-      return;
-    }
-    this.api.deleteMagazineReceipt(receipt.id).subscribe({
-      next: () => {
-        this.update(card.periodicalId, receipts => receipts.filter(r => r.id !== receipt.id));
-        this.ui.toast('Removed.');
-      },
-      error: err => this.ui.error(err, 'Could not remove it.'),
+  /** Every issue in a popup; a removal there updates this card's strip straight away. */
+  async showIssues(card: MagazineCard) {
+    const modal = await this.modals.create({
+      component: MagazineIssuesModal,
+      componentProps: { card, onChange: (receipts: MagazineReceipt[]) => this.update(card.periodicalId, () => receipts) },
     });
+    await modal.present();
   }
 
   /** Changes one card's receipts in place, so the strip updates without reloading the page. */

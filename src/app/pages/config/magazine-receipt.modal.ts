@@ -47,6 +47,15 @@ export class MagazineReceiptModal implements OnInit {
     this.periodTo = period.to;
   }
 
+  /** A new "From" moves "To" to the end of that issue (6 days on for weekly, 14 for fortnightly), so its calendar opens on the same month. */
+  fromChanged() {
+    if (!this.periodFrom) {
+      return;
+    }
+    const [y, m, d] = this.periodFrom.split('-').map(Number);
+    this.periodTo = localIsoDate(new Date(y, m - 1, d + (this.card.frequency === 'WEEKLY' ? 6 : 14)));
+  }
+
   cancel() {
     this.modals.dismiss(null, 'cancel');
   }

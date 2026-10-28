@@ -36,7 +36,7 @@
       <div class="range">
         <label class="field">
           <span class="label">From</span>
-          <span class="box"><input type="date" name="periodFrom" [max]="today" [(ngModel)]="periodFrom" /></span>
+          <span class="box"><input type="date" name="periodFrom" [max]="today" [(ngModel)]="periodFrom" (ngModelChange)="fromChanged()" /></span>
         </label>
         <label class="field">
           <span class="label">To</span>

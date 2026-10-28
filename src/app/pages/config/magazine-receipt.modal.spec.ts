@@ -45,6 +45,13 @@ describe('MagazineReceiptModal', () => {
     expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25' });
   });
 
+  it('newFromMovesToToTheEndOfThatIssue', () => {
+    const { modal } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
+    modal.periodFrom = '2026-08-03';
+    modal.fromChanged();
+    expect(modal.periodTo).toBe('2026-08-09');
+  });
+
   it('needsAnIssueNumber', () => {
     const { modal, addMagazineReceipt } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
     modal.issueNo = '';

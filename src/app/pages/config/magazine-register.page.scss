@@ -118,51 +118,18 @@
   }
 }
 
-.receipts {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-radius: 12px;
-  background: var(--app-surface);
+.actions {
+  display: flex;
+  gap: 10px;
 
-  li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 6px 0 12px;
-
-    & + li {
-      border-top: 1px solid var(--app-rule);
-    }
-  }
-
-  .what {
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .when {
+  button {
     flex: 1;
-    font-size: 12px;
-    color: var(--app-muted);
   }
-}
-
-.remove {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--app-muted);
-  cursor: pointer;
 }
 
 /* Outlined blue pill, like the other secondary actions. */
-.mark {
+.mark,
+.issues {
   height: 44px;
   border: 1px solid var(--app-accent);
   border-radius: 100px;
@@ -172,6 +139,17 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+/* Secondary to Mark received: grey outline. */
+.issues {
+  border-color: var(--app-rule);
+  color: var(--app-ink);
 }
 
 .empty-icon {

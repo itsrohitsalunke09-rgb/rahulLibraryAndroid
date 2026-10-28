@@ -53,21 +53,12 @@
             <p class="missing">{{ v.missing }} {{ v.card.frequency === 'MONTHLY' ? 'month' : v.card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}{{ v.missing === 1 ? '' : 's' }} missing so far</p>
           }
 
-          @if (v.recent.length) {
-            <ul class="receipts">
-              @for (r of v.recent; track r.id) {
-                <li>
-                  <span class="what marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
-                  <span class="when">{{ receiptLabel(r) }}</span>
-                  <button type="button" class="remove" [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : receiptLabel(r))" (click)="remove(v.card, r)">
-                    <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
-                  </button>
-                </li>
-              }
-            </ul>
-          }
-
-          <button type="button" class="mark" (click)="markReceived(v.card)">Mark received</button>
+          <div class="actions">
+            <button type="button" class="issues" [disabled]="!v.card.receipts.length" (click)="showIssues(v.card)">
+              Issues ({{ v.card.receipts.length }})
+            </button>
+            <button type="button" class="mark" (click)="markReceived(v.card)">Mark received</button>
+          </div>
         </section>
       } @empty {
         <div class="empty-state">
