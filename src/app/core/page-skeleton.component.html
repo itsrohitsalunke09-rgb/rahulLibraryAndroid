@@ -14,8 +14,8 @@
   }
 
   @case ('register') {
-    @for (group of [3, 2]; track $index) {
-      <span class="sk heading" [style.width.%]="$first ? 22 : 30"></span>
+    @for (group of [items().length]; track $index) {
+      <span class="sk heading" style="width: 22%"></span>
       <div class="card rows">
         @for (row of items().slice(0, group); track $index) {
           <div class="row">
@@ -34,8 +34,8 @@
   }
 
   @case ('report') {
-    @for (group of [items().length, 2]; track $index) {
-      <span class="sk heading" [style.width.%]="$first ? 22 : 30"></span>
+    @for (group of [items().length]; track $index) {
+      <span class="sk heading" style="width: 22%"></span>
       <div class="card rows">
         @for (row of items().slice(0, group); track $index) {
           <div class="row">

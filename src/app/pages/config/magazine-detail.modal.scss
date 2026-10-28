@@ -216,3 +216,23 @@ ion-footer {
     color: var(--app-on-accent);
   }
 }
+
+/* Call beside Mark received, when the magazine has a contact number. */
+.bar.two {
+  grid-template-columns: auto 1fr;
+}
+
+.call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 50px;
+  padding: 0 20px;
+  border: 1px solid var(--ion-color-success);
+  border-radius: 100px;
+  color: var(--ion-color-success);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}

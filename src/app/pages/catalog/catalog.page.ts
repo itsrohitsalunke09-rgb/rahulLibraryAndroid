@@ -6,7 +6,8 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { Book, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../core/models';
+import { searchClippings, yearsLabel } from '../../core/clippings';
+import { Book, Clipping, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
 import { errorMessage } from '../../core/ui.service';
@@ -33,14 +34,20 @@ export class CatalogPage implements ViewWillEnter {
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
 
-  /** Books by default; the other tab lists the subscribed newspapers and magazines. */
-  readonly tab = signal<'books' | 'papers'>('books');
+  /** Books by default; the others list the subscribed newspapers and magazines, and the कात्रणे. */
+  readonly tab = signal<'books' | 'papers' | 'clippings'>('books');
   /** null until loaded. */
   readonly papers = signal<PeriodicalSummary[] | null>(null);
   readonly papersError = signal('');
   /** Daily, weekly, fortnightly, monthly: a card each. */
   readonly paperGroups = computed(() => byFrequency(this.papers() ?? []));
   protected readonly labels = FREQUENCY_LABELS;
+  /** null until loaded. */
+  readonly clippings = signal<Clipping[] | null>(null);
+  readonly clippingsError = signal('');
+  readonly clippingQuery = signal('');
+  readonly shownClippings = computed(() => searchClippings(this.clippings() ?? [], this.clippingQuery()));
+  protected readonly yearsLabel = yearsLabel;
 
   ionViewWillEnter() {
     // Reload only when stale, so availability is current without refetching on every tab switch.
@@ -48,18 +55,31 @@ export class CatalogPage implements ViewWillEnter {
   }
 
   setTab(value: unknown) {
-    this.tab.set(value === 'papers' ? 'papers' : 'books');
+    this.tab.set(value === 'papers' || value === 'clippings' ? value : 'books');
     if (this.tab() === 'papers' && !this.papers()) {
       this.loadPapers();
+    }
+    if (this.tab() === 'clippings' && !this.clippings()) {
+      this.loadClippings();
     }
   }
 
   refresh(event: RefresherCustomEvent) {
     if (this.tab() === 'books') {
       this.books.refresh(event);
-    } else {
+    } else if (this.tab() === 'papers') {
       this.loadPapers(() => event.target.complete());
+    } else {
+      this.loadClippings(() => event.target.complete());
     }
+  }
+
+  private loadClippings(done?: () => void) {
+    this.clippingsError.set('');
+    this.api.clippings().subscribe({
+      next: list => { this.clippings.set(list); done?.(); },
+      error: err => { this.clippingsError.set(errorMessage(err, 'Could not load the कात्रणे.')); done?.(); },
+    });
   }
 
   private loadPapers(done?: () => void) {

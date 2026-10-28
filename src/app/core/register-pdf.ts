@@ -1,4 +1,4 @@
-import { MonthReport } from './models';
+import { MagazineCard, MonthReport } from './models';
 
 export type Orientation = 'landscape' | 'portrait';
 
@@ -376,16 +376,28 @@ function wrap(text: string, size: number, bold: boolean, maxW: number, maxLines:
  */
 export function drawRegisterPage(months: { report: MonthReport; monthName: string }[], library: string,
                                  orientation: Orientation, title = 'Newspaper & magazine register'): PdfPage {
+  const period = months.length === 1 ? months[0].monthName : `${months[0].monthName} to ${months[months.length - 1].monthName}`;
+  const amount = months.reduce((sum, m) => sum + m.report.totalAmount, 0);
+  return drawTablePage(months.map(m => ({ heading: m.monthName, table: registerTable(m.report, orientation) })), library, orientation,
+    `${title} - ${period}`, `Total expense for ${period}: Rs. ${amount.toLocaleString('en-IN')}`, 'Blank cell = no copy that day');
+}
+
+/**
+ * One A4 page of tables, each under its own heading, in black and white: the library name and a
+ * title on top, a footer line below; the rows stretch to fill the page and each table's
+ * bottom-right total is highlighted.
+ */
+export function drawTablePage(tables: { heading: string; table: RegisterTable }[], library: string, orientation: Orientation,
+                              title: string, footer: string, footNote: string): PdfPage {
   const [pageW, pageH] = A4[orientation];
   const page = new PdfPage(pageW, pageH);
-  const period = months.length === 1 ? months[0].monthName : `${months[0].monthName} to ${months[months.length - 1].monthName}`;
 
   drawText(page, library, MARGIN, 24, 17, { bold: true, maxW: pageW - 2 * MARGIN });
-  drawText(page, `${title} - ${period}`, MARGIN, 46, 11);
+  drawText(page, title, MARGIN, 46, 11);
 
-  // Lay out each month (column positions, header lines), then share the height between all rows.
-  const blocks = months.map(m => {
-    const t = registerTable(m.report, orientation);
+  // Lay out each table (column positions, header lines), then share the height between all rows.
+  const blocks = tables.map(m => {
+    const t = m.table;
     const cols = t.header.length;
     const firstW = orientation === 'landscape' ? 132 : 46;
     const lastW = orientation === 'landscape' ? 50 : 56;
@@ -410,7 +422,7 @@ export function drawRegisterPage(months: { report: MonthReport; monthName: strin
     const { t, cols, colX, headLines, headH, headFont, rows } = b;
     const colW = (c: number) => colX[c + 1] - colX[c];
     const cellFont = Math.max(5.5, Math.min(12, rowH * 0.5, b.innerW * 0.34));
-    drawText(page, b.monthName, MARGIN, top + BLOCK_TITLE / 2, 11.5, { bold: true });
+    drawText(page, b.heading, MARGIN, top + BLOCK_TITLE / 2, 11.5, { bold: true });
 
     const tableTop = top + BLOCK_TITLE;
     const rowY = (r: number) => tableTop + headH + r * rowH;
@@ -451,11 +463,9 @@ export function drawRegisterPage(months: { report: MonthReport; monthName: strin
     top = tableBottom + BLOCK_GAP;
   }
 
-  // Footer: the expense for everything on this page.
-  const amount = months.reduce((sum, m) => sum + m.report.totalAmount, 0);
   const footY = pageH - FOOT / 2;
-  drawText(page, `Total expense for ${period}: Rs. ${amount.toLocaleString('en-IN')}`, MARGIN, footY, 13, { bold: true });
-  drawText(page, 'Blank cell = no copy that day', pageW - MARGIN, footY, 8, { align: 'right' });
+  drawText(page, footer, MARGIN, footY, 13, { bold: true });
+  drawText(page, footNote, pageW - MARGIN, footY, 8, { align: 'right' });
   return page;
 }
 
@@ -466,4 +476,41 @@ export function drawRegisterPage(months: { report: MonthReport; monthName: strin
 export function registerPdf(months: { report: MonthReport; monthName: string }[], library: string, orientation: Orientation,
                             title?: string): Promise<Uint8Array> {
   return buildPdf(packPages(months, orientation).map(page => drawRegisterPage(page, library, orientation, title)));
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** Magazines on one landscape page before the next one starts. */
+const MAGAZINES_PER_PAGE = 25;
+
+/**
+ * A year of magazines as a table: magazines down, months across. Each cell holds the issue
+ * numbers (अंक) that came that month, blank when none did; totals per magazine and per month.
+ */
+export function magazineTable(cards: MagazineCard[], year: number): RegisterTable {
+  const inMonth = (card: MagazineCard, m: number) => card.receipts
+    .filter(r => r.receivedOn.startsWith(`${year}-${String(m + 1).padStart(2, '0')}`))
+    .sort((a, b) => (a.issueNo ?? 0) - (b.issueNo ?? 0));
+  const counts = cards.map(card => MONTHS.map((_, m) => inMonth(card, m).length));
+  return {
+    header: ['Magazine', ...MONTHS, 'Issues'],
+    body: cards.map((card, i) => [
+      card.name,
+      // Issues recorded before numbering began show as *.
+      ...MONTHS.map((_, m) => inMonth(card, m).map(r => r.issueNo ?? '*').join(',')),
+      String(counts[i].reduce((a, b) => a + b, 0)),
+    ]),
+    totals: ['Issues', ...MONTHS.map((_, m) => String(counts.reduce((sum, c) => sum + c[m], 0) || '')),
+      String(counts.flat().reduce((a, b) => a + b, 0))],
+  };
+}
+
+/** One kind of magazine for a calendar year as a landscape A4 PDF, 25 magazines a page. Ready to save. */
+export function magazinePdf(cards: MagazineCard[], year: number, library: string, title: string): Promise<Uint8Array> {
+  const pages: PdfPage[] = [];
+  for (let i = 0; i < Math.max(cards.length, 1); i += MAGAZINES_PER_PAGE) {
+    const table = magazineTable(cards.slice(i, i + MAGAZINES_PER_PAGE), year);
+    pages.push(drawTablePage([{ heading: String(year), table }], library, 'landscape', `${title} - ${year}`,
+      `Issues received in ${year}: ${magazineTable(cards, year).totals.at(-1)}`, 'Cell = issue numbers (अंक) that came; blank = none'));
+  }
+  return buildPdf(pages);
 }

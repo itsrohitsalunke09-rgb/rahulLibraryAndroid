@@ -4,7 +4,7 @@ import { Component, computed, input } from '@angular/core';
  * Loading placeholder shaped like the page that is coming, tall enough to fill the screen:
  * - list: a count line and a card of rows (optionally an avatar circle and a chip on the right)
  * - cards: News story cards (photo, headline, date, two lines)
- * - register: the daily newspaper register (group title, rows with a tick box and a price)
+ * - register: the daily newspaper register (one group title, rows with a tick box and a price)
  * - report: the monthly report (group title, rows with an amount, totals, export button)
  * - dashboard: under the real Books row, the tiles, blue card, newspaper tiles and list
  * - form: labelled fields

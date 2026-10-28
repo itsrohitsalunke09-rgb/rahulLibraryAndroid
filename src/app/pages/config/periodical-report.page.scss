@@ -18,3 +18,7 @@
 .days .cell.received { background: var(--ion-color-success); color: #fff; }
 .days .cell.missing { background: var(--app-rust-soft); color: var(--app-rust); box-shadow: inset 0 0 0 1px var(--app-rust); font-weight: 600; }
 .days .cell.upcoming { background: var(--app-surface); color: var(--app-muted); box-shadow: inset 0 0 0 1px var(--app-rule); }
+
+.month-name { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 17px; font-weight: 600; color: var(--app-ink); }
+.month-name small { font-size: 12px; font-weight: 400; color: var(--app-muted); }
+.day + .intro-note { margin-top: 14px; }

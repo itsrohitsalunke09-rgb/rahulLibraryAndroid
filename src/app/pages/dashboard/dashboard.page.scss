@@ -308,3 +308,21 @@ button {
     color: var(--app-muted);
   }
 }
+
+/* Reports: a soft blue row under the paper tiles. */
+.records.reports {
+  margin-top: 12px;
+  background: var(--app-accent-soft);
+
+  .record-label {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--app-muted);
+  }
+}

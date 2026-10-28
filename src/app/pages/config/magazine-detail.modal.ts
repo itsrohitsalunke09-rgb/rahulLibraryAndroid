@@ -3,7 +3,7 @@ import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonTitle, IonT
 import { ApiService } from '../../core/api.service';
 import { formatDate } from '../../core/dates';
 import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
-import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, rupees } from '../../core/models';
+import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, rupees, tel } from '../../core/models';
 import { UiService } from '../../core/ui.service';
 import { MagazineReceiptModal } from './magazine-receipt.modal';
 
@@ -32,6 +32,7 @@ export class MagazineDetailModal implements OnInit {
   readonly labels = FREQUENCY_LABELS;
   readonly rupees = rupees;
   readonly formatDate = formatDate;
+  readonly tel = tel;
   readonly sorted = computed(() =>
     [...this.receipts()].sort((a, b) => (a.issueNo ?? 0) - (b.issueNo ?? 0) || a.periodFrom.localeCompare(b.periodFrom)));
   readonly periods = computed(() => magazinePeriods({ ...this.card, receipts: this.receipts() }));

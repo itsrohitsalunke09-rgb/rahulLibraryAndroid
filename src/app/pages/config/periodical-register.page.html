@@ -45,6 +45,11 @@
                 }
               </span>
             </label>
+            @if (line.contactNumber) {
+              <a class="call" [href]="tel(line.contactNumber)" [attr.aria-label]="'Call about ' + line.name + ', ' + line.contactNumber">
+                <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
+              </a>
+            }
             <label class="price">
               <span class="sr-only">Price of {{ line.name }}</span>
               <span aria-hidden="true">₹</span>

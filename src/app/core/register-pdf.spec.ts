@@ -1,5 +1,5 @@
 import { MonthReport } from './models';
-import { PdfPage, buildPdf, deflate, isPlainText, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
+import { PdfPage, buildPdf, deflate, isPlainText, magazineTable, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
 
 /** The PDF's objects by number, with stream contents unpacked. */
 function readPdf(pdf: Uint8Array) {
@@ -130,5 +130,27 @@ describe('shortPrice', () => {
     expect(shortPrice(6)).toBe('6');
     expect(shortPrice(5.5)).toBe('5.5');
     expect(shortPrice(7.25)).toBe('7.25');
+  });
+});
+
+describe('magazineTable', () => {
+  it('puts each month’s issue numbers in its cell, with totals per magazine and per month', () => {
+    const t = magazineTable([
+      { periodicalId: 1, name: 'India Today', frequency: 'WEEKLY', receipts: [
+        { id: 2, issueNo: 41, receivedOn: '2026-10-12', periodFrom: '2026-10-12', periodTo: '2026-10-18' },
+        { id: 1, issueNo: 40, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-11' },
+        { id: 3, issueNo: 1, receivedOn: '2025-12-29', periodFrom: '2025-12-29', periodTo: '2026-01-04' },
+      ] },
+      { periodicalId: 2, name: 'Lokrajya', frequency: 'MONTHLY', receipts: [
+        { id: 4, issueNo: null, receivedOn: '2026-02-05', periodFrom: '2026-02-05', periodTo: '2026-02-05' },
+      ] },
+    ], 2026);
+    expect(t.header).toEqual(['Magazine', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Issues']);
+    expect(t.body[0][10]).toBe('40,41');
+    expect(t.body[0][13]).toBe('2');
+    expect(t.body[1][2]).toBe('*');
+    expect(t.totals[10]).toBe('2');
+    expect(t.totals[1]).toBe('');
+    expect(t.totals[13]).toBe('3');
   });
 });

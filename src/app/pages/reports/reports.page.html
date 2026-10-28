@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Reports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    @for (c of cards; track c.link) {
+      <a class="report" [class]="c.tone" [routerLink]="c.link">
+        <span class="icon kind" [style.--icon]="'url(assets/icons/' + c.icon + '.svg)'" aria-hidden="true"></span>
+        <span class="text">
+          <span class="title marathi" lang="mr">{{ c.title }}</span>
+          <span class="sub">{{ c.sub }} · cells and PDF</span>
+        </span>
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+      </a>
+    }
+  </div>
+</ion-content>

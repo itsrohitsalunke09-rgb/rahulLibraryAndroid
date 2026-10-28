@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/reports" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title class="marathi" lang="mr">{{ title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="wrap">
+    @if (error()) {
+      <p class="page-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (cards()) {
+      @if (view().length) {
+        <p class="legend"><span class="cell received"></span> came <span class="cell missing"></span> missing <span class="cell upcoming"></span> not due yet · tap a magazine for its issues</p>
+        @for (v of view(); track v.card.periodicalId) {
+          <button type="button" class="magazine" (click)="open(v.card)">
+            <span class="head">
+              <span class="name marathi">{{ v.card.name }}</span>
+              <span class="tally" [class.short]="v.missing"><strong>{{ v.received }}</strong>/{{ v.periods.length }}</span>
+            </span>
+            <span class="strip" [class.weekly]="frequency !== 'MONTHLY'" role="list"
+                  [attr.aria-label]="v.received + ' received, ' + v.missing + ' missing'">
+              @for (p of v.periods; track p.from) {
+                <span class="cell" [class]="p.state" role="listitem" [attr.aria-label]="p.label + ', ' + p.state">
+                  @if (frequency === 'MONTHLY') { {{ p.label }} }
+                </span>
+              }
+            </span>
+          </button>
+        }
+        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
+          <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Export {{ label }} PDF…
+        </button>
+        <p class="note">The PDF lists, for the year you pick, the issue numbers (अंक) that came each month.</p>
+      } @else {
+        <div class="empty-state">
+          <h2>No {{ label.toLowerCase() }} magazines</h2>
+          <p>Add them in Profile › Masters › Papers &amp; magazines.</p>
+        </div>
+      }
+    } @else if (!error()) {
+      <app-page-skeleton kind="report" />
+    }
+  </div>
+</ion-content>

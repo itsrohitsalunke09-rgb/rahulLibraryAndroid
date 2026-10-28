@@ -222,6 +222,8 @@ export interface Periodical {
   subscriptionAmount?: number | null;
   subscriptionStart?: string | null;
   subscriptionEnd?: string | null;
+  /** Vendor or agent to phone when a copy doesn't come. */
+  contactNumber?: string | null;
 }
 
 export type PeriodicalRequest = Omit<Periodical, 'id'>;
@@ -248,6 +250,7 @@ export interface MagazineCard {
   subscriptionStart?: string | null;
   subscriptionEnd?: string | null;
   receipts: MagazineReceipt[];
+  contactNumber?: string | null;
 }
 
 /** One line of a day's arrival register. */
@@ -259,6 +262,7 @@ export interface RegisterRow {
   defaultPrice: number;
   arrived: boolean;
   price: number;
+  contactNumber?: string | null;
 }
 
 export interface DayRegister {
@@ -297,4 +301,19 @@ export interface MonthReport {
 export function rupees(amount: number): string {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 })
     .format(amount);
+}
+
+/** A कात्रण file: newspaper clippings on one subject, for the years they span. */
+export interface Clipping {
+  id: number;
+  title: string;
+  yearFrom: number;
+  yearTo: number;
+}
+
+export type ClippingRequest = Omit<Clipping, 'id'>;
+
+/** A tel: link for a phone number as typed ("+91 98765-43210" → "tel:+919876543210"). */
+export function tel(number: string): string {
+  return 'tel:' + number.replace(/[^0-9+]/g, '');
 }

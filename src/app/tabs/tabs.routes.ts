@@ -80,6 +80,21 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/magazine-register.page').then(m => m.MagazineRegisterPage),
       },
       {
+        path: 'reports',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/reports/reports.page').then(m => m.ReportsPage),
+      },
+      {
+        path: 'reports/:frequency',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/reports/magazine-report.page').then(m => m.MagazineReportPage),
+      },
+      {
+        path: 'profile/masters/clippings',
+        ...ADMIN_ONLY,
+        loadComponent: () => import('../pages/config/clippings.page').then(m => m.ClippingsPage),
+      },
+      {
         path: 'profile/masters/about',
         ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/about-master.page').then(m => m.AboutMasterPage),

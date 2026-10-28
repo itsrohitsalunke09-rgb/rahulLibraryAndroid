@@ -31,7 +31,7 @@ describe('PageSkeletonComponent', () => {
 
   it('drawsTheShapeOfEachKindOfPage', () => {
     expect(render({ kind: 'cards' }).querySelectorAll('.photo').length).toBe(3);
-    expect(render({ kind: 'register' }).querySelectorAll('.box').length).toBe(5);
+    expect(render({ kind: 'register' }).querySelectorAll('.box').length).toBe(4);
     expect(render({ kind: 'dashboard' }).querySelectorAll('.tile').length).toBe(4);
     expect(render({ kind: 'form', rows: 5 }).querySelectorAll('.field').length).toBe(5);
   });

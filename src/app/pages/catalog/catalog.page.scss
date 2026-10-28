@@ -78,3 +78,14 @@ ion-item {
   --icon-size: 32px;
   color: var(--app-ink);
 }
+
+/* कात्रणे: the years a clipping file covers, as a soft pill. */
+.years {
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--app-mint-soft);
+  color: var(--app-ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}

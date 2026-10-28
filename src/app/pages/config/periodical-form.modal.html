@@ -88,6 +88,18 @@
       </div>
     }
 
+    <h3 class="form-section">If a copy doesn't come</h3>
+    <div class="form-card">
+      <label class="form-field">
+        <span class="form-label">Contact number</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-phone.svg)" aria-hidden="true"></span>
+          <input name="contactNumber" type="tel" inputmode="tel" maxlength="20" placeholder="e.g. 98765 43210" [(ngModel)]="form.contactNumber" />
+        </span>
+        <span class="form-helper">The vendor or agent to call. A call button shows in the registers.</span>
+      </label>
+    </div>
+
     <div class="form-panel active-row">
       <ion-item lines="none">
         <ion-toggle name="active" [(ngModel)]="form.active">Subscribed</ion-toggle>

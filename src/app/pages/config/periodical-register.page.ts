@@ -7,7 +7,7 @@ import {
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { formatDate, localIsoDate } from '../../core/dates';
-import { FREQUENCY_LABELS, RegisterRow, byFrequency, rupees } from '../../core/models';
+import { FREQUENCY_LABELS, RegisterRow, byFrequency, rupees, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
@@ -42,6 +42,7 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
   readonly groups = computed(() => byFrequency(this.lines()));
   readonly rupees = rupees;
   readonly formatDate = formatDate;
+  readonly tel = tel;
 
   ionViewWillEnter() {
     if (!this.dirty()) {

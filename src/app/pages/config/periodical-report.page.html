@@ -11,13 +11,13 @@
   <div class="wrap">
     <div class="day">
       <button type="button" class="step" aria-label="Previous month" (click)="shift(-1)">‹</button>
-      <label class="date">
-        <span class="sr-only">Month</span>
-        <input #monthBox type="month" [max]="thisMonth" [value]="month()" (change)="pick(monthBox.value); monthBox.value = month()" />
-      </label>
+      <!-- Month by the arrows only; no calendar box. -->
+      <span class="month-name" aria-live="polite">
+        {{ monthName(month()) }}
+        @if (month() === thisMonth) { <small>so far</small> }
+      </span>
       <button type="button" class="step" aria-label="Next month" [disabled]="month() >= thisMonth" (click)="shift(1)">›</button>
     </div>
-    <p class="when">{{ monthName(month()) }}{{ month() === thisMonth ? ' · so far' : '' }}</p>
 
     <p class="note intro-note">Export under a card saves a print-ready PDF of those papers for the months you tick (up to 3 years back): one row per newspaper, one column per date with the price paid, day totals and the total expense.</p>
 

@@ -33,6 +33,12 @@ ion-back-button { --color: var(--app-ink); --icon-font-size: 22px; }
 .meta { font-size: 12px; color: var(--app-muted); }
 .line:not(.on) .name { color: var(--app-muted); }
 
+/* Phone the vendor when a copy didn't come. */
+.call {
+  display: grid; place-items: center; flex: 0 0 40px; height: 40px; border-radius: 50%;
+  background: var(--app-success-soft); color: var(--ion-color-success);
+}
+
 .price {
   display: flex; align-items: center; gap: 4px; flex: 0 0 96px; height: 44px; padding: 0 10px;
   border: 1px solid var(--app-rule); border-radius: var(--app-radius-control); color: var(--app-muted);

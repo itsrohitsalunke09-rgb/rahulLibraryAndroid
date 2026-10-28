@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
-  Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
+  Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
@@ -67,6 +67,21 @@ export class ApiService {
 
   deleteCategory(id: number) {
     return changes(this.http.delete<void>(`${this.base}/categories/${id}`));
+  }
+
+  /** कात्रणे: clipping files by title and the years they cover, newest first. */
+  clippings() {
+    return this.http.get<Clipping[]>(`${this.base}/clippings`);
+  }
+
+  saveClipping(clipping: ClippingRequest, id?: number) {
+    return changes(id
+      ? this.http.put<Clipping>(`${this.base}/clippings/${id}`, clipping)
+      : this.http.post<Clipping>(`${this.base}/clippings`, clipping));
+  }
+
+  deleteClipping(id: number) {
+    return changes(this.http.delete<void>(`${this.base}/clippings/${id}`));
   }
 
   /** Bulk-add books from an .xlsx sheet (admin and librarian only). */

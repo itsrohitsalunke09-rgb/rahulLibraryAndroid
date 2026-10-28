@@ -36,7 +36,7 @@ export class PeriodicalFormModal implements OnInit {
   readonly frequencies = Object.entries(FREQUENCY_LABELS) as [PeriodicalFrequency, string][];
   form = {
     name: '', language: '', frequency: 'DAILY' as PeriodicalFrequency, price: '' as number | string, active: true,
-    subscriptionAmount: '' as number | string, subscriptionStart: '', subscriptionEnd: '',
+    subscriptionAmount: '' as number | string, subscriptionStart: '', subscriptionEnd: '', contactNumber: '',
   };
   readonly saving = signal(false);
   readonly deleting = signal(false);
@@ -48,7 +48,7 @@ export class PeriodicalFormModal implements OnInit {
       this.form = {
         name: p.name, language: p.language ?? '', frequency: p.frequency, price: p.price, active: p.active,
         subscriptionAmount: p.subscriptionAmount ?? '', subscriptionStart: p.subscriptionStart ?? '',
-        subscriptionEnd: p.subscriptionEnd ?? '',
+        subscriptionEnd: p.subscriptionEnd ?? '', contactNumber: p.contactNumber ?? '',
       };
     }
   }
@@ -74,6 +74,13 @@ export class PeriodicalFormModal implements OnInit {
       this.error.set('Enter the yearly amount in rupees, e.g. 1200.');
       return;
     }
+    const contactNumber = this.form.contactNumber.trim();
+    // Same rule as the server: digits with an optional +, spaces or dashes, 6 to 15 digits.
+    const digits = contactNumber.replace(/\D/g, '').length;
+    if (contactNumber && (!/^\+?[0-9 -]+$/.test(contactNumber) || digits < 6 || digits > 15)) {
+      this.error.set('Enter a phone number with 6 to 15 digits, like 98765 43210.');
+      return;
+    }
     this.saving.set(true);
     this.error.set('');
     const request = {
@@ -83,6 +90,7 @@ export class PeriodicalFormModal implements OnInit {
       subscriptionAmount: daily ? null : amount,
       subscriptionStart: daily ? null : this.form.subscriptionStart || null,
       subscriptionEnd: daily ? null : this.form.subscriptionEnd || null,
+      contactNumber: contactNumber || null,
     };
     this.api.savePeriodical(request, this.periodical?.id).subscribe({
       next: saved => {
