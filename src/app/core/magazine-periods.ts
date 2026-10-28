@@ -34,12 +34,18 @@ export function subscriptionWindow(card: Pick<MagazineCard, 'subscriptionStart' 
   return { from: `${year}-01-01`, to: `${year}-12-31` };
 }
 
-/** The period one issue usually covers: the week (Mon–Sun), the half month, or the month around a date. */
-export function defaultPeriod(frequency: PeriodicalFrequency, date: string): { from: string; to: string } {
+/** The weekday (0 = Sunday) a weekly magazine's weeks start on: that of its first recorded issue, else Monday. */
+export function weekStartDay(receipts: Pick<MagazineReceipt, 'periodFrom'>[]): number {
+  const first = receipts.map(r => r.periodFrom).sort()[0];
+  return first ? parse(first).getDay() : 1;
+}
+
+/** The period one issue usually covers: the 7-day week (from startDay, Monday by default), the half month, or the month around a date. */
+export function defaultPeriod(frequency: PeriodicalFrequency, date: string, startDay = 1): { from: string; to: string } {
   const d = parse(date);
   if (frequency === 'WEEKLY') {
-    const monday = addDays(d, -((d.getDay() + 6) % 7));
-    return { from: localIsoDate(monday), to: localIsoDate(addDays(monday, 6)) };
+    const start = addDays(d, -((d.getDay() - startDay + 7) % 7));
+    return { from: localIsoDate(start), to: localIsoDate(addDays(start, 6)) };
   }
   const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
   if (frequency === 'FORTNIGHTLY') {
@@ -55,7 +61,9 @@ export function magazinePeriods(card: MagazineCard, today = localIsoDate()): Mag
   const window = subscriptionWindow(card, today);
   const end = window.to;
   const periods: { from: string; to: string; label: string }[] = [];
-  let cursor = defaultPeriod(card.frequency, window.from);
+  // Weeks line up with the first issue's dates, so one issue fills exactly one cell.
+  const startDay = weekStartDay(card.receipts);
+  let cursor = defaultPeriod(card.frequency, window.from, startDay);
   while (cursor.from <= end) {
     const from = parse(cursor.from);
     const label = card.frequency === 'WEEKLY'
@@ -64,7 +72,7 @@ export function magazinePeriods(card: MagazineCard, today = localIsoDate()): Mag
         ? `${MONTHS[from.getMonth()]} ${from.getDate()}–${parse(cursor.to).getDate()}`
         : MONTHS[from.getMonth()];
     periods.push({ ...cursor, label });
-    cursor = defaultPeriod(card.frequency, localIsoDate(addDays(parse(cursor.to), 1)));
+    cursor = defaultPeriod(card.frequency, localIsoDate(addDays(parse(cursor.to), 1)), startDay);
   }
   return periods.map(p => ({
     ...p,

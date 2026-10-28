@@ -1,4 +1,4 @@
-import { defaultPeriod, magazinePeriods, receiptLabel, subscriptionWindow } from './magazine-periods';
+import { defaultPeriod, magazinePeriods, receiptLabel, subscriptionWindow, weekStartDay } from './magazine-periods';
 import { MagazineCard } from './models';
 
 const card = (over: Partial<MagazineCard> = {}): MagazineCard => ({
@@ -32,6 +32,19 @@ describe('magazine periods', () => {
     expect(periods[0].from).toBe('2025-12-29');
     expect(periods.length).toBe(53);
     expect(periods.every(p => p.state !== 'received')).toBe(true);
+  });
+
+  it('weeksLineUpWithTheFirstIssueSoEachIssueFillsOneCell', () => {
+    // First issue Thu 1 Oct – Wed 7 Oct: weeks become Thursday–Wednesday.
+    const receipts = [
+      { id: 2, issueNo: 2, receivedOn: '2026-10-08', periodFrom: '2026-10-08', periodTo: '2026-10-14' },
+      { id: 1, issueNo: 1, receivedOn: '2026-10-01', periodFrom: '2026-10-01', periodTo: '2026-10-07' },
+    ];
+    expect(weekStartDay(receipts)).toBe(4);
+    expect(defaultPeriod('WEEKLY', '2026-10-28', 4)).toEqual({ from: '2026-10-22', to: '2026-10-28' });
+    const periods = magazinePeriods(card({ frequency: 'WEEKLY', subscriptionStart: '2026-01-01', subscriptionEnd: '2026-12-31', receipts }), '2026-10-28');
+    expect(periods[0].from).toBe('2026-01-01');
+    expect(periods.filter(p => p.state === 'received').map(p => p.from)).toEqual(['2026-10-01', '2026-10-08']);
   });
 
   it('fortnightsSplitEachMonthAtTheFifteenth', () => {

@@ -20,7 +20,7 @@ describe('MagazineReceiptModal', () => {
     const fixture = TestBed.createComponent(MagazineReceiptModal);
     fixture.componentInstance.card = card;
     fixture.detectChanges();
-    return { modal: fixture.componentInstance, addMagazineReceipt, dismiss };
+    return { modal: fixture.componentInstance, fixture, addMagazineReceipt, dismiss };
   }
 
   it('monthlyIssueIsItsNumberAndPublishedDateSuggestingTheNextNumber', () => {
@@ -45,11 +45,14 @@ describe('MagazineReceiptModal', () => {
     expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25' });
   });
 
-  it('newFromMovesToToTheEndOfThatIssue', () => {
-    const { modal } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
-    modal.periodFrom = '2026-08-03';
-    modal.fromChanged();
-    expect(modal.periodTo).toBe('2026-08-09');
+  it('newFromMovesToToTheEndOfThatIssueAndBarsEarlierDates', async () => {
+    const { modal, fixture } = render({ periodicalId: 7, name: 'India Today', frequency: 'WEEKLY', receipts: [] });
+    const from = fixture.nativeElement.querySelector('input[name=periodFrom]') as HTMLInputElement;
+    from.value = '2026-11-01';
+    from.dispatchEvent(new Event('input'));
+    expect(modal.periodTo).toBe('2026-11-07');
+    await fixture.whenStable();
+    expect((fixture.nativeElement.querySelector('input[name=periodTo]') as HTMLInputElement).min).toBe('2026-11-01');
   });
 
   it('needsAnIssueNumber', () => {

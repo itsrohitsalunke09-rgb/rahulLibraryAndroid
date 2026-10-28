@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
-import { defaultPeriod } from '../../core/magazine-periods';
+import { defaultPeriod, weekStartDay } from '../../core/magazine-periods';
 import { MagazineCard } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -29,7 +29,7 @@ export class MagazineReceiptModal implements OnInit {
   issueNo: number | string = '';
   /** Monthly: the day it was published. */
   publishedOn = this.today;
-  /** Weekly/fortnightly: the period it covers, this week (or half-month) to start with. */
+  /** Weekly/fortnightly: the period it covers, this week (on the same weekday as the first issue) or half-month to start with. */
   periodFrom = '';
   periodTo = '';
   readonly saving = signal(false);
@@ -42,7 +42,7 @@ export class MagazineReceiptModal implements OnInit {
   ngOnInit() {
     const last = Math.max(0, ...this.card.receipts.map(r => r.issueNo ?? 0));
     this.issueNo = last + 1;
-    const period = defaultPeriod(this.card.frequency, this.today);
+    const period = defaultPeriod(this.card.frequency, this.today, weekStartDay(this.card.receipts));
     this.periodFrom = period.from;
     this.periodTo = period.to;
   }
