@@ -44,6 +44,8 @@ export class PeriodicalReportPage implements ViewWillEnter {
     amount: g.items.reduce((sum, r) => sum + r.amount, 0),
   })));
   readonly rupees = rupees;
+  readonly today = localIsoDate();
+  readonly dayCells = dayCells;
 
   ionViewWillEnter() {
     this.load();
@@ -177,6 +179,17 @@ export class PeriodicalReportPage implements ViewWillEnter {
       }
     });
   }
+}
+
+/**
+ * A paper's month as day cells: received when a copy came, missing when the day has passed
+ * without one, upcoming for today onwards with nothing ticked yet.
+ */
+export function dayCells(prices: (number | null)[], month: string, today: string): { day: number; state: 'received' | 'missing' | 'upcoming' }[] {
+  return prices.map((price, i) => {
+    const date = `${month}-${String(i + 1).padStart(2, '0')}`;
+    return { day: i + 1, state: price !== null ? 'received' : date < today ? 'missing' : 'upcoming' };
+  });
 }
 
 /** "2026-10" and the months before it, newest first. */

@@ -1,4 +1,4 @@
-import { recentMonths } from './periodical-report.page';
+import { dayCells, recentMonths } from './periodical-report.page';
 
 describe('recentMonths', () => {
   it('lists the latest month and the ones before it, across a year boundary', () => {
@@ -10,5 +10,13 @@ describe('recentMonths', () => {
     expect(months.length).toBe(12);
     expect(months[0]).toBe('2026-10');
     expect(months[11]).toBe('2025-11');
+  });
+});
+
+describe('dayCells', () => {
+  it('marksDaysReceivedMissingOrStillToCome', () => {
+    const cells = dayCells([5, null, null, 6], '2026-10', '2026-10-03');
+    expect(cells.map(c => c.state)).toEqual(['received', 'missing', 'upcoming', 'received']);
+    expect(cells[3].day).toBe(4);
   });
 });

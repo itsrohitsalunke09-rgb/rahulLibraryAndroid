@@ -1,5 +1,5 @@
 /* On top of periodical-register.page.scss (header, ‹ month ›, card, summary). */
-.row { display: flex; align-items: center; gap: 12px; min-height: 60px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-height: 60px; padding-bottom: 12px; }
 .row + .row { border-top: 1px solid var(--app-rule); }
 .row .what { flex: 1; }
 .amount { font-size: 15px; color: var(--app-ink); white-space: nowrap; }
@@ -11,3 +11,10 @@
 .group-summary { margin: 10px 4px 8px; }
 .group-summary strong { font-size: 15px; }
 .total { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--app-rule); }
+
+/* One cell per day of the month, 16 a line, coloured like the magazine register. */
+.days { flex-basis: 100%; display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
+.days .cell { display: grid; place-items: center; height: 18px; border-radius: 4px; font-size: 9px; font-weight: 600; }
+.days .cell.received { background: var(--ion-color-success); color: #fff; }
+.days .cell.missing { background: var(--app-rust-soft); color: var(--app-rust); box-shadow: inset 0 0 0 1px var(--app-rust); font-weight: 600; }
+.days .cell.upcoming { background: var(--app-surface); color: var(--app-muted); box-shadow: inset 0 0 0 1px var(--app-rule); }

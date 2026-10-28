@@ -44,6 +44,12 @@
                 </span>
               </div>
               <strong class="amount">{{ rupees(row.amount) }}</strong>
+              <!-- The month at a glance: green came, red missing, grey still to come. -->
+              <div class="days" role="list" [attr.aria-label]="row.issues + ' copies, ' + (row.missingDays ?? 0) + ' days missing'">
+                @for (c of dayCells(row.prices, r.month, today); track c.day) {
+                  <span class="cell" [class]="c.state" role="listitem" [attr.aria-label]="c.day + ', ' + c.state">{{ c.day }}</span>
+                }
+              </div>
             </div>
           }
         </div>
