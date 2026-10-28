@@ -35,7 +35,7 @@ describe('IssueBookModal', () => {
     expect(button.textContent).toContain('Choose a student');
   });
 
-  it('issuesToTheChosenStudentForThePickedPeriod', () => {
+  it('handsBackTheChosenStudentAndPeriodAtOnce', () => {
     const fixture = render();
     fixture.componentInstance.choose(asha);
     fixture.componentInstance.days.set(21);
@@ -44,7 +44,8 @@ describe('IssueBookModal', () => {
     expect(button.textContent).toContain('Issue to Asha Patil');
     expect(fixture.nativeElement.querySelector('.period.on')?.textContent).toContain('21 days');
     button.click();
-    expect(issueBook).toHaveBeenCalledWith(7, 3, 21);
-    expect(dismiss).toHaveBeenCalledWith({ id: 1 }, 'issued');
+    // Closes at once with the choice; Book details sends it to the server.
+    expect(dismiss).toHaveBeenCalledWith({ student: asha, days: 21 }, 'issue');
+    expect(issueBook).not.toHaveBeenCalled();
   });
 });

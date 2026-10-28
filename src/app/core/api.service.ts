@@ -6,7 +6,7 @@ import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
-  MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
+  MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
 
@@ -213,6 +213,19 @@ export class ApiService {
   /** Copies and cost per newspaper/magazine for a month (YYYY-MM). */
   periodicalReport(month: string) {
     return this.http.get<MonthReport>(`${this.base}/periodicals/report`, { params: { month } });
+  }
+
+  /** The magazine register: each magazine with its subscription and the issues received. */
+  magazines() {
+    return this.http.get<MagazineCard[]>(`${this.base}/periodicals/magazines`);
+  }
+
+  addMagazineReceipt(periodicalId: number, receipt: MagazineReceiptRequest) {
+    return changes(this.http.post<MagazineReceipt>(`${this.base}/periodicals/${periodicalId}/receipts`, receipt));
+  }
+
+  deleteMagazineReceipt(id: number) {
+    return changes(this.http.delete<void>(`${this.base}/periodicals/receipts/${id}`));
   }
 
   // ---- About us page ----

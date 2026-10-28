@@ -34,7 +34,10 @@ export class PeriodicalFormModal implements OnInit {
   private ui = inject(UiService);
 
   readonly frequencies = Object.entries(FREQUENCY_LABELS) as [PeriodicalFrequency, string][];
-  form = { name: '', language: '', frequency: 'DAILY' as PeriodicalFrequency, price: '' as number | string, active: true };
+  form = {
+    name: '', language: '', frequency: 'DAILY' as PeriodicalFrequency, price: '' as number | string, active: true,
+    subscriptionAmount: '' as number | string, subscriptionStart: '', subscriptionEnd: '',
+  };
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly error = signal('');
@@ -42,7 +45,11 @@ export class PeriodicalFormModal implements OnInit {
   ngOnInit() {
     const p = this.periodical;
     if (p) {
-      this.form = { name: p.name, language: p.language ?? '', frequency: p.frequency, price: p.price, active: p.active };
+      this.form = {
+        name: p.name, language: p.language ?? '', frequency: p.frequency, price: p.price, active: p.active,
+        subscriptionAmount: p.subscriptionAmount ?? '', subscriptionStart: p.subscriptionStart ?? '',
+        subscriptionEnd: p.subscriptionEnd ?? '',
+      };
     }
   }
 
@@ -57,13 +64,26 @@ export class PeriodicalFormModal implements OnInit {
       this.error.set('Enter the name of the newspaper or magazine.');
       return;
     }
-    if (!Number.isFinite(price) || price < 0 || price > 10000) {
+    const daily = this.form.frequency === 'DAILY';
+    if (daily && (!Number.isFinite(price) || price < 0 || price > 10000)) {
       this.error.set('Enter the price of one copy in rupees, e.g. 6 or 7.50.');
+      return;
+    }
+    const amount = this.form.subscriptionAmount === '' || this.form.subscriptionAmount === null ? null : Number(this.form.subscriptionAmount);
+    if (!daily && amount !== null && (!Number.isFinite(amount) || amount < 0)) {
+      this.error.set('Enter the yearly amount in rupees, e.g. 1200.');
       return;
     }
     this.saving.set(true);
     this.error.set('');
-    const request = { name, language: this.form.language.trim() || null, frequency: this.form.frequency, price, active: this.form.active };
+    const request = {
+      name, language: this.form.language.trim() || null, frequency: this.form.frequency, active: this.form.active,
+      // Magazines are paid yearly, so they keep no price per copy.
+      price: daily ? price : 0,
+      subscriptionAmount: daily ? null : amount,
+      subscriptionStart: daily ? null : this.form.subscriptionStart || null,
+      subscriptionEnd: daily ? null : this.form.subscriptionEnd || null,
+    };
     this.api.savePeriodical(request, this.periodical?.id).subscribe({
       next: saved => {
         this.saving.set(false);

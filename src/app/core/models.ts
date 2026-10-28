@@ -218,9 +218,35 @@ export interface Periodical {
   price: number;
   /** False once the subscription stops; its register history stays. */
   active: boolean;
+  /** Magazines only: paid yearly. The amount (rupees) and the year it covers (ISO dates). */
+  subscriptionAmount?: number | null;
+  subscriptionStart?: string | null;
+  subscriptionEnd?: string | null;
 }
 
 export type PeriodicalRequest = Omit<Periodical, 'id'>;
+
+/** One magazine issue received and the period it covers (a week, a month, or several months combined). */
+export interface MagazineReceipt {
+  id: number;
+  receivedOn: string;
+  periodFrom: string;
+  periodTo: string;
+}
+
+export type MagazineReceiptRequest = Omit<MagazineReceipt, 'id'>;
+
+/** A weekly/fortnightly/monthly magazine in the magazine register. */
+export interface MagazineCard {
+  periodicalId: number;
+  name: string;
+  language?: string | null;
+  frequency: PeriodicalFrequency;
+  subscriptionAmount?: number | null;
+  subscriptionStart?: string | null;
+  subscriptionEnd?: string | null;
+  receipts: MagazineReceipt[];
+}
 
 /** One line of a day's arrival register. */
 export interface RegisterRow {

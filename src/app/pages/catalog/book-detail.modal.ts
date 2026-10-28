@@ -14,7 +14,7 @@ import { Book, BookIssue } from '../../core/models';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
-import { IssueBookModal } from './issue-book.modal';
+import { IssueBookModal, IssueChoice } from './issue-book.modal';
 
 /** What the book card shows below the description (Figma: Details / Issue history / Edit expanded). */
 type Section = 'none' | 'details' | 'history' | 'edit';
@@ -115,9 +115,7 @@ export class BookDetailModal implements OnInit {
     this.api.saveBook(result.request, this.current()!.id).subscribe({
       next: saved => {
         this.saving.set(false);
-        this.current.set(saved);
-        this.changed = true;
-        this.onChange?.(saved);
+        this.setBook(saved);
         this.section.set('none');
         this.ui.toast('Book updated.');
       },
@@ -131,17 +129,31 @@ export class BookDetailModal implements OnInit {
   async issue() {
     const modal = await this.modals.create({ component: IssueBookModal, componentProps: { book: this.current() } });
     await modal.present();
-    const { role } = await modal.onWillDismiss();
-    if (role === 'issued') {
-      // One copy just left the shelf: show it at once, then confirm with the server in the background.
-      const book = this.current()!;
-      const issued = { ...book, availableCopies: Math.max(0, book.availableCopies - 1) };
-      this.current.set(issued);
-      this.changed = true;
-      this.onChange?.(issued);
-      this.reloadBook();
-      this.loadHistory();
+    const { data, role } = await modal.onWillDismiss<IssueChoice>();
+    if (role !== 'issue' || !data) {
+      return;
     }
+    // Show the copy as gone at once; if the server refuses, put the book back as it was.
+    const before = this.current()!;
+    this.setBook({ ...before, availableCopies: Math.max(0, before.availableCopies - 1) });
+    this.api.issueBook(before.id, data.student.id, data.days).subscribe({
+      next: () => {
+        this.ui.toast(`Issued to ${data.student.fullName}.`);
+        this.reloadBook();
+        this.loadHistory();
+      },
+      error: err => {
+        this.setBook(before);
+        this.ui.error(err, 'Could not issue the book.');
+      }
+    });
+  }
+
+  /** Shows a new state of the book here and in the Catalog row behind. */
+  private setBook(book: Book) {
+    this.current.set(book);
+    this.changed = true;
+    this.onChange?.(book);
   }
 
   remove() {
@@ -161,11 +173,7 @@ export class BookDetailModal implements OnInit {
 
   private reloadBook() {
     this.api.book(this.current()!.id).subscribe({
-      next: book => {
-        this.current.set(book);
-        this.changed = true;
-        this.onChange?.(book);
-      },
+      next: book => this.setBook(book),
       // The issue itself went through; only the copy count shown here is out of date.
       error: err => this.ui.error(err, 'Book issued, but the copy count could not be refreshed.')
     });

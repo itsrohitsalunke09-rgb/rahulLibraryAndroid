@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Magazine register</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="wrap">
+    @if (error()) {
+      <p class="page-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (cards()) {
+      @for (v of view(); track v.card.periodicalId) {
+        <section class="magazine">
+          <header class="head">
+            <span class="title">
+              <span class="name marathi">{{ v.card.name }}</span>
+              <span class="meta">{{ labels[v.card.frequency] }}{{ v.card.language ? ' · ' + v.card.language : '' }}</span>
+            </span>
+            <span class="tally" [class.short]="v.missing">
+              <strong>{{ v.received }}</strong>/{{ v.periods.length }}
+            </span>
+          </header>
+
+          <p class="subscription">
+            @if (v.card.subscriptionStart) {
+              @if ((v.card.subscriptionAmount ?? null) !== null) { <strong>{{ rupees(v.card.subscriptionAmount ?? 0) }}</strong> a year · }
+              {{ formatDate(v.card.subscriptionStart) }} – {{ formatDate(v.card.subscriptionEnd ?? undefined) }}
+            } @else {
+              No subscription dates yet: showing this calendar year. An admin can add them in the master.
+            }
+          </p>
+
+          <!-- The year at a glance: green came, red missing, grey not due yet. -->
+          <div class="strip" [class.weekly]="v.card.frequency !== 'MONTHLY'" role="list"
+               [attr.aria-label]="v.received + ' received, ' + v.missing + ' missing'">
+            @for (p of v.periods; track p.from) {
+              <span class="cell" [class]="p.state" role="listitem" [attr.title]="p.label + ': ' + p.state"
+                    [attr.aria-label]="p.label + ', ' + p.state">
+                @if (v.card.frequency === 'MONTHLY') { {{ p.label }} }
+              </span>
+            }
+          </div>
+          @if (v.missing) {
+            <p class="missing">{{ v.missing }} {{ v.card.frequency === 'MONTHLY' ? 'month' : v.card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}{{ v.missing === 1 ? '' : 's' }} missing so far</p>
+          }
+
+          @if (v.recent.length) {
+            <ul class="receipts">
+              @for (r of v.recent; track r.id) {
+                <li>
+                  <span class="what">{{ receiptLabel(r, v.card.frequency) }}</span>
+                  <span class="when">came {{ formatDate(r.receivedOn) }}</span>
+                  <button type="button" class="remove" [attr.aria-label]="'Remove ' + receiptLabel(r, v.card.frequency)" (click)="remove(v.card, r)">
+                    <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+
+          <button type="button" class="mark" (click)="markReceived(v.card)">Mark received</button>
+        </section>
+      } @empty {
+        <div class="empty-state">
+          <span class="icon empty-icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
+          <h2>No magazines yet</h2>
+          <p>Weekly, fortnightly and monthly magazines from the master show here.</p>
+        </div>
+      }
+    } @else if (!error()) {
+      <app-page-skeleton kind="report" />
+    }
+  </div>
+</ion-content>

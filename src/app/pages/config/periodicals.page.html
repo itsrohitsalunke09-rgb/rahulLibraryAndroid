@@ -39,7 +39,16 @@
                   @if (!p.active) { {{ p.language ? '·' : '' }} <strong>Not subscribed</strong> }
                 </p>
               </ion-label>
-              <span slot="end" class="price">{{ rupees(p.price) }}</span>
+              <!-- Daily papers: price per copy. Magazines: the yearly subscription. -->
+              <span slot="end" class="price">
+                @if (p.frequency === 'DAILY') {
+                  {{ rupees(p.price) }}
+                } @else if ((p.subscriptionAmount ?? null) !== null) {
+                  {{ rupees(p.subscriptionAmount ?? 0) }}<small>/yr</small>
+                } @else {
+                  <small>Yearly</small>
+                }
+              </span>
             </ion-item>
           }
         </ion-list>

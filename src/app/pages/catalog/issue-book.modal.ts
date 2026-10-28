@@ -1,12 +1,17 @@
 import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
 import {
-  IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController
+  IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { Book, UserAccount } from '../../core/models';
 import { AvatarHuePipe, InitialsPipe, MarathiPipe } from '../../core/pipes';
-import { UiService, errorMessage } from '../../core/ui.service';
+
+/** What the Issue screen hands back to Book details. */
+export interface IssueChoice {
+  student: UserAccount;
+  days: number;
+}
 
 /** Wait this long after the last keystroke before searching. */
 const SEARCH_DELAY = 300;
@@ -18,7 +23,7 @@ const LOAN_PERIODS = [7, 14, 21, 30];
   templateUrl: 'issue-book.modal.html',
   styleUrls: ['issue-book.modal.scss'],
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonFooter, IonSpinner,
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonFooter,
     MarathiPipe, InitialsPipe, AvatarHuePipe
   ],
 })
@@ -27,7 +32,6 @@ export class IssueBookModal implements OnDestroy {
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
-  private ui = inject(UiService);
 
   /** Text in the student box: what the user typed, or the chosen student's name. */
   readonly query = signal('');
@@ -37,7 +41,6 @@ export class IssueBookModal implements OnDestroy {
   readonly searching = signal(false);
   readonly searched = signal(false);
   readonly selected = signal<UserAccount | null>(null);
-  readonly saving = signal(false);
   readonly error = signal('');
   readonly periods = LOAN_PERIODS;
   readonly days = signal(14);
@@ -88,25 +91,14 @@ export class IssueBookModal implements OnDestroy {
     this.modals.dismiss(null, 'cancel');
   }
 
+  /** Closes straight away with the choice; Book details issues it and undoes the count if the server refuses. */
   issue() {
     const student = this.selected();
-    const days = this.days();
     if (!student) {
       this.error.set('Choose a student first.');
       return;
     }
-    this.saving.set(true);
-    this.error.set('');
-    this.api.issueBook(this.book.id, student.id, days).subscribe({
-      next: issue => {
-        this.ui.toast(`Issued to ${student.fullName}.`);
-        this.modals.dismiss(issue, 'issued');
-      },
-      error: err => {
-        this.saving.set(false);
-        this.error.set(errorMessage(err, 'Could not issue the book.'));
-      }
-    });
+    this.modals.dismiss({ student, days: this.days() } satisfies IssueChoice, 'issue');
   }
 
   private search(q: string) {

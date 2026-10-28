@@ -9,7 +9,7 @@ import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { Freshness } from '../../core/freshness';
 import { issueYears, openYearSelect } from '../../core/issue-years';
-import { Dashboard, DayRegister, IssueCounts, MonthReport } from '../../core/models';
+import { Dashboard, DayRegister, IssueCounts, MagazineCard } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
@@ -136,10 +136,10 @@ export class DashboardPage implements ViewWillEnter {
   private loadPapers() {
     this.papersRequest?.unsubscribe();
     const today = localIsoDate();
-    this.papersRequest = forkJoin([this.api.periodicalRegister(today), this.api.periodicalReport(today.slice(0, 7))]).subscribe({
-      next: ([day, month]) => {
+    this.papersRequest = forkJoin([this.api.periodicalRegister(today), this.api.magazines()]).subscribe({
+      next: ([day, magazines]) => {
         this.papersError.set('');
-        this.papers.set(paperSummary(day, month));
+        this.papers.set(paperSummary(day, magazines, today));
       },
       error: err => this.papersError.set(errorMessage(err, 'Could not load the newspaper register.')),
     });
@@ -153,14 +153,17 @@ export interface PaperSummary {
   magazines: { received: number; total: number };
 }
 
-/** Today's register lists every subscribed paper; the month's report says which magazines have come. */
-export function paperSummary(day: DayRegister, month: MonthReport): PaperSummary {
-  const dailies = day.rows.filter(r => r.frequency === 'DAILY');
-  const magazines = day.rows.filter(r => r.frequency !== 'DAILY');
-  const cameThisMonth = new Set(month.rows.filter(r => r.issues > 0).map(r => r.periodicalId));
+/**
+ * Today's register lists the daily papers; the magazine register says which magazines have an issue
+ * covering this month (a combined issue counts for every month it covers).
+ */
+export function paperSummary(day: DayRegister, magazines: MagazineCard[], today: string): PaperSummary {
+  const monthStart = today.slice(0, 8) + '01';
+  const monthEnd = today.slice(0, 8) + '31';
+  const coversThisMonth = (m: MagazineCard) => m.receipts.some(r => r.periodFrom <= monthEnd && r.periodTo >= monthStart);
   return {
-    newspapers: { received: dailies.filter(r => r.arrived).length, total: dailies.length },
-    magazines: { received: magazines.filter(r => cameThisMonth.has(r.periodicalId)).length, total: magazines.length },
+    newspapers: { received: day.rows.filter(r => r.arrived).length, total: day.rows.length },
+    magazines: { received: magazines.filter(coversThisMonth).length, total: magazines.length },
   };
 }
 

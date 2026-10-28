@@ -1,0 +1,90 @@
+import { localIsoDate } from './dates';
+import { MagazineCard, MagazineReceipt, PeriodicalFrequency } from './models';
+
+/** One month, fortnight or week of a magazine's subscription year, and whether its issue came. */
+export interface MagazinePeriod {
+  from: string;
+  to: string;
+  /** "Oct", "Oct 1–15" or "6 Oct". */
+  label: string;
+  /** received: an issue covers it. missing: its time has passed with no issue. upcoming: not due yet. */
+  state: 'received' | 'missing' | 'upcoming';
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function parse(iso: string): Date {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function addDays(d: Date, days: number): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + days);
+}
+
+/** The subscription year, or this calendar year when the master has no dates yet. */
+export function subscriptionWindow(card: Pick<MagazineCard, 'subscriptionStart' | 'subscriptionEnd'>, today = localIsoDate()) {
+  if (card.subscriptionStart) {
+    const start = parse(card.subscriptionStart);
+    // No end given: one year, as the server stores it.
+    const to = card.subscriptionEnd ?? localIsoDate(new Date(start.getFullYear() + 1, start.getMonth(), start.getDate() - 1));
+    return { from: card.subscriptionStart, to };
+  }
+  const year = today.slice(0, 4);
+  return { from: `${year}-01-01`, to: `${year}-12-31` };
+}
+
+/** The period one issue usually covers: the week (Mon–Sun), the half month, or the month around a date. */
+export function defaultPeriod(frequency: PeriodicalFrequency, date: string): { from: string; to: string } {
+  const d = parse(date);
+  if (frequency === 'WEEKLY') {
+    const monday = addDays(d, -((d.getDay() + 6) % 7));
+    return { from: localIsoDate(monday), to: localIsoDate(addDays(monday, 6)) };
+  }
+  const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  if (frequency === 'FORTNIGHTLY') {
+    return d.getDate() <= 15
+      ? { from: localIsoDate(new Date(d.getFullYear(), d.getMonth(), 1)), to: localIsoDate(new Date(d.getFullYear(), d.getMonth(), 15)) }
+      : { from: localIsoDate(new Date(d.getFullYear(), d.getMonth(), 16)), to: localIsoDate(monthEnd) };
+  }
+  return { from: localIsoDate(new Date(d.getFullYear(), d.getMonth(), 1)), to: localIsoDate(monthEnd) };
+}
+
+/** Every period of the subscription year, oldest first, each marked received, missing or upcoming. */
+export function magazinePeriods(card: MagazineCard, today = localIsoDate()): MagazinePeriod[] {
+  const window = subscriptionWindow(card, today);
+  const end = window.to;
+  const periods: { from: string; to: string; label: string }[] = [];
+  let cursor = defaultPeriod(card.frequency, window.from);
+  while (cursor.from <= end) {
+    const from = parse(cursor.from);
+    const label = card.frequency === 'WEEKLY'
+      ? `${from.getDate()} ${MONTHS[from.getMonth()]}`
+      : card.frequency === 'FORTNIGHTLY'
+        ? `${MONTHS[from.getMonth()]} ${from.getDate()}–${parse(cursor.to).getDate()}`
+        : MONTHS[from.getMonth()];
+    periods.push({ ...cursor, label });
+    cursor = defaultPeriod(card.frequency, localIsoDate(addDays(parse(cursor.to), 1)));
+  }
+  return periods.map(p => ({
+    ...p,
+    state: covered(p, card.receipts) ? 'received' : p.to < today ? 'missing' : 'upcoming',
+  }));
+}
+
+function covered(period: { from: string; to: string }, receipts: MagazineReceipt[]): boolean {
+  return receipts.some(r => r.periodFrom <= period.to && r.periodTo >= period.from);
+}
+
+/** "Oct 2026", or "Oct – Nov 2026" for a combined issue (any span longer than a month shows both ends). */
+export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>, frequency: PeriodicalFrequency): string {
+  const from = parse(r.periodFrom);
+  const to = parse(r.periodTo);
+  if (frequency === 'MONTHLY') {
+    const sameMonth = from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth();
+    return sameMonth
+      ? `${MONTHS[from.getMonth()]} ${from.getFullYear()}`
+      : `${MONTHS[from.getMonth()]}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${MONTHS[to.getMonth()]} ${to.getFullYear()}`;
+  }
+  return `${from.getDate()} ${MONTHS[from.getMonth()]} – ${to.getDate()} ${MONTHS[to.getMonth()]} ${to.getFullYear()}`;
+}

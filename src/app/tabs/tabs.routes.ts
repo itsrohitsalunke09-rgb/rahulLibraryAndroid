@@ -75,6 +75,11 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/periodical-report.page').then(m => m.PeriodicalReportPage),
       },
       {
+        path: 'config/periodicals/magazines',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/magazine-register.page').then(m => m.MagazineRegisterPage),
+      },
+      {
         path: 'profile/masters/about',
         ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/about-master.page').then(m => m.AboutMasterPage),

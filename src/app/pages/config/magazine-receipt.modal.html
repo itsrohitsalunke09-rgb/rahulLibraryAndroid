@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="cancel()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mark received</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <section class="magazine">
+      <span class="name marathi">{{ card.name }}</span>
+      <span class="meta">{{ card.frequency === 'MONTHLY' ? 'Monthly' : card.frequency === 'WEEKLY' ? 'Weekly' : 'Fortnightly' }}{{ card.language ? ' · ' + card.language : '' }}</span>
+    </section>
+
+    <label class="field">
+      <span class="label">Came on</span>
+      <span class="box">
+        <span class="icon" style="--icon: url(assets/icons/field-calendar.svg); --icon-size: 18px" aria-hidden="true"></span>
+        <input type="date" name="receivedOn" [max]="today" [(ngModel)]="receivedOn"
+               (ngModelChange)="card.frequency !== 'MONTHLY' && fillPeriod()" />
+      </span>
+    </label>
+
+    @if (card.frequency === 'MONTHLY') {
+      <h3 class="step">Issue for</h3>
+      <p class="hint">Tick more than one month for a combined issue.</p>
+      <div class="months" role="group" aria-label="Months this issue covers">
+        @for (m of months(); track m.from) {
+          <button type="button" class="month" [class.on]="picked().has(m.from)" [class.had]="m.state === 'received'"
+                  [attr.aria-pressed]="picked().has(m.from)" (click)="toggle(m)">
+            {{ m.label }}<small>{{ m.from.slice(2, 4) }}</small>
+          </button>
+        }
+      </div>
+      @if (pickedLabel()) {
+        <p class="covers">Covers <strong>{{ pickedLabel() }}</strong></p>
+      }
+    } @else {
+      <h3 class="step">Issue for</h3>
+      <div class="range">
+        <label class="field">
+          <span class="label">From</span>
+          <span class="box"><input type="date" name="periodFrom" [(ngModel)]="periodFrom" /></span>
+        </label>
+        <label class="field">
+          <span class="label">To</span>
+          <span class="box"><input type="date" name="periodTo" [min]="periodFrom" [(ngModel)]="periodTo" /></span>
+        </label>
+      </div>
+      <p class="hint">Filled in from the day it came; change it if the issue is for another {{ card.frequency === 'WEEKLY' ? 'week' : 'fortnight' }}.</p>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="bar">
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+    <button type="button" class="primary" [disabled]="saving()" (click)="save()">
+      @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+    </button>
+  </div>
+</ion-footer>

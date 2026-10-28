@@ -12,7 +12,7 @@
       </span>
       <ion-label>
         <h2>Daily newspaper register</h2>
-        <p>Tick the newspapers and magazines that came today, with their price</p>
+        <p>Tick the daily newspapers that came today, with their price</p>
       </ion-label>
       <div slot="end" class="end">
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
@@ -24,7 +24,19 @@
       </span>
       <ion-label>
         <h2>Monthly newspaper report</h2>
-        <p>Copies received, total cost and missing days</p>
+        <p>Daily newspapers: copies received, total cost and missing days</p>
+      </ion-label>
+      <div slot="end" class="end">
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
+      </div>
+    </ion-item>
+    <ion-item button detail="false" routerLink="/tabs/config/periodicals/magazines">
+      <span slot="start" class="master-icon" aria-hidden="true">
+        <span class="icon" style="--icon: url(assets/icons/book.svg); --icon-size: 20px"></span>
+      </span>
+      <ion-label>
+        <h2>Magazine register</h2>
+        <p>Weekly and monthly magazines: issues received against the yearly subscription</p>
       </ion-label>
       <div slot="end" class="end">
         <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
