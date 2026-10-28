@@ -79,6 +79,11 @@ export const routes: Routes = [
         ...STAFF_ONLY,
         loadComponent: () => import('../pages/config/magazine-register.page').then(m => m.MagazineRegisterPage),
       },
+      {
+        path: 'config/periodicals/magazines/:frequency',
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/magazine-register.page').then(m => m.MagazineRegisterPage),
+      },
       // Reports live under the Dashboard tab, so back stays in it.
       {
         path: 'dashboard/reports',

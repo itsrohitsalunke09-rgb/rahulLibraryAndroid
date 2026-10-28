@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
   IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
@@ -6,7 +7,7 @@ import {
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
-import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, byFrequency } from '../../core/models';
+import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency, byFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
 import { MagazineDetailModal } from './magazine-detail.modal';
@@ -33,6 +34,9 @@ export class MagazineRegisterPage implements ViewWillEnter {
   readonly error = signal('');
   readonly query = signal('');
   readonly labels = FREQUENCY_LABELS;
+  /** Opened from a साप्ताहिक / मासिक card: only that kind; otherwise every magazine, grouped. */
+  readonly frequency = inject(ActivatedRoute).snapshot.paramMap.get('frequency') as PeriodicalFrequency | null;
+  readonly title = this.frequency ? MARATHI_FREQUENCY[this.frequency] : 'Magazine register';
   readonly receiptLabel = receiptLabel;
 
   /** Each magazine's counts and latest issue, grouped by frequency and narrowed by the search box. */
@@ -40,6 +44,7 @@ export class MagazineRegisterPage implements ViewWillEnter {
     const today = localIsoDate();
     const q = this.query().toLowerCase();
     const rows = (this.cards() ?? [])
+      .filter(card => !this.frequency || card.frequency === this.frequency)
       .filter(card => !q || `${card.name} ${card.language ?? ''}`.toLowerCase().includes(q))
       .map(card => {
         const periods = magazinePeriods(card, today);

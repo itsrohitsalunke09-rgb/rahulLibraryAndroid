@@ -5,42 +5,17 @@
 </ion-header>
 
 <ion-content>
-  <ion-list inset="true" lines="full">
-    <ion-item button detail="false" routerLink="/tabs/config/periodicals/register">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/sheet.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Daily newspaper register</h2>
-        <p>Tick the daily newspapers that came today, with their price</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/config/periodicals/report">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/clock.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Monthly newspaper report</h2>
-        <p>Daily newspapers: copies received, total cost and missing days</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/config/periodicals/magazines">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/book.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Magazine register</h2>
-        <p>Weekly and monthly magazines: issues received against the yearly subscription</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-  </ion-list>
+  <!-- Same cards as Dashboard › Reports, but each opens its register for marking. -->
+  <div class="wrap">
+    @for (c of cards; track c.link) {
+      <a class="report" [class]="c.tone" [routerLink]="c.link">
+        <span class="icon kind" [style.--icon]="'url(assets/icons/' + c.icon + '.svg)'" aria-hidden="true"></span>
+        <span class="text">
+          <span class="title marathi" lang="mr">{{ c.title }}</span>
+          <span class="sub">{{ c.sub }}</span>
+        </span>
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+      </a>
+    }
+  </div>
 </ion-content>

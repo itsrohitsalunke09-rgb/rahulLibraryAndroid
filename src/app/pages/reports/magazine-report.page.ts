@@ -9,17 +9,12 @@ import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { magazinePeriods } from '../../core/magazine-periods';
-import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, PeriodicalFrequency } from '../../core/models';
+import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { magazinePdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { MagazineDetailModal } from '../config/magazine-detail.modal';
-
-/** Marathi names on the report cards and titles. */
-export const MARATHI_FREQUENCY: Record<PeriodicalFrequency, string> = {
-  DAILY: 'दैनिके', WEEKLY: 'साप्ताहिक', FORTNIGHTLY: 'पाक्षिक', MONTHLY: 'मासिक',
-};
 
 /**
  * One kind of magazine (weekly or monthly) as cells: each magazine's subscription year, green

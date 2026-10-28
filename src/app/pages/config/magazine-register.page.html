@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>Magazine register</ion-title>
+    <ion-title [class.marathi]="frequency">{{ title }}</ion-title>
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar placeholder="Search name or language" [debounce]="200"
@@ -22,7 +22,9 @@
 
   @if (cards()) {
     @for (group of groups(); track group.frequency) {
-      <h2 class="section-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
+      @if (!frequency) {
+        <h2 class="section-title">{{ labels[group.frequency] }} <span class="group-count">{{ group.items.length }}</span></h2>
+      }
       <ion-list inset="true" lines="full">
         @for (v of group.items; track v.card.periodicalId) {
           <!-- One line per magazine; tap for its year strip, issues and Mark received. -->

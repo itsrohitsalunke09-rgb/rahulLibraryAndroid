@@ -317,3 +317,8 @@ export type ClippingRequest = Omit<Clipping, 'id'>;
 export function tel(number: string): string {
   return 'tel:' + number.replace(/[^0-9+]/g, '');
 }
+
+/** Marathi names for the register and report cards and titles. */
+export const MARATHI_FREQUENCY: Record<PeriodicalFrequency, string> = {
+  DAILY: 'दैनिके', WEEKLY: 'साप्ताहिक', FORTNIGHTLY: 'पाक्षिक', MONTHLY: 'मासिक',
+};
