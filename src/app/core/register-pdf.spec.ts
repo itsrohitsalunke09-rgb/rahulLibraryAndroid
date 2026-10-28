@@ -134,9 +134,9 @@ describe('shortPrice', () => {
 });
 
 describe('magazineTable', () => {
-  it('puts each month’s issue numbers in its cell, with totals per magazine and per month', () => {
+  it('puts each month’s issue numbers in its cell, the yearly price last, issue counts and the price total below', () => {
     const t = magazineTable([
-      { periodicalId: 1, name: 'India Today', frequency: 'WEEKLY', receipts: [
+      { periodicalId: 1, name: 'India Today', frequency: 'WEEKLY', subscriptionAmount: 1500, receipts: [
         { id: 2, issueNo: 41, receivedOn: '2026-10-12', periodFrom: '2026-10-12', periodTo: '2026-10-18' },
         { id: 1, issueNo: 40, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-11' },
         { id: 3, issueNo: 1, receivedOn: '2025-12-29', periodFrom: '2025-12-29', periodTo: '2026-01-04' },
@@ -145,12 +145,14 @@ describe('magazineTable', () => {
         { id: 4, issueNo: null, receivedOn: '2026-02-05', periodFrom: '2026-02-05', periodTo: '2026-02-05' },
       ] },
     ], 2026);
-    expect(t.header).toEqual(['Magazine', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Issues']);
+    expect(t.header).toEqual(['Magazine', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Price Rs.']);
     expect(t.body[0][10]).toBe('40,41');
-    expect(t.body[0][13]).toBe('2');
+    expect(t.body[0][13]).toBe('1500');
+    expect(t.body[1][13]).toBe('');
     expect(t.body[1][2]).toBe('*');
     expect(t.totals[10]).toBe('2');
     expect(t.totals[1]).toBe('');
-    expect(t.totals[13]).toBe('3');
+    expect(t.totals[0]).toBe('Total');
+    expect(t.totals[13]).toBe('1500');
   });
 });

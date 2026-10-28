@@ -484,7 +484,8 @@ const MAGAZINES_PER_PAGE = 25;
 
 /**
  * A year of magazines as a table: magazines down, months across. Each cell holds the issue
- * numbers (अंक) that came that month, blank when none did; totals per magazine and per month.
+ * numbers (अंक) that came that month, blank when none did. The last column is each magazine's
+ * yearly subscription price; the bottom row counts issues per month and totals the prices.
  */
 export function magazineTable(cards: MagazineCard[], year: number): RegisterTable {
   const inMonth = (card: MagazineCard, m: number) => card.receipts
@@ -492,16 +493,20 @@ export function magazineTable(cards: MagazineCard[], year: number): RegisterTabl
     .sort((a, b) => (a.issueNo ?? 0) - (b.issueNo ?? 0));
   const counts = cards.map(card => MONTHS.map((_, m) => inMonth(card, m).length));
   return {
-    header: ['Magazine', ...MONTHS, 'Issues'],
+    header: ['Magazine', ...MONTHS, 'Price Rs.'],
     body: cards.map((card, i) => [
       card.name,
       // Issues recorded before numbering began show as *.
       ...MONTHS.map((_, m) => inMonth(card, m).map(r => r.issueNo ?? '*').join(',')),
-      String(counts[i].reduce((a, b) => a + b, 0)),
+      card.subscriptionAmount == null ? '' : shortPrice(card.subscriptionAmount),
     ]),
-    totals: ['Issues', ...MONTHS.map((_, m) => String(counts.reduce((sum, c) => sum + c[m], 0) || '')),
-      String(counts.flat().reduce((a, b) => a + b, 0))],
+    totals: ['Total', ...MONTHS.map((_, m) => String(counts.reduce((sum, c) => sum + c[m], 0) || '')),
+      shortPrice(subscriptionTotal(cards))],
   };
+}
+
+function subscriptionTotal(cards: MagazineCard[]): number {
+  return cards.reduce((sum, c) => sum + (c.subscriptionAmount ?? 0), 0);
 }
 
 /** One kind of magazine for a calendar year as a landscape A4 PDF, 25 magazines a page. Ready to save. */
@@ -510,7 +515,7 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
   for (let i = 0; i < Math.max(cards.length, 1); i += MAGAZINES_PER_PAGE) {
     const table = magazineTable(cards.slice(i, i + MAGAZINES_PER_PAGE), year);
     pages.push(drawTablePage([{ heading: String(year), table }], library, 'landscape', `${title} - ${year}`,
-      `Issues received in ${year}: ${magazineTable(cards, year).totals.at(-1)}`, 'Cell = issue numbers (अंक) that came; blank = none'));
+      `Total subscription: Rs. ${subscriptionTotal(cards).toLocaleString('en-IN')}`, 'Cell = issue numbers (अंक) that came; blank = none'));
   }
   return buildPdf(pages);
 }
