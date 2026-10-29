@@ -125,3 +125,28 @@
 .export {
   margin-top: 14px;
 }
+
+/* "Show all 200 students" / "Show all 23 books". */
+.more {
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 16px;
+  border: 1px solid var(--app-accent);
+  border-radius: 100px;
+  background: var(--app-surface);
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.in-card {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--app-rule);
+    border-radius: 0;
+    background: transparent;
+    padding: 12px 0;
+  }
+}

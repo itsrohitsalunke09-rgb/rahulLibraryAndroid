@@ -6,7 +6,7 @@ import {
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
-import { bookMoves, bubbleSize, readers } from '../../core/book-moves';
+import { Reader, bookMoves, bubbleSize, readers } from '../../core/book-moves';
 import { formatDate, localIsoDate } from '../../core/dates';
 import { BookIssue } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
@@ -14,6 +14,10 @@ import { AvatarHuePipe, InitialsPipe, MarathiPipe } from '../../core/pipes';
 import { bookMovesPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
+
+/** Circles shown before "Show all", and books per student before "Show all N books". */
+const TOP_CIRCLES = 12;
+const BOOKS_SHOWN = 3;
 
 /**
  * पुस्तकांची देवाण घेवाण: a month of books given and returned, student by student. Each student is
@@ -46,6 +50,21 @@ export class BookReportPage implements ViewWillEnter {
   /** The student whose circle was tapped; null shows everyone. */
   readonly selected = signal<number | null>(null);
   readonly shown = computed(() => this.readers().filter(r => this.selected() === null || r.studentId === this.selected()));
+  /** With ~200 students, the circles start with the busiest few; "Show all" lists everyone. */
+  readonly allCircles = signal(false);
+  readonly circles = computed(() => (this.allCircles() ? this.readers() : this.readers().slice(0, TOP_CIRCLES)));
+  /** Students whose full book list is open; others show their latest few. */
+  readonly openBooks = signal<ReadonlySet<number>>(new Set());
+  readonly booksShown = BOOKS_SHOWN;
+
+  /** A student's books, the latest few unless opened (or picked by their circle). */
+  booksOf(r: Reader) {
+    return this.openBooks().has(r.studentId) || this.selected() === r.studentId ? r.books : r.books.slice(0, BOOKS_SHOWN);
+  }
+
+  showAllBooks(studentId: number) {
+    this.openBooks.update(open => new Set(open).add(studentId));
+  }
 
   /** Circle size for a student, against the busiest one this month. */
   size(books: number) {
@@ -101,6 +120,8 @@ export class BookReportPage implements ViewWillEnter {
     const month = this.month();
     this.issues.set(null);
     this.selected.set(null);
+    this.allCircles.set(false);
+    this.openBooks.set(new Set());
     this.error.set('');
     this.api.issuesMovedInMonth(month).subscribe({
       next: list => {

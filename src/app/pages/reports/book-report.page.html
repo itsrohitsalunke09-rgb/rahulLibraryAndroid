@@ -35,7 +35,7 @@
       @if (moves().length) {
         <!-- A circle per student, bigger for more books; tap one to see just their books. -->
         <div class="card bubbles" role="list" aria-label="Students by books this month">
-          @for (r of readers(); track r.studentId) {
+          @for (r of circles(); track r.studentId) {
             <button type="button" class="reader" role="listitem" [class.picked]="selected() === r.studentId"
                     [class.faded]="selected() !== null && selected() !== r.studentId"
                     [attr.aria-pressed]="selected() === r.studentId"
@@ -50,6 +50,9 @@
             </button>
           }
         </div>
+        @if (readers().length > circles().length) {
+          <button type="button" class="more" (click)="allCircles.set(true)">Show all {{ readers().length }} students</button>
+        }
         <p class="hint">{{ selected() === null ? 'Tap a student to see only their books.' : 'Tap the circle again to see everyone.' }}</p>
 
         @for (r of shown(); track r.studentId) {
@@ -57,7 +60,7 @@
             <span class="group-count">{{ r.books.length }} book{{ r.books.length === 1 ? '' : 's' }} · {{ r.given }} given · {{ r.returned }} returned</span>
           </h2>
           <div class="card">
-            @for (b of r.books; track b.issue.id) {
+            @for (b of booksOf(r); track b.issue.id) {
               <div class="move">
                 <span class="what">
                   <span class="name" [class.marathi]="b.issue.category | marathi">{{ b.issue.bookTitle }}</span>
@@ -69,6 +72,9 @@
                 </span>
                 <span class="kind" [class]="b.moves[b.moves.length - 1].kind">{{ b.moves[b.moves.length - 1].kind === 'out' ? 'With student' : 'Returned' }}</span>
               </div>
+            }
+            @if (booksOf(r).length < r.books.length) {
+              <button type="button" class="more in-card" (click)="showAllBooks(r.studentId)">Show all {{ r.books.length }} books</button>
             }
           </div>
         }
