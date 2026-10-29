@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-  IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
+  IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
@@ -22,7 +22,7 @@ import { ImportBooksModal } from './import-books.modal';
   templateUrl: 'catalog.page.html',
   styleUrls: ['catalog.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
     IonSegment, IonSegmentButton, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe,
     PageSkeletonComponent
   ],

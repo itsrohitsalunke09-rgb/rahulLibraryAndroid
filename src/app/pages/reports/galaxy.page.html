@@ -1,7 +1,8 @@
 <ion-header class="space-header">
   <ion-toolbar>
+    <!-- Staff come from the books report, students from My books. -->
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/dashboard/reports/BOOKS" text=""></ion-back-button>
+      <ion-back-button [defaultHref]="meId === undefined ? '/tabs/dashboard/reports/BOOKS' : '/tabs/my-books'" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Reading Galaxy</ion-title>
     <ion-buttons slot="end">
@@ -30,9 +31,9 @@
     @for (p of planets(); track p.studentId) {
       <div class="orbit" [style.left.px]="p.x - p.r" [style.top.px]="p.y - p.r"
            [style.animation-duration.s]="p.duration" [style.animation-delay.s]="p.delay">
-        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" role="listitem" [style.--hue]="p.hue"
+        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" [class.me]="p.studentId === meId" role="listitem" [style.--hue]="p.hue"
                 [style.width.px]="p.r * 2" [style.height.px]="p.r * 2"
-                [attr.aria-label]="p.reader.studentName + ', ' + p.reader.books + ' book' + (p.reader.books === 1 ? '' : 's')"
+                [attr.aria-label]="(p.studentId === meId ? 'You, ' : p.reader.studentName + ', ') + p.reader.books + ' book' + (p.reader.books === 1 ? '' : 's')"
                 (click)="open(p.reader)">
           @if (p.named) {
             @if (planetName(p.kind); as name) {
@@ -66,7 +67,7 @@
   }
 
   @if (readers()?.length) {
-    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · {{ mode() === '3d' ? 'drag to turn' : 'pinch to zoom' }} · i for the guide</p>
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader ·{{ meId !== undefined ? ' you twinkle ·' : '' }} {{ mode() === '3d' ? 'drag to turn' : 'pinch to zoom' }} · i for the guide</p>
   }
 
   <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->

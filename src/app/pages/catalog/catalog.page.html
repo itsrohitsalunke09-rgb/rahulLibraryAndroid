@@ -1,6 +1,12 @@
 <!-- Built from Figma "rahul-library" › Catalog - Mobile (node 15:952). -->
 <ion-header>
   <ion-toolbar>
+    <!-- Staff come here from Registers. -->
+    @if (auth.isStaff()) {
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+      </ion-buttons>
+    }
     <ion-title>
       Catalog
       @if (tab() === 'books') {

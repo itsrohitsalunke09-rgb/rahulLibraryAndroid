@@ -55,6 +55,13 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/config.page').then(m => m.ConfigPage),
       },
       {
+        // Staff open the catalog from Registers (they have no Catalog tab).
+        path: 'config/catalog',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/catalog/catalog.page').then(m => m.CatalogPage),
+      },
+      {
         path: 'profile/masters',
         ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/masters.page').then(m => m.MastersPage),
@@ -152,7 +159,7 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/my-books/my-books.page').then(m => m.MyBooksPage),
       },
       {
-        // Students reach the Reading Galaxy from My books, when given Galaxy view.
+        // Students reach the Reading Galaxy from My books, when given Galaxy view; their own planet twinkles.
         path: 'my-books/galaxy',
         canMatch: [roleGuard(['STUDENT'])],
         ...GALAXY,

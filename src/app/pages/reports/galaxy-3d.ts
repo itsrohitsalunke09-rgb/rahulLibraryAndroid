@@ -39,6 +39,15 @@ export function prepare3d(): Promise<unknown> {
   return maps;
 }
 
+/**
+ * How far the camera starts so most planets fit across the screen; a tall phone
+ * screen starts further out than a wide one.
+ */
+export function fitDistance(aspect: number): number {
+  const across = 2 * Math.tan((55 / 2) * Math.PI / 180) * Math.max(aspect, 0.1);
+  return Math.min(Math.max(120 / across, 111), 360);
+}
+
 /** Repeatable random numbers in [0, 1). */
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -117,9 +126,12 @@ function stars(scene: Scene, round: Texture) {
 /**
  * Starts the 3D Reading Galaxy in host: the top reader is the Sun at the centre, lighting everyone; the rest
  * orbit it as textured planets and dwarf planets (sized by books), with names on the named ones. Drag to
- * turn, pinch to zoom; a tap (not a drag) on a body calls onPick with the student's id.
+ * turn, pinch to zoom; a tap (not a drag) on a body calls onPick with the student's id. The body of meId
+ * (the student looking) twinkles like a star.
  */
-export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (studentId: number) => void): Promise<Galaxy3d> {
+export async function start3d(
+  host: HTMLElement, bodies: Body3d[], onPick: (studentId: number) => void, meId?: number,
+): Promise<Galaxy3d> {
   const surfaces = await prepare3d() as Map<PlanetKind, CanvasImageSource>;
   const renderer = new WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -128,13 +140,17 @@ export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (stud
 
   const scene = new Scene();
   scene.background = new Color(0x020309);
-  const camera = new PerspectiveCamera(55, host.clientWidth / host.clientHeight, 0.5, 2000);
+  const camera = new PerspectiveCamera(55, 1, 0.5, 2000);
   camera.position.set(0, 48, 100);
+  // The host may still be hidden (no size) here; the first real size sets the starting distance.
+  let fitted = false;
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
+  // Gentle pinch and wheel: half of Three.js's default speed.
+  controls.zoomSpeed = 0.5;
   controls.minDistance = 18;
-  controls.maxDistance = 320;
+  controls.maxDistance = 420;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.35;
 
@@ -153,6 +169,7 @@ export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (stud
   const meshes: Mesh[] = [];
   const spinning: { group: Group; orbit: ReturnType<typeof orbitLayout>[number] }[] = [];
   const ringTexture = texture(paintRings());
+  let twinkle: Sprite | null = null;
 
   for (const orbit of orbitLayout(bodies)) {
     const body = kinds.get(orbit.studentId)!;
@@ -177,6 +194,12 @@ export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (stud
       }));
       glow.scale.setScalar(orbit.radius * 5);
       group.add(glow);
+    }
+    if (body.studentId === meId) {
+      twinkle = new Sprite(new SpriteMaterial({
+        map: texture(paintGlow('rgba(255,255,255,1)', 'rgba(150,200,255,0.45)')), blending: AdditiveBlending, depthWrite: false,
+      }));
+      group.add(twinkle);
     }
     if (body.kind === 'saturn') {
       const ring = new RingGeometry(orbit.radius * 1.35, orbit.radius * 2.3, 64);
@@ -224,6 +247,10 @@ export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (stud
     renderer.setSize(host.clientWidth, host.clientHeight);
     camera.aspect = host.clientWidth / Math.max(host.clientHeight, 1);
     camera.updateProjectionMatrix();
+    if (!fitted && host.clientWidth && host.clientHeight) {
+      camera.position.setLength(fitDistance(camera.aspect));
+      fitted = true;
+    }
   });
   resize.observe(host);
 
@@ -238,6 +265,12 @@ export async function start3d(host: HTMLElement, bodies: Body3d[], onPick: (stud
       group.position.x = Math.cos(orbit.angle) * orbit.distance;
       group.position.z = Math.sin(orbit.angle) * orbit.distance;
       group.children[0].rotation.y += dt * 0.25;
+    }
+    if (twinkle) {
+      // Bright and dim about once a second, never fully out, so the student can find themself.
+      const glow = 0.5 + 0.5 * Math.sin(now / 160);
+      twinkle.material.opacity = 0.35 + 0.65 * glow;
+      twinkle.scale.setScalar(Math.max(twinkle.parent!.children[0].scale.x, 1.2) * (8 + 6 * glow));
     }
     controls.update();
     renderer.render(scene, camera);

@@ -5,6 +5,7 @@ import {
 import {
   GalaxyView, MAX_ZOOM, PLANET_GUIDE, clampView, floatTiming, layoutGalaxy, planetHue, planetName, planetTiers, zoomAt,
 } from '../../core/galaxy';
+import { AuthService } from '../../core/auth.service';
 import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
 import { paintGalaxySky } from '../../core/galaxy-sky';
 import { ReaderCount } from '../../core/models';
@@ -15,6 +16,8 @@ import { ReaderProfileModal } from './reader-profile.modal';
 const NAME_FROM_R = 28;
 /** A finger moving more than this (px) is a drag, not a tap. */
 const DRAG = 8;
+/** Pinch zoom follows the fingers at this power (below 1 is gentler than the fingers). */
+const PINCH = 0.6;
 
 /**
  * Reading Galaxy: deep space with a spiral galaxy, and each student who read this year as a body of the
@@ -23,7 +26,7 @@ const DRAG = 8;
  * All fit on one screen and can be zoomed (pinch, drag, wheel, double-tap or the buttons); the bigger ones
  * carry the body's name; a tap opens the student's reading profile; the guide explains the bodies.
  * It opens in 2D; the 3D view (Three.js, its own lazy chunk) gets ready in the background and a 3D
- * button appears once it is.
+ * button appears once it is. When a student opens it, their own body twinkles like a star.
  */
 @Component({
   selector: 'app-galaxy',
@@ -40,6 +43,9 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, O
   private resize?: ResizeObserver;
 
   private store = inject(GalaxyReadersStore);
+  private auth = inject(AuthService);
+  /** The student looking, whose body twinkles; staff have none. */
+  readonly meId = this.auth.isStaff() ? undefined : this.auth.user()?.id;
   readonly year = this.store.year;
   /** Shown at once from the copy saved on the phone, then refreshed. */
   readonly readers = this.store.readers;
@@ -141,7 +147,7 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, O
         this.moved = 0;
         void this.open(reader);
       }
-    });
+    }, this.meId);
   }
 
   private stop3d() {
@@ -190,7 +196,7 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, O
     const [w, h] = this.size();
     if (this.pointers.size === 2) {
       const other = [...this.pointers.entries()].find(([id]) => id !== e.pointerId)![1];
-      const factor = Math.hypot(now.x - other.x, now.y - other.y) / Math.max(Math.hypot(before.x - other.x, before.y - other.y), 1);
+      const factor = Math.pow(Math.hypot(now.x - other.x, now.y - other.y) / Math.max(Math.hypot(before.x - other.x, before.y - other.y), 1), PINCH);
       const mid = { x: (now.x + other.x) / 2, y: (now.y + other.y) / 2 };
       const shifted = { ...this.view(), x: this.view().x + (now.x - before.x) / 2, y: this.view().y + (now.y - before.y) / 2 };
       this.view.set(zoomAt(shifted, factor, mid.x, mid.y, w, h));
@@ -222,7 +228,7 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, O
     e.preventDefault();
     const { x, y } = this.local(e);
     const [w, h] = this.size();
-    this.view.set(zoomAt(this.view(), e.deltaY < 0 ? 1.15 : 1 / 1.15, x, y, w, h));
+    this.view.set(zoomAt(this.view(), e.deltaY < 0 ? 1.08 : 1 / 1.08, x, y, w, h));
   }
 
   private local(e: { clientX: number; clientY: number }) {
@@ -235,9 +241,10 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, O
     return [el.clientWidth, el.clientHeight];
   }
 
-  /** The student's reading profile, with their place among this year's readers (not after a drag). */
+  /** The student's reading profile, with their place among this year's readers (not after a drag; students see only their own). */
   async open(reader: ReaderCount) {
-    if (this.moved > DRAG) {
+    // A student may open only their own profile, not other students'.
+    if (this.moved > DRAG || (this.meId !== undefined && reader.studentId !== this.meId)) {
       return;
     }
     const list = this.readers() ?? [];
