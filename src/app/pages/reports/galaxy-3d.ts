@@ -45,7 +45,7 @@ export function prepare3d(): Promise<unknown> {
  */
 export function fitDistance(aspect: number): number {
   const across = 2 * Math.tan((55 / 2) * Math.PI / 180) * Math.max(aspect, 0.1);
-  return Math.min(Math.max(120 / across, 111), 360);
+  return Math.min(Math.max(100 / across, 111), 360);
 }
 
 /** Repeatable random numbers in [0, 1). */

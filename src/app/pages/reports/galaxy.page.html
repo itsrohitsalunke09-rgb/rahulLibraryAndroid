@@ -6,68 +6,27 @@
     </ion-buttons>
     <ion-title>Reading Galaxy</ion-title>
     <ion-buttons slot="end">
-      <!-- Shows once the 3D view is ready in the background. -->
-      @if (ready3d()) {
-        <button type="button" class="view-button" [attr.aria-label]="mode() === '3d' ? 'Show in 2D' : 'Show in 3D'" (click)="toggle3d()">
-          {{ mode() === '3d' ? '2D' : '3D' }}
-        </button>
-      }
       <button type="button" class="guide-button" aria-label="Planet guide" (click)="guideOpen.set(true)">i</button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<!-- One screen, no scrolling: every reader fits in the sky. -->
+<!-- One screen, no scrolling: drag to turn, pinch to zoom, tap a body for the reader's profile. -->
 <ion-content [scrollY]="false" class="space">
-  <!-- Pinch, drag, wheel or double-tap to zoom (up to 4×) and move around; a drag never opens a profile. -->
-  <!-- The 3D view draws here when chosen. -->
-  <div class="three" #three [class.on]="mode() === '3d'"></div>
-  <div class="viewport" #viewport [class.off]="mode() === '3d'" (pointerdown)="down($event)" (pointermove)="move($event)" (pointerup)="up($event)"
-       (pointercancel)="up($event)" (wheel)="wheel($event)">
-  <div class="world" [style.transform]="transform()">
-  <!-- Stars, nebulae and the spiral galaxy, painted once per screen size. -->
-  <canvas #space class="cosmos" aria-hidden="true"></canvas>
-  <div class="sky" #sky role="list" [attr.aria-label]="(readers()?.length ?? 0) + ' readers in ' + year">
-    @for (p of planets(); track p.studentId) {
-      <div class="orbit" [style.left.px]="p.x - p.r" [style.top.px]="p.y - p.r"
-           [style.animation-duration.s]="p.duration" [style.animation-delay.s]="p.delay">
-        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" [class.me]="p.studentId === meId" role="listitem" [style.--hue]="p.hue"
-                [style.width.px]="p.r * 2" [style.height.px]="p.r * 2"
-                [attr.aria-label]="(p.studentId === meId ? 'You, ' : p.reader.studentName + ', ') + p.reader.books + ' book' + (p.reader.books === 1 ? '' : 's')"
-                (click)="open(p.reader)">
-          @if (p.named) {
-            @if (planetName(p.kind); as name) {
-              <span class="name" [style.font-size.px]="p.r * 0.28">{{ name }}</span>
-            }
-            <span class="books" [style.font-size.px]="p.r * 0.2">{{ p.reader.books }} book{{ p.reader.books === 1 ? '' : 's' }}</span>
-          }
-        </button>
-      </div>
-    }
+  <div class="three" #three role="img" [attr.aria-label]="(readers()?.length ?? 0) + ' readers in ' + year + ' as planets'"></div>
 
-    @if (error()) {
-      <p class="message" role="alert">{{ error() }}</p>
-    } @else if (!readers()) {
-      <p class="message">Gathering the planets…</p>
-    } @else if (!readers()!.length) {
-      <p class="message">No books read yet in {{ year }}. The galaxy fills up as books are given.</p>
-    }
-  </div>
-  </div>
-  </div>
-
-  @if (readers()?.length && mode() === '2d') {
-    <div class="zoom" role="group" aria-label="Zoom">
-      <button type="button" aria-label="Zoom in" [disabled]="view().scale >= maxZoom" (click)="zoomBy(1.6)">+</button>
-      <button type="button" aria-label="Zoom out" [disabled]="view().scale <= 1" (click)="zoomBy(1 / 1.6)">&minus;</button>
-      @if (view().scale > 1) {
-        <button type="button" class="reset" aria-label="Show the whole galaxy" (click)="reset()">&#8634;</button>
-      }
-    </div>
+  @if (error()) {
+    <p class="message" role="alert">{{ error() }}</p>
+  } @else if (unsupported()) {
+    <p class="message">This phone can't show the 3D galaxy.</p>
+  } @else if (readers()?.length === 0) {
+    <p class="message">No books read yet in {{ year }}. The galaxy fills up as books are given.</p>
+  } @else if (!shown()) {
+    <p class="message">Gathering the planets…</p>
   }
 
   @if (readers()?.length) {
-    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader ·{{ meId !== undefined ? ' you twinkle ·' : '' }} {{ mode() === '3d' ? 'drag to turn' : 'pinch to zoom' }} · i for the guide</p>
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader ·{{ meId !== undefined ? ' you twinkle ·' : '' }} drag to turn · i for the guide</p>
   }
 
   <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->
