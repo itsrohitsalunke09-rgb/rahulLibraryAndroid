@@ -163,6 +163,8 @@ export class BookDetailModal implements OnInit {
         this.busy.set(false);
         this.requested.set(true);
         this.ui.toast('Request sent to the librarian.');
+        // The Catalog then shows it under My books › Requests.
+        this.modals.dismiss(null, 'requested');
       },
       error: err => {
         this.busy.set(false);

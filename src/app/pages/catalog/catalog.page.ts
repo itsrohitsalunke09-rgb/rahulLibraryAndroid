@@ -4,6 +4,7 @@ import {
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { searchClippings, yearsLabel } from '../../core/clippings';
@@ -36,6 +37,7 @@ export class CatalogPage implements ViewWillEnter {
   /** What this role may do (Roles & permissions). */
   protected perms = inject(PermissionsStore);
   private searchbar = viewChild<IonSearchbar>('bookSearch');
+  private router = inject(Router);
 
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
@@ -118,12 +120,7 @@ export class CatalogPage implements ViewWillEnter {
             this.api.suggestBook({ title: v.title.trim(), author: v.author?.trim() || undefined, note: v.note?.trim() || undefined }).subscribe({
               next: () => {
                 this.ui.toast('Thanks! Your suggestion is sent to the librarian.');
-                // Back to the whole catalog: the search that found nothing is done with.
-                const box = this.searchbar();
-                if (box) {
-                  box.value = '';
-                }
-                this.search('');
+                this.showMine('SUGGESTED');
               },
               error: err => this.ui.error(err, 'Could not send the suggestion.'),
             });
@@ -148,7 +145,19 @@ export class CatalogPage implements ViewWillEnter {
     const { role } = await modal.onWillDismiss<Book>();
     if (role === 'deleted') {
       this.books.remove(b => b.id === book.id);
+    } else if (role === 'requested') {
+      this.showMine('REQUESTED');
     }
+  }
+
+  /** After a request or suggestion: clear the search and open My books on the matching tab. */
+  private showMine(tab: 'REQUESTED' | 'SUGGESTED') {
+    const box = this.searchbar();
+    if (box) {
+      box.value = '';
+    }
+    this.search('');
+    this.router.navigate(['/tabs/my-books'], { queryParams: { tab } });
   }
 
   async add() {

@@ -13,7 +13,8 @@ import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PermissionsStore } from '../../core/permissions.store';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /** Tabs: books with the student, books given back, and books they requested or suggested. */
 type Tab = 'CURRENT' | 'RETURNED' | 'REQUESTED' | 'SUGGESTED';
@@ -51,6 +52,8 @@ export class MyBooksPage implements ViewWillEnter {
 
   constructor() {
     addIcons({ bookmarksOutline });
+    // The Catalog opens a tab after a request (?tab=REQUESTED) or a suggestion (?tab=SUGGESTED).
+    inject(ActivatedRoute).queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => this.setTab(params.get('tab')));
   }
 
   ionViewWillEnter() {
