@@ -159,3 +159,40 @@ export function zoomAt(view: GalaxyView, factor: number, px: number, py: number,
   const ratio = scale / view.scale;
   return clampView({ scale, x: px - (px - view.x) * ratio, y: py - (py - view.y) * ratio }, width, height);
 }
+
+/** Where a student's body sits in the 3D galaxy: its orbit around the Sun, height, size and orbit speed. */
+export interface Orbit3d {
+  studentId: number;
+  /** Distance from the Sun and starting angle (radians) on its orbit. */
+  distance: number;
+  angle: number;
+  /** Above or below the galaxy's disc. */
+  height: number;
+  radius: number;
+  /** Radians per second; nearer bodies go round faster, like real orbits. */
+  speed: number;
+}
+
+/**
+ * The 3D layout: the top reader is the Sun at the centre; everyone else orbits it, busiest readers on the
+ * inner orbits, spread around the disc with a little height so the galaxy has depth. Sizes follow books.
+ */
+export function orbitLayout(readers: { studentId: number; books: number }[]): Orbit3d[] {
+  const sorted = [...readers].sort((a, b) => b.books - a.books || a.studentId - b.studentId);
+  const most = Math.max(sorted[0]?.books ?? 1, 1);
+  return sorted.map((reader, i) => {
+    const random = seeded(hash(reader.studentId) + 11);
+    if (i === 0) {
+      return { studentId: reader.studentId, distance: 0, angle: 0, height: 0, radius: 6, speed: 0 };
+    }
+    const distance = 16 + 90 * Math.sqrt(i / Math.max(sorted.length - 1, 1)) + random() * 4;
+    return {
+      studentId: reader.studentId,
+      distance,
+      angle: i * 2.399963 + random() * 0.6,
+      height: (random() - 0.5) * (2 + distance * 0.08),
+      radius: 0.45 + 2.6 * Math.sqrt(reader.books / most),
+      speed: 0.6 / Math.sqrt(distance),
+    };
+  });
+}

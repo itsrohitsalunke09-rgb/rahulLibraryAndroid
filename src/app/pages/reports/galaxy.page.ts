@@ -1,14 +1,14 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
 import {
-  IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, ModalController, ViewWillEnter,
+  IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, ModalController, ViewDidLeave, ViewWillEnter,
 } from '@ionic/angular';
-import { ApiService } from '../../core/api.service';
 import {
   GalaxyView, MAX_ZOOM, PLANET_GUIDE, clampView, floatTiming, layoutGalaxy, planetHue, planetName, planetTiers, zoomAt,
 } from '../../core/galaxy';
+import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
 import { paintGalaxySky } from '../../core/galaxy-sky';
 import { ReaderCount } from '../../core/models';
-import { errorMessage } from '../../core/ui.service';
+import type { Galaxy3d } from './galaxy-3d';
 import { ReaderProfileModal } from './reader-profile.modal';
 
 /** Planets this big (radius, px) or bigger carry their body's name (Sun, Jupiter …). */
@@ -22,6 +22,8 @@ const DRAG = 8;
  * counts Jupiter … Ceres, and readers below those plain planets in their own colour; sized by books read.
  * All fit on one screen and can be zoomed (pinch, drag, wheel, double-tap or the buttons); the bigger ones
  * carry the body's name; a tap opens the student's reading profile; the guide explains the bodies.
+ * It opens in 2D; the 3D view (Three.js, its own lazy chunk) gets ready in the background and a 3D
+ * button appears once it is.
  */
 @Component({
   selector: 'app-galaxy',
@@ -29,17 +31,19 @@ const DRAG = 8;
   styleUrls: ['planets.scss', 'galaxy.page.scss'],
   imports: [IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent],
 })
-export class GalaxyPage implements ViewWillEnter, AfterViewInit, OnDestroy {
-  private api = inject(ApiService);
+export class GalaxyPage implements ViewWillEnter, ViewDidLeave, AfterViewInit, OnDestroy {
   private modals = inject(ModalController);
   private sky = viewChild.required<ElementRef<HTMLElement>>('sky');
   private canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('space');
   private viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
+  private threeHost = viewChild<ElementRef<HTMLElement>>('three');
   private resize?: ResizeObserver;
 
-  readonly year = new Date().getFullYear();
-  readonly readers = signal<ReaderCount[] | null>(null);
-  readonly error = signal('');
+  private store = inject(GalaxyReadersStore);
+  readonly year = this.store.year;
+  /** Shown at once from the copy saved on the phone, then refreshed. */
+  readonly readers = this.store.readers;
+  readonly error = this.store.error;
   private readonly box = signal({ width: 0, height: 0 });
   /** The planet guide (which body means what) is open. */
   readonly guideOpen = signal(false);
@@ -61,6 +65,13 @@ export class GalaxyPage implements ViewWillEnter, AfterViewInit, OnDestroy {
   private moved = 0;
   private lastTap = 0;
 
+  /** 2D (the default) or 3D. */
+  readonly mode = signal<'2d' | '3d'>('2d');
+  /** The 3D view has loaded and its planet maps are ready (drawn once, then from the phone's cache). */
+  readonly ready3d = signal(false);
+  private galaxy3d?: Galaxy3d;
+  private module3d?: typeof import('./galaxy-3d');
+
   /** Each planet with what the template needs: place, colour, float timing, and the name when it fits. */
   readonly planets = computed(() => {
     const readers = this.readers() ?? [];
@@ -78,10 +89,64 @@ export class GalaxyPage implements ViewWillEnter, AfterViewInit, OnDestroy {
   });
 
   ionViewWillEnter() {
-    this.api.readersInYear(this.year).subscribe({
-      next: list => { this.readers.set(list); this.error.set(''); },
-      error: err => this.error.set(errorMessage(err, 'Could not load this year’s readers.')),
+    this.store.refresh();
+    this.load3d();
+    if (this.mode() === '3d') {
+      void this.show3d();
+    }
+  }
+
+  /** Leaving the screen stops the 3D view, so it doesn't use the battery in the background. */
+  ionViewDidLeave() {
+    this.stop3d();
+  }
+
+  /** Loads the 3D view in the background (once) and gets its planet maps ready; then the 3D button shows. */
+  private load3d() {
+    if (this.module3d) {
+      return;
+    }
+    void import('./galaxy-3d').then(async m => {
+      if (!m.supports3d()) {
+        return;
+      }
+      this.module3d = m;
+      await m.prepare3d();
+      this.ready3d.set(true);
+    }).catch(() => undefined);
+  }
+
+  async toggle3d() {
+    if (this.mode() === '3d') {
+      this.stop3d();
+      this.mode.set('2d');
+    } else {
+      this.mode.set('3d');
+      await this.show3d();
+    }
+  }
+
+  private async show3d() {
+    const host = this.threeHost()?.nativeElement;
+    if (!this.module3d || !host || this.galaxy3d) {
+      return;
+    }
+    const tiers = this.tiers();
+    const readers = this.readers() ?? [];
+    const bodies = readers.map(r => ({ studentId: r.studentId, books: r.books, kind: tiers.get(r.studentId) ?? 'other' as const, hue: planetHue(r.studentId) }));
+    const byId = new Map(readers.map(r => [r.studentId, r]));
+    this.galaxy3d = await this.module3d.start3d(host, bodies, id => {
+      const reader = byId.get(id);
+      if (reader) {
+        this.moved = 0;
+        void this.open(reader);
+      }
     });
+  }
+
+  private stop3d() {
+    this.galaxy3d?.dispose();
+    this.galaxy3d = undefined;
   }
 
   ngAfterViewInit() {
@@ -96,6 +161,7 @@ export class GalaxyPage implements ViewWillEnter, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.resize?.disconnect();
+    this.stop3d();
   }
 
   zoomBy(factor: number) {

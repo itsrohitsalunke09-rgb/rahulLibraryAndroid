@@ -26,6 +26,20 @@ ion-content.space {
   touch-action: none;
 }
 
+.viewport.off {
+  visibility: hidden;
+}
+
+/* The 3D view, over the 2D one while chosen. */
+.three {
+  position: absolute;
+  inset: 0;
+  display: none;
+  touch-action: none;
+
+  &.on { display: block; }
+}
+
 .world {
   position: absolute;
   inset: 0;
@@ -218,4 +232,18 @@ ion-content.space {
   }
 
   .reset { font-size: 18px; }
+}
+
+/* 3D / 2D switch, next to the guide. */
+.view-button {
+  height: 30px;
+  margin-inline-end: 8px;
+  padding: 0 12px;
+  border: 1.5px solid #c9cfee;
+  border-radius: 100px;
+  background: transparent;
+  color: #eef1ff;
+  font: 700 13px/1 system-ui, sans-serif;
+  letter-spacing: 0.5px;
+  cursor: pointer;
 }

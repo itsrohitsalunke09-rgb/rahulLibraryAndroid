@@ -10,7 +10,8 @@ import { ApiService } from '../../core/api.service';
 import { bookMoves, readers } from '../../core/book-moves';
 import { localIsoDate } from '../../core/dates';
 import { planetHue, planetTiers } from '../../core/galaxy';
-import { ReaderCount, StudentSummary } from '../../core/models';
+import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
+import { StudentSummary } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { RouterLink } from '@angular/router';
 import { bookMovesPdf } from '../../core/register-pdf';
@@ -46,8 +47,9 @@ export class BookReportPage implements ViewWillEnter {
   readonly error = signal('');
   readonly exporting = signal(false);
 
-  /** This year's books per student, the most first (for the Reading Galaxy banner); null until loaded. */
-  readonly yearReaders = signal<ReaderCount[] | null>(null);
+  private galaxy = inject(GalaxyReadersStore);
+  /** This year's books per student, the most first (for the Reading Galaxy banner); saved on the phone. */
+  readonly yearReaders = this.galaxy.readers;
 
   /** The banner's top readers drawn as their bodies (the Sun first). */
   readonly tiers = computed(() => planetTiers(this.yearReaders() ?? []));
@@ -113,10 +115,7 @@ export class BookReportPage implements ViewWillEnter {
   }
 
   private loadYear(done?: () => void) {
-    this.api.readersInYear(this.thisYear).subscribe({
-      next: list => { this.yearReaders.set(list); done?.(); },
-      error: err => { this.error.set(errorMessage(err, 'Could not load this year’s readers.')); done?.(); },
-    });
+    this.galaxy.refresh(done);
   }
 
   private load(done?: () => void) {

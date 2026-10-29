@@ -1,4 +1,4 @@
-import { clampView, layoutGalaxy, planetHue, planetName, planetTiers, zoomAt } from './galaxy';
+import { clampView, layoutGalaxy, orbitLayout, planetHue, planetName, planetTiers, zoomAt } from './galaxy';
 
 describe('layoutGalaxy', () => {
   function check(count: number, width: number, height: number) {
@@ -81,5 +81,18 @@ describe('galaxy zoom', () => {
     expect(zoomAt({ scale: 3, x: -500, y: -900 }, 3, 0, 0, 360, 640).scale).toBe(4);
     expect(zoomAt({ scale: 1.5, x: -100, y: -100 }, 0.1, 0, 0, 360, 640)).toEqual({ scale: 1, x: 0, y: 0 });
     expect(clampView({ scale: 2, x: 50, y: -2000 }, 360, 640)).toEqual({ scale: 2, x: 0, y: -640 });
+  });
+});
+
+describe('orbitLayout', () => {
+  it('putsTheTopReaderInTheMiddleAndBusierReadersCloser', () => {
+    const readers = Array.from({ length: 30 }, (_, i) => ({ studentId: i + 1, books: 30 - i }));
+    const orbits = orbitLayout(readers);
+    const of = (id: number) => orbits.find(o => o.studentId === id)!;
+    expect(of(1).distance).toBe(0);
+    expect(of(2).distance).toBeLessThan(of(30).distance);
+    expect(of(2).radius).toBeGreaterThan(of(30).radius);
+    expect(of(2).speed).toBeGreaterThan(of(30).speed);
+    expect(orbitLayout(readers)).toEqual(orbits);
   });
 });

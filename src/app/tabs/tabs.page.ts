@@ -6,6 +6,7 @@ import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angu
 import { addIcons } from 'ionicons';
 import { bookmarksOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
+import { GalaxyReadersStore } from '../core/galaxy-readers.store';
 
 const FULL_SCREEN = ['/tabs/dashboard/reports/galaxy'];
 
@@ -29,6 +30,10 @@ export class TabsPage {
 
   constructor() {
     addIcons({ bookmarksOutline });
+    // The Reading Galaxy's saved readers are brought up to date each time the app starts.
+    if (this.auth.isStaff()) {
+      inject(GalaxyReadersStore).refresh();
+    }
   }
 
   /**

@@ -5,6 +5,12 @@
     </ion-buttons>
     <ion-title>Reading Galaxy</ion-title>
     <ion-buttons slot="end">
+      <!-- Shows once the 3D view is ready in the background. -->
+      @if (ready3d()) {
+        <button type="button" class="view-button" [attr.aria-label]="mode() === '3d' ? 'Show in 2D' : 'Show in 3D'" (click)="toggle3d()">
+          {{ mode() === '3d' ? '2D' : '3D' }}
+        </button>
+      }
       <button type="button" class="guide-button" aria-label="Planet guide" (click)="guideOpen.set(true)">i</button>
     </ion-buttons>
   </ion-toolbar>
@@ -13,7 +19,9 @@
 <!-- One screen, no scrolling: every reader fits in the sky. -->
 <ion-content [scrollY]="false" class="space">
   <!-- Pinch, drag, wheel or double-tap to zoom (up to 4×) and move around; a drag never opens a profile. -->
-  <div class="viewport" #viewport (pointerdown)="down($event)" (pointermove)="move($event)" (pointerup)="up($event)"
+  <!-- The 3D view draws here when chosen. -->
+  <div class="three" #three [class.on]="mode() === '3d'"></div>
+  <div class="viewport" #viewport [class.off]="mode() === '3d'" (pointerdown)="down($event)" (pointermove)="move($event)" (pointerup)="up($event)"
        (pointercancel)="up($event)" (wheel)="wheel($event)">
   <div class="world" [style.transform]="transform()">
   <!-- Stars, nebulae and the spiral galaxy, painted once per screen size. -->
@@ -47,7 +55,7 @@
   </div>
   </div>
 
-  @if (readers()?.length) {
+  @if (readers()?.length && mode() === '2d') {
     <div class="zoom" role="group" aria-label="Zoom">
       <button type="button" aria-label="Zoom in" [disabled]="view().scale >= maxZoom" (click)="zoomBy(1.6)">+</button>
       <button type="button" aria-label="Zoom out" [disabled]="view().scale <= 1" (click)="zoomBy(1 / 1.6)">&minus;</button>
@@ -58,7 +66,7 @@
   }
 
   @if (readers()?.length) {
-    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · pinch to zoom · i for the guide</p>
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · {{ mode() === '3d' ? 'drag to turn' : 'pinch to zoom' }} · i for the guide</p>
   }
 
   <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->
