@@ -157,7 +157,7 @@ export async function start3d(
   controls.minDistance = 18;
   controls.maxDistance = 420;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.21;
+  controls.autoRotateSpeed = 0.15;
   // The slow turn pauses while a finger is down (it fought the drag), and comes back 3 s after.
   let resumeTurn: ReturnType<typeof setTimeout> | undefined;
   const onStart = () => {
