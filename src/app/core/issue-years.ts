@@ -1,10 +1,10 @@
-/** The app started recording issues in 2025; earlier years have nothing to show. */
-export const FIRST_ISSUE_YEAR = 2025;
+/** The first year every year dropdown offers. */
+export const FIRST_YEAR = 1994;
 
-/** This year back to the first year of issues, newest first. Built here, so the dropdown opens at once. */
+/** This year back to 1994, newest first. Built here, so the dropdown opens at once. */
 export function issueYears(today = new Date()): number[] {
-  const latest = Math.max(today.getFullYear(), FIRST_ISSUE_YEAR);
-  return Array.from({ length: latest - FIRST_ISSUE_YEAR + 1 }, (_, i) => latest - i);
+  const latest = Math.max(today.getFullYear(), FIRST_YEAR);
+  return Array.from({ length: latest - FIRST_YEAR + 1 }, (_, i) => latest - i);
 }
 
 /**

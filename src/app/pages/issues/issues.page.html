@@ -15,7 +15,7 @@
     <ion-toolbar>
       <!-- The year comes first: the page opens on it, and it narrows the other tabs too. -->
       <ion-segment [value]="filter()" (ionChange)="setFilter($event.detail.value)" [scrollable]="true">
-        <ion-segment-button value="YEAR" (click)="openYears($event)">
+        <ion-segment-button value="YEAR" (click)="yearPicker.open($event)">
           <span class="year-label">
             {{ year() }}{{ count('YEAR') !== null ? ' (' + count('YEAR') + ')' : '' }}
             <span class="icon year-caret" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
@@ -32,13 +32,7 @@
 <ion-content>
   <!-- Opened by the Year tab; kept outside the header so focusing it never
        scrolls the tab row out of sight. Picks which year's issues (by issued date) to show. -->
-  <ion-select #yearSelect class="year-select" interface="popover" aria-label="Issue year"
-              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year()"
-              (ionChange)="setYear($event.detail.value)">
-    @for (y of years(); track y) {
-      <ion-select-option [value]="y">{{ y }}</ion-select-option>
-    }
-  </ion-select>
+  <app-year-select #yearPicker label="Issue year" [value]="year()" (yearChange)="setYear($event)" />
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>

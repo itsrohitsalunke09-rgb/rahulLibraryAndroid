@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonTitle,
-  AlertController, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
+  IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
@@ -12,6 +12,7 @@ import { localIsoDate } from '../../core/dates';
 import { planetHue, planetTiers } from '../../core/galaxy';
 import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
 import { StudentSummary } from '../../core/models';
+import { YearSelectComponent } from '../../core/year-select.component';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { RouterLink } from '@angular/router';
 import { bookMovesPdf } from '../../core/register-pdf';
@@ -31,14 +32,13 @@ import { StudentBooksModal } from './student-books.modal';
   styleUrls: ['../config/periodical-report.page.scss', 'planets.scss', 'book-report.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    IonList, IonItem, IonLabel, RouterLink, PageSkeletonComponent,
+    IonList, IonItem, IonLabel, RouterLink, PageSkeletonComponent, YearSelectComponent,
   ],
 })
 export class BookReportPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
   private modals = inject(ModalController);
-  private alerts = inject(AlertController);
   /** What this role may do (Roles & permissions). */
   protected perms = inject(PermissionsStore);
 
@@ -76,23 +76,11 @@ export class BookReportPage implements ViewWillEnter {
     await modal.present();
   }
 
-  /** Asks which year, then saves that year's books given and returned, student by student, as a portrait PDF. */
-  async exportPdf() {
+  /** Saves the picked year's books given and returned, student by student, as a portrait PDF. */
+  async exportPdf(year: number) {
     if (this.exporting()) {
       return;
     }
-    const alert = await this.alerts.create({
-      header: 'Export PDF',
-      subHeader: 'Which year?',
-      inputs: [0, 1, 2].map(i => ({ type: 'radio' as const, label: String(this.thisYear - i), value: this.thisYear - i, checked: i === 0 })),
-      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
-    });
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss<{ values: number }>();
-    if (role !== 'confirm' || !data?.values) {
-      return;
-    }
-    const year = data.values;
     this.exporting.set(true);
     try {
       // The year's months up to now; an issue given in one month and returned in another comes back twice.

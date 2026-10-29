@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
@@ -10,7 +10,7 @@ import { addIcons } from 'ionicons';
 import { swapHorizontalOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
-import { issueYears, openYearSelect } from '../../core/issue-years';
+import { YearSelectComponent } from '../../core/year-select.component';
 import { clearLinkFilters } from '../../core/link-filters';
 import { BookIssue, IssueCounts, Page } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
@@ -32,9 +32,9 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'YEAR'];
   styleUrls: ['../catalog/catalog.page.scss', 'issues.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
-    IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSelect, IonSelectOption,
+    IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe,
-    PageSkeletonComponent
+    PageSkeletonComponent, YearSelectComponent
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -48,8 +48,6 @@ export class IssuesPage implements ViewWillEnter {
   readonly filter = signal<Filter>('YEAR');
   /** Year that narrows every tab; starts on the current year. */
   readonly year = signal(new Date().getFullYear());
-  readonly years = signal(issueYears());
-  private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
   readonly query = signal('');
   readonly counts = signal<IssueCounts | null>(null);
   readonly returning = signal<number | null>(null);
@@ -98,16 +96,7 @@ export class IssuesPage implements ViewWillEnter {
     this.issues.reset();
   }
 
-  /** Opens the year list under the Year tab (also when tapped again to change the year). */
-  openYears(event: Event) {
-    return openYearSelect(this.yearSelect()?.nativeElement, event);
-  }
-
-  setYear(value: unknown) {
-    const year = Number(value);
-    if (!Number.isInteger(year) || year <= 0) {
-      return;
-    }
+  setYear(year: number) {
     this.year.set(year);
     this.filter.set('YEAR');
     this.issues.reset();

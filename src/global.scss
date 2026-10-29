@@ -685,10 +685,12 @@ ion-skeleton-text {
   --background: rgba(var(--ion-text-color-rgb), 0.07);
 }
 
-/* Year dropdown (Dashboard, Issues): a short list under the chip that scrolls when it grows. */
+/* The year dropdown (app-year-select): three years at a time under the chip, scroll for the rest. */
 ion-popover.year-popover {
   --width: 160px;
-  --max-height: 50vh;
+  --max-height: calc(3 * 48px);
+
+  ion-item { --min-height: 48px; }
 }
 
 /* ---- Dialogs, toasts, modals ---- */

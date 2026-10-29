@@ -85,18 +85,6 @@ button {
   }
 }
 
-/* The year list is opened from the chip; the select itself stays out of sight. */
-.year-select {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Overdue and out-with-students tiles. */
 .circulation {
   display: grid;

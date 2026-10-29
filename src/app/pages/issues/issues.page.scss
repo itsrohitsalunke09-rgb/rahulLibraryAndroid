@@ -20,14 +20,3 @@
   --icon-size: 14px;
 }
 
-/* The year list is opened from the Year tab; the select itself stays out of sight. */
-.year-select {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}

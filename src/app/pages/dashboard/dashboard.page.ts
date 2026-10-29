@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent, IonHeader, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSkeletonText, IonTitle,
@@ -8,7 +8,7 @@ import { Subscription, forkJoin, of } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { Freshness } from '../../core/freshness';
-import { issueYears, openYearSelect } from '../../core/issue-years';
+import { YearSelectComponent } from '../../core/year-select.component';
 import { Dashboard, DayRegister, IssueCounts, MagazineCard } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
@@ -30,8 +30,8 @@ interface Tile {
   templateUrl: 'dashboard.page.html',
   styleUrls: ['dashboard.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText, IonSelect,
-    IonSelectOption, PageSkeletonComponent],
+    IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonSkeletonText,
+    PageSkeletonComponent, YearSelectComponent],
 })
 export class DashboardPage implements ViewWillEnter {
   private api = inject(ApiService);
@@ -57,8 +57,6 @@ export class DashboardPage implements ViewWillEnter {
   readonly papersError = signal('');
   /** Year for the issue numbers; starts on the current year, null = all years. */
   readonly year = signal<number | null>(new Date().getFullYear());
-  readonly years = signal(issueYears());
-  private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
   private request?: Subscription;
   private papersRequest?: Subscription;
   private freshness = new Freshness();
@@ -71,11 +69,6 @@ export class DashboardPage implements ViewWillEnter {
 
   refresh(event: RefresherCustomEvent) {
     this.load(() => event.target.complete());
-  }
-
-  /** Opens the year list under the chip; the years are built in the app, so it opens at once. */
-  openYears(event: Event) {
-    return openYearSelect(this.yearSelect()?.nativeElement, event);
   }
 
   setYear(value: unknown) {

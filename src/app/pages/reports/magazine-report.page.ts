@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
-  AlertController, IonBackButton, IonButtons, IonContent, IonHeader, IonRefresher, IonRefresherContent, IonTitle, IonToolbar,
+  IonBackButton, IonButtons, IonContent, IonHeader, IonRefresher, IonRefresherContent, IonTitle, IonToolbar,
   ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
@@ -10,6 +10,7 @@ import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { magazinePeriods } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency } from '../../core/models';
+import { YearSelectComponent } from '../../core/year-select.component';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { magazinePdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
@@ -26,12 +27,12 @@ import { MagazineDetailModal } from '../config/magazine-detail.modal';
   styleUrls: ['../config/magazine-strip.scss', '../config/magazine-detail.modal.scss', 'magazine-report.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent, PageSkeletonComponent,
+    YearSelectComponent,
   ],
 })
 export class MagazineReportPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
-  private alerts = inject(AlertController);
   private modals = inject(ModalController);
 
   readonly frequency = inject(ActivatedRoute).snapshot.paramMap.get('frequency') as PeriodicalFrequency;
@@ -75,24 +76,11 @@ export class MagazineReportPage implements ViewWillEnter {
     await modal.present();
   }
 
-  /** Asks which calendar year, then saves these magazines' issue numbers month by month as a PDF. */
-  async exportPdf() {
+  /** Saves these magazines' issue numbers month by month for the picked calendar year as a PDF. */
+  async exportPdf(year: number) {
     if (this.exporting()) {
       return;
     }
-    const thisYear = new Date().getFullYear();
-    const alert = await this.alerts.create({
-      header: `Export ${this.label} PDF`,
-      subHeader: 'Which year?',
-      inputs: [0, 1, 2].map(i => ({ type: 'radio' as const, label: String(thisYear - i), value: thisYear - i, checked: i === 0 })),
-      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
-    });
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss<{ values: number }>();
-    if (role !== 'confirm' || !data?.values) {
-      return;
-    }
-    const year = data.values;
     const cards = this.view().map(v => v.card);
     this.exporting.set(true);
     try {

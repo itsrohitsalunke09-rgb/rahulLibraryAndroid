@@ -36,7 +36,9 @@
             </span>
           </button>
         }
-        <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
+        <!-- Which year: the app's year dropdown, under the button. -->
+        <app-year-select #pdfYear label="PDF year" (yearChange)="exportPdf($event)" />
+        <button type="button" class="secondary export" [disabled]="exporting()" (click)="pdfYear.open($event)">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
           Export {{ label }} PDF…
         </button>

@@ -37,7 +37,9 @@
       <!-- Students heading with the year PDF on the right. -->
       <div class="list-head">
         <h2 class="section-title">Students <span class="group-count">{{ list.length }} · all years</span></h2>
-        <button type="button" class="export-pdf" [disabled]="exporting()" (click)="exportPdf()"
+        <!-- Which year: the app's year dropdown, under the button. -->
+        <app-year-select #pdfYear label="PDF year" (yearChange)="exportPdf($event)" />
+        <button type="button" class="export-pdf" [disabled]="exporting()" (click)="pdfYear.open($event)"
                 aria-label="Export a year as PDF">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 16px" aria-hidden="true"></span>
           Export PDF

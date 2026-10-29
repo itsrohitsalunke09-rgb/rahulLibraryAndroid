@@ -10,14 +10,7 @@
 
 <ion-content>
   <!-- Opened by the year chip; kept out of the header so focusing it never scrolls anything. -->
-  <ion-select #yearSelect class="year-select" interface="popover" aria-label="Dashboard year"
-              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year() ?? 0"
-              (ionChange)="setYear($event.detail.value)">
-    <ion-select-option [value]="0">All years</ion-select-option>
-    @for (y of years(); track y) {
-      <ion-select-option [value]="y">{{ y }}</ion-select-option>
-    }
-  </ion-select>
+  <app-year-select #yearPicker label="Dashboard year" [value]="year()" (yearChange)="setYear($event)" />
 
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -31,7 +24,7 @@
     <!-- Books: the year filter applies to the issue numbers (overdue, out with students). -->
     <div class="filter-row">
       <h2 class="section">Books <span class="filter-text">{{ year() ? 'issued in ' + year() : 'all years' }}</span></h2>
-      <button type="button" class="year-chip" [class.active]="year()" (click)="openYears($event)" aria-label="Choose year">
+      <button type="button" class="year-chip" [class.active]="year()" (click)="yearPicker.open($event)" aria-label="Choose year">
         {{ year() ?? 'All years' }}
         <span class="icon" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
       </button>
