@@ -9,6 +9,7 @@ import { AuthService } from '../../core/auth.service';
 import { formatDate, localIsoDate } from '../../core/dates';
 import { FREQUENCY_LABELS, RegisterRow, byFrequency, rupees, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 /** One editable line: price is a string while typing. */
@@ -28,6 +29,8 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   readonly today = localIsoDate();
   readonly date = signal(this.today);

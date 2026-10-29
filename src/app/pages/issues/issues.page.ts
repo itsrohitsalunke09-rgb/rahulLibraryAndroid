@@ -16,6 +16,7 @@ import { BookIssue, IssueCounts, Page } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService } from '../../core/ui.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 /**
@@ -40,6 +41,8 @@ export class IssuesPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
   private route = inject(ActivatedRoute);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
   private router = inject(Router);
 
   readonly filter = signal<Filter>('ALL');

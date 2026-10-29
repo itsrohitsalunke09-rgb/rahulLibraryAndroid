@@ -1,7 +1,8 @@
 import { inject } from '@angular/core';
-import { CanMatchFn, Router } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { Role } from './models';
+import { Permission, PermissionsStore } from './permissions.store';
 
 /** Signed-in pages. Also signs out if the stored session or profile has been cleared. */
 export const authGuard: CanMatchFn = () => {
@@ -21,4 +22,9 @@ export function roleGuard(roles: Role[]): CanMatchFn {
     const role = auth.role();
     return role && roles.includes(role) ? true : inject(Router).parseUrl(auth.homeUrl());
   };
+}
+
+/** Screens that need a permission from the Roles & permissions master; without it, a "no permission" page. */
+export function permissionGuard(permission: Permission): CanActivateFn {
+  return () => inject(PermissionsStore).can(permission) ? true : inject(Router).parseUrl('/tabs/no-access');
 }

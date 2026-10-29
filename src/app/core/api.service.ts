@@ -9,6 +9,7 @@ import {
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
+import type { PermissionMatrix } from './permissions.store';
 
 /** Thin wrapper over the Spring Boot API (same endpoints the website uses). */
 @Injectable({ providedIn: 'root' })
@@ -127,6 +128,15 @@ export class ApiService {
       params = params.set('year', year);
     }
     return this.http.get<Page<BookIssue>>(`${this.base}/issues/issued`, { params });
+  }
+
+  /** Roles & permissions master: each role's permissions (admin always all). */
+  permissions() {
+    return this.http.get<PermissionMatrix>(`${this.base}/permissions`);
+  }
+
+  savePermissions(matrix: PermissionMatrix) {
+    return this.http.put<PermissionMatrix>(`${this.base}/permissions`, matrix);
   }
 
   /** Books report circles: how many books each student was given in the year, the most first. */

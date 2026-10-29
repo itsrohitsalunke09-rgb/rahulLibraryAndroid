@@ -14,6 +14,7 @@ import { errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
+import { PermissionsStore } from '../../core/permissions.store';
 import { ImportBooksModal } from './import-books.modal';
 
 @Component({
@@ -30,6 +31,8 @@ export class CatalogPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
   protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');

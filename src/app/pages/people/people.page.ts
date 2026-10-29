@@ -14,6 +14,7 @@ import { PagedList } from '../../core/paged-list';
 import { AvatarHuePipe, InitialsPipe } from '../../core/pipes';
 import { UiService } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { PermissionsStore } from '../../core/permissions.store';
 import { UserFormModal } from './user-form.modal';
 
 @Component({
@@ -34,6 +35,8 @@ export class PeoplePage implements ViewWillEnter {
   private modals = inject(ModalController);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   readonly query = signal('');
   readonly people = new PagedList<UserAccount>((page, size) => this.fetch(page, size), 'Could not load people.');

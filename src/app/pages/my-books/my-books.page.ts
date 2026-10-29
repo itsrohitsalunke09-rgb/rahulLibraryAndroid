@@ -11,6 +11,8 @@ import { BookIssue } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { PermissionsStore } from '../../core/permissions.store';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-my-books',
@@ -20,11 +22,13 @@ import { PageSkeletonComponent } from '../../core/page-skeleton.component';
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
     IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe,
-    PageSkeletonComponent
+    PageSkeletonComponent, RouterLink,
   ],
 })
 export class MyBooksPage implements ViewWillEnter {
   private api = inject(ApiService);
+  /** The Reading Galaxy shows here when the student role has Galaxy view. */
+  protected perms = inject(PermissionsStore);
 
   readonly issues = new PagedList<BookIssue>((page, size) => this.api.myIssues(page, size), 'Could not load your books.');
   /** Books still with the student, most urgent (earliest due) first; history is listed separately. */

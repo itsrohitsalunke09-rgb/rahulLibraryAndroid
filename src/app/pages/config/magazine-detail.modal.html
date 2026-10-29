@@ -53,14 +53,18 @@
           <li>
             <span class="no marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
             <span class="when">{{ label(r) }}</span>
+            @if (perms.can('DELETE')) {
             <button type="button" class="remove" [disabled]="removing() === r.id"
                     [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : label(r))" (click)="remove(r)">
               <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
             </button>
+            }
           </li>
         }
       </ul>
-      <p class="hint">Tap × on an issue marked by mistake.</p>
+      @if (perms.can('DELETE')) {
+        <p class="hint">Tap × on an issue marked by mistake.</p>
+      }
     } @else {
       <p class="hint">No issues recorded yet.</p>
     }
@@ -76,7 +80,9 @@
         Call
       </a>
     }
-    <button type="button" class="primary" (click)="markReceived()">Mark received</button>
+    @if (perms.can('WRITE')) {
+      <button type="button" class="primary" (click)="markReceived()">Mark received</button>
+    }
   </div>
 </ion-footer>
 }

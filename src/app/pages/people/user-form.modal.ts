@@ -13,6 +13,7 @@ import { AuthService } from '../../core/auth.service';
 import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
 import { Role, UserAccount, UserRequest } from '../../core/models';
 import { RoleLabelPipe } from '../../core/pipes';
+import { PermissionsStore } from '../../core/permissions.store';
 import { UiService, errorMessage } from '../../core/ui.service';
 
 @Component({
@@ -45,6 +46,8 @@ export class UserFormModal implements OnInit, OnDestroy {
   private modals = inject(ModalController);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   form: UserRequest = { username: '', fullName: '', email: '', phone: '', role: 'STUDENT', active: true, password: '' };
   /** Librarians can't create or promote admins (enforced by the backend too). */

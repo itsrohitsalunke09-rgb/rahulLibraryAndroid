@@ -10,6 +10,7 @@ import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency, byFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { MagazineReceiptModal } from './magazine-receipt.modal';
 
 /**
@@ -29,6 +30,8 @@ import { MagazineReceiptModal } from './magazine-receipt.modal';
 export class MagazineRegisterPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   readonly cards = signal<MagazineCard[] | null>(null);
   readonly error = signal('');
@@ -74,6 +77,13 @@ export class MagazineRegisterPage implements ViewWillEnter {
 
   /** Mark received for the magazine (its cells and issues are on that screen); its line here updates straight away. */
   async open(card: MagazineCard) {
+    // Without Write, show the magazine's year and issues instead of Mark received.
+    if (!this.perms.can('WRITE')) {
+      const { MagazineDetailModal } = await import('./magazine-detail.modal');
+      const view = await this.modals.create({ component: MagazineDetailModal, componentProps: { card } });
+      await view.present();
+      return;
+    }
     const modal = await this.modals.create({
       component: MagazineReceiptModal,
       componentProps: { card, onChange: (receipts: MagazineReceipt[]) => this.update(card.periodicalId, receipts) },

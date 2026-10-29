@@ -5,6 +5,7 @@ import { formatDate } from '../../core/dates';
 import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MagazineCard, MagazineReceipt, rupees, tel } from '../../core/models';
 import { UiService } from '../../core/ui.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { MagazineReceiptModal } from './magazine-receipt.modal';
 
 /**
@@ -26,6 +27,8 @@ export class MagazineDetailModal implements OnInit {
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
   private ui = inject(UiService);
 
   readonly receipts = signal<MagazineReceipt[]>([]);

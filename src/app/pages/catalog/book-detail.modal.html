@@ -203,7 +203,7 @@
         }
 
         <!-- Issue section; hidden while editing, as in the Edit frame. -->
-        @if (auth.isStaff() && section() !== 'edit') {
+        @if (auth.isStaff() && perms.can('WRITE') && section() !== 'edit') {
           <div class="issue-area">
             @if (book.availableCopies < 1) {
               <p class="reason">No copies available to issue</p>
@@ -218,12 +218,12 @@
         <!-- Menu: floats over the card under the "more options" button. -->
         @if (menuOpen()) {
           <div class="menu" role="menu">
-            @if (auth.isStaff()) {
+            @if (perms.can('UPDATE')) {
               <button role="menuitem" (click)="show('edit')">
                 <ion-icon name="pencil-outline" aria-hidden="true"></ion-icon> Edit
               </button>
             }
-            @if (auth.isAdmin()) {
+            @if (perms.can('DELETE')) {
               <button role="menuitem" class="danger" (click)="askDelete()">
                 <ion-icon name="trash-outline" aria-hidden="true"></ion-icon> Delete
               </button>

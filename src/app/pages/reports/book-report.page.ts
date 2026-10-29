@@ -17,6 +17,7 @@ import { RouterLink } from '@angular/router';
 import { bookMovesPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { StudentBooksModal } from './student-books.modal';
 
 /**
@@ -38,6 +39,8 @@ export class BookReportPage implements ViewWillEnter {
   private ui = inject(UiService);
   private modals = inject(ModalController);
   private alerts = inject(AlertController);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
 
   readonly today = localIsoDate();
   readonly thisYear = Number(this.today.slice(0, 4));

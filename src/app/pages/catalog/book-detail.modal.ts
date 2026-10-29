@@ -14,6 +14,7 @@ import { Book, BookIssue } from '../../core/models';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
+import { PermissionsStore } from '../../core/permissions.store';
 import { IssueBookModal, IssueChoice } from './issue-book.modal';
 
 /** What the book card shows below the description (Figma: Details / Issue history / Edit expanded). */
@@ -41,6 +42,8 @@ export class BookDetailModal implements OnInit {
   private modals = inject(ModalController);
   private ui = inject(UiService);
   protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
   protected categories = inject(CategoriesStore);
 
   readonly current = signal<Book | null>(null);

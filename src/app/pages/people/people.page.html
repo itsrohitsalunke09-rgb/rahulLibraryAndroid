@@ -5,11 +5,13 @@
   <ion-toolbar class="with-actions">
     <ion-searchbar placeholder="Search people" [debounce]="350"
                    (ionInput)="search($event.detail.value)"></ion-searchbar>
-    <div slot="end" class="search-actions">
-      <button class="heading-action" aria-label="Add person" (click)="open()">
-        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
-      </button>
-    </div>
+    @if (perms.can('WRITE')) {
+      <div slot="end" class="search-actions">
+        <button class="heading-action" aria-label="Add person" (click)="open()">
+          <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+        </button>
+      </div>
+    }
   </ion-toolbar>
 </ion-header>
 

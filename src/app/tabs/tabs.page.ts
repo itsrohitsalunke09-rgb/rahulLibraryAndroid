@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { bookmarksOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
 import { GalaxyReadersStore } from '../core/galaxy-readers.store';
+import { PermissionsStore } from '../core/permissions.store';
 
 const FULL_SCREEN = ['/tabs/dashboard/reports/galaxy'];
 
@@ -30,6 +31,8 @@ export class TabsPage {
 
   constructor() {
     addIcons({ bookmarksOutline });
+    // What this role may do, brought up to date each time the app starts.
+    inject(PermissionsStore).refresh();
     // The Reading Galaxy's saved readers are brought up to date each time the app starts.
     if (this.auth.isStaff()) {
       inject(GalaxyReadersStore).refresh();

@@ -31,7 +31,7 @@
   </ion-toolbar>
   }
   @if (tab() === 'books') {
-  <ion-toolbar class="search-bar" [class.with-actions]="auth.isStaff()">
+  <ion-toolbar class="search-bar" [class.with-actions]="perms.can('WRITE')">
     <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
     <ion-searchbar
       placeholder="Title, author, reg. no."
@@ -39,7 +39,7 @@
       [debounce]="350"
       (ionInput)="search($event.detail.value)">
     </ion-searchbar>
-    @if (auth.isStaff()) {
+    @if (perms.can('WRITE')) {
       <div slot="end" class="search-actions">
         <button class="heading-action secondary" aria-label="Import books from Excel" (click)="importExcel()">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
@@ -157,7 +157,7 @@
           <p>Try part of the title, the author's name or a registration number.</p>
         } @else {
           <h2>No books in the catalog yet</h2>
-          <p>{{ auth.isStaff() ? 'Add the first book with the + button.' : 'Check back once the librarian has added books.' }}</p>
+          <p>{{ perms.can('WRITE') ? 'Add the first book with the + button.' : 'Check back once the librarian has added books.' }}</p>
         }
       </div>
     }

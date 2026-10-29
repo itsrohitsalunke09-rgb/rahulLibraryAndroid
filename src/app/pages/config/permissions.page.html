@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile/masters" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Roles &amp; permissions</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wrap">
+    <p class="intro">Tick what each role may do. Buttons for the rest are hidden over the app, and the server refuses them too.</p>
+
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (ticks()) {
+      <!-- Roles down, permissions across. -->
+      <div class="grid" role="table" aria-label="Roles and permissions">
+        <div class="row head" role="row">
+          <span class="role" role="columnheader">Role</span>
+          @for (p of permissions; track p.key) {
+            <span class="cell" role="columnheader">{{ p.label === 'Galaxy view' ? 'Galaxy' : p.label }}</span>
+          }
+        </div>
+        @for (r of roles; track r.role) {
+          <div class="row" role="row" [class.fixed]="r.fixed">
+            <span class="role" role="rowheader">
+              {{ r.label }}
+              @if (r.fixed) { <small>always all</small> }
+            </span>
+            @for (p of permissions; track p.key) {
+              <label class="cell" role="cell">
+                <input type="checkbox" [checked]="has(r.role, p.key)" [disabled]="r.fixed || saving()"
+                       [attr.aria-label]="r.label + ': ' + p.label" (change)="toggle(r.role, p.key)" />
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <dl class="legend">
+        @for (p of permissions; track p.key) {
+          <div><dt>{{ p.label }}</dt><dd>{{ p.hint }}</dd></div>
+        }
+      </dl>
+
+      <button type="button" class="save" [disabled]="saving() || !dirty()" (click)="save()">
+        @if (saving()) { <ion-spinner name="crescent"></ion-spinner> } @else { Save }
+      </button>
+      @if (dirty()) {
+        <p class="unsaved" role="status">Not saved yet.</p>
+      }
+    } @else if (!error()) {
+      <app-page-skeleton kind="form" [rows]="4" />
+    }
+  </div>
+</ion-content>
