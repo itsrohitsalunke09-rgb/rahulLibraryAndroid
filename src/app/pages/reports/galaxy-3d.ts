@@ -152,7 +152,7 @@ export async function start3d(
   controls.minDistance = 18;
   controls.maxDistance = 420;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.35;
+  controls.autoRotateSpeed = 0.21;
 
   const round = texture(paintGlow('rgba(255,255,255,1)', 'rgba(255,255,255,0.5)', 32));
   stars(scene, round);
@@ -254,17 +254,17 @@ export async function start3d(
   });
   resize.observe(host);
 
-  // Slow orbits and spins; stops when the screen is left (dispose).
+  // Slow orbits and spins (40% slower than first built); stops when the screen is left (dispose).
   let last = performance.now();
   let frame = 0;
   const tick = (now: number) => {
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
     for (const { group, orbit } of spinning) {
-      orbit.angle += orbit.speed * dt * 0.15;
+      orbit.angle += orbit.speed * dt * 0.09;
       group.position.x = Math.cos(orbit.angle) * orbit.distance;
       group.position.z = Math.sin(orbit.angle) * orbit.distance;
-      group.children[0].rotation.y += dt * 0.25;
+      group.children[0].rotation.y += dt * 0.15;
     }
     if (twinkle) {
       // Bright and dim about once a second, never fully out, so the student can find themself.
