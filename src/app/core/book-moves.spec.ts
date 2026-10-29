@@ -1,5 +1,5 @@
 import { BookIssue } from './models';
-import { bookMoves, bubbleSpan, mixed, readers } from './book-moves';
+import { bookMoves, readers } from './book-moves';
 
 const issue = (id: number, issueDate: string, returnDate?: string, studentId = 2, studentName = 'Asha'): BookIssue => ({
   id, bookId: id, bookTitle: 'Book ' + id, author: 'A', studentId, studentName, issuedByName: 'Admin',
@@ -25,18 +25,5 @@ describe('book moves', () => {
     expect(list[0].books.map(b => b.issue.id)).toEqual([1, 2]);
   });
 
-  it('sizesCirclesByBooksTheBusiestBiggest', () => {
-    expect(bubbleSpan(24, 24)).toBe(3);
-    expect(bubbleSpan(12, 24)).toBe(2);
-    expect(bubbleSpan(3, 24)).toBe(1);
-    expect(bubbleSpan(1, 1)).toBe(3);
-  });
 
-  it('mixesCirclesInAnOrderThatStaysTheSame', () => {
-    const list = Array.from({ length: 8 }, (_, i) => ({ studentId: i + 1, books: 8 - i }));
-    const once = mixed(list).map(r => r.studentId);
-    expect(once).not.toEqual(list.map(r => r.studentId));
-    expect(mixed(list).map(r => r.studentId)).toEqual(once);
-    expect([...once].sort((a, b) => a - b)).toEqual(list.map(r => r.studentId));
-  });
 });

@@ -1,0 +1,105 @@
+/* Night-sky header so the screen reads as one piece of space. */
+.space-header ion-toolbar {
+  --background: #020309;
+  --color: #eef1ff;
+  --border-width: 0;
+}
+
+.space-header ion-title {
+  color: #eef1ff;
+}
+
+ion-back-button {
+  --color: #eef1ff;
+  --icon-font-size: 22px;
+}
+
+ion-content.space {
+  --background: #020309;
+}
+
+/* The painted sky behind everything. */
+.cosmos {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The planets' box: the whole screen above the legend line. */
+.sky {
+  position: absolute;
+  inset: 8px 8px 34px;
+}
+
+/* Each planet bobs gently; the timing differs per student so they don't move together. */
+.orbit {
+  position: absolute;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit { animation: none; }
+}
+
+/* The planet itself is painted by planets.scss; here only its size, layout and the name on it. */
+.planet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 6px;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+
+  /* A thin lit atmosphere, as planets look against black space. */
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.06), 0 0 14px rgb(160 190 255 / 0.18);
+
+  &:active { filter: brightness(1.15); }
+
+  .name {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    font-weight: 700;
+    line-height: 1.1;
+    text-shadow: 0 1px 3px #000c, 0 0 2px #000a;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+  }
+
+  .books {
+    font-weight: 600;
+    opacity: 0.85;
+  }
+}
+
+.message {
+  position: absolute;
+  inset: 40% 24px auto;
+  margin: 0;
+  color: #c9cfee;
+  font-size: 14px;
+  text-align: center;
+}
+
+.legend {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  left: 12px;
+  margin: 0;
+  color: #aab2d8;
+  font-size: 12px;
+  text-align: center;
+}

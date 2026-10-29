@@ -7,11 +7,10 @@ import { Component, computed, input } from '@angular/core';
  * - register: the daily newspaper register (one group title, rows with a tick box and a price)
  * - report: the monthly report (group title, rows with an amount and the month's day cells, totals, export)
  * - strips: a magazine report (soft cards with a name, tally and the year's cells, export)
- * - bubbles: the books report's circles, one per student in different sizes
  * - dashboard: under the real Books row, the tiles, blue card, paper tiles, Reports row and list
  * - form: labelled fields
  */
-export type SkeletonKind = 'list' | 'cards' | 'register' | 'report' | 'strips' | 'bubbles' | 'dashboard' | 'form';
+export type SkeletonKind = 'list' | 'cards' | 'register' | 'report' | 'strips' | 'dashboard' | 'form';
 
 /** Row widths cycle through these, so the lines look like real text rather than a grid. */
 const TITLE = [72, 58, 66, 80, 54, 62, 76, 60, 68, 56];
@@ -42,7 +41,7 @@ export class PageSkeletonComponent {
 
   readonly items = computed(() => {
     const n = this.rows() ?? this.groups()?.reduce((a, b) => a + b, 0)
-      ?? { list: 9, cards: 3, register: 4, report: 4, strips: 3, bubbles: 0, dashboard: 3, form: 6 }[this.kind()];
+      ?? { list: 9, cards: 3, register: 4, report: 4, strips: 3, dashboard: 3, form: 6 }[this.kind()];
     return Array.from({ length: n }, (_, i) => ({ title: TITLE[i % TITLE.length], sub: SUB[i % SUB.length] }));
   });
 
@@ -56,6 +55,4 @@ export class PageSkeletonComponent {
   /** A month of day cells (two lines of 16) and a year of week cells (two lines of 27). */
   readonly dayCells = Array.from({ length: 31 });
   readonly stripCells = Array.from({ length: 53 });
-  /** Student circles of the books report, busiest first. */
-  readonly bubbleSpans = [1, 3, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1];
 }

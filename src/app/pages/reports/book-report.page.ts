@@ -1,63 +1,58 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonTitle,
-  IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
+  AlertController, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
-import { Reader, bookMoves, bubbleSpan, mixed, readers } from '../../core/book-moves';
+import { Reader, bookMoves, readers } from '../../core/book-moves';
 import { localIsoDate } from '../../core/dates';
+import { planetKind } from '../../core/galaxy';
 import { BookIssue, ReaderCount } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
-import { AvatarHuePipe, InitialsPipe } from '../../core/pipes';
+import { RouterLink } from '@angular/router';
 import { bookMovesPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { StudentBooksModal } from './student-books.modal';
 
 /**
- * पुस्तकांची देवाण घेवाण. On top, this year's readers: a circle per student, bigger for more books.
- * Below, a month of books given and returned, one line per student (tap for their books), and the
+ * पुस्तकांची देवाण घेवाण. On top, the way into the Reading Galaxy (this year's readers as planets).
+ * Below, this month's books given and returned, one line per student (tap for their books), with the
  * month's register as a PDF.
  */
 @Component({
   selector: 'app-book-report',
   templateUrl: 'book-report.page.html',
-  styleUrls: ['../config/periodical-register.page.scss', '../config/periodical-report.page.scss', 'book-report.page.scss'],
+  styleUrls: ['../config/periodical-report.page.scss', 'planets.scss', 'book-report.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    IonList, IonItem, IonLabel, InitialsPipe, AvatarHuePipe, PageSkeletonComponent,
+    IonList, IonItem, IonLabel, RouterLink, PageSkeletonComponent,
   ],
 })
 export class BookReportPage implements ViewWillEnter {
   private api = inject(ApiService);
   private ui = inject(UiService);
   private modals = inject(ModalController);
+  private alerts = inject(AlertController);
 
   readonly today = localIsoDate();
   readonly thisYear = Number(this.today.slice(0, 4));
   readonly thisMonth = this.today.slice(0, 7);
+  /** The list and PDF cover this month. */
   readonly month = signal(this.thisMonth);
   readonly issues = signal<BookIssue[] | null>(null);
   readonly error = signal('');
   readonly exporting = signal(false);
 
-  /** This year's books per student, the most first; null until loaded. */
+  /** This year's books per student, the most first (for the Reading Galaxy banner); null until loaded. */
   readonly yearReaders = signal<ReaderCount[] | null>(null);
-  /** The circles, big and small mixed together. */
-  readonly cloud = computed(() => mixed(this.yearReaders() ?? []));
-  /** The circle tapped, to show whose it is. */
-  readonly picked = signal<ReaderCount | null>(null);
 
+  readonly kind = planetKind;
   readonly moves = computed(() => bookMoves(this.issues() ?? [], this.month()));
-  readonly given = computed(() => this.moves().filter(m => m.kind === 'out').length);
   readonly readers = computed(() => readers(this.moves()));
-
-  /** Grid cells a circle spans, against the year's busiest reader. */
-  span(books: number) {
-    return bubbleSpan(books, this.yearReaders()?.[0]?.books ?? 1);
-  }
 
   ionViewWillEnter() {
     this.load();
@@ -69,10 +64,6 @@ export class BookReportPage implements ViewWillEnter {
     const settled = () => --pending || event.target.complete();
     this.load(settled);
     this.loadYear(settled);
-  }
-
-  pick(reader: ReaderCount) {
-    this.picked.update(current => (current?.studentId === reader.studentId ? null : reader));
   }
 
   /** A student's books for the month, in a popup. */
@@ -89,25 +80,39 @@ export class BookReportPage implements ViewWillEnter {
     return new Date(month + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
   }
 
-  shift(months: number) {
-    const [y, m] = this.month().split('-').map(Number);
-    const d = new Date(y, m - 1 + months, 1);
-    const next = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    if (next <= this.thisMonth) {
-      this.month.set(next);
-      this.load();
-    }
-  }
 
+  /** Asks which year, then saves that year's books given and returned, student by student, as a portrait PDF. */
   async exportPdf() {
-    if (this.exporting() || !this.moves().length) {
+    if (this.exporting()) {
       return;
     }
+    const alert = await this.alerts.create({
+      header: 'Export PDF',
+      subHeader: 'Which year?',
+      inputs: [0, 1, 2].map(i => ({ type: 'radio' as const, label: String(this.thisYear - i), value: this.thisYear - i, checked: i === 0 })),
+      buttons: [{ text: 'Cancel', role: 'cancel' }, { text: 'Save PDF', role: 'confirm' }],
+    });
+    await alert.present();
+    const { role, data } = await alert.onDidDismiss<{ values: number }>();
+    if (role !== 'confirm' || !data?.values) {
+      return;
+    }
+    const year = data.values;
     this.exporting.set(true);
     try {
+      // The year's months up to now; an issue given in one month and returned in another comes back twice.
+      const months = Array.from({ length: year === this.thisYear ? Number(this.thisMonth.slice(5)) : 12 },
+        (_, i) => `${year}-${String(i + 1).padStart(2, '0')}`);
+      const lists = await Promise.all(months.map(m => firstValueFrom(this.api.issuesMovedInMonth(m))));
+      const issues = [...new Map(lists.flat().map(issue => [issue.id, issue])).values()];
+      const yearReaders = readers(bookMoves(issues, String(year)));
+      if (!yearReaders.length) {
+        this.ui.toast(`No books were given or returned in ${year}.`, 'error');
+        return;
+      }
       this.ui.toast('Saving PDF… it will appear in Download.');
-      const where = await saveFile(await bookMovesPdf(this.readers(), this.monthName(this.month()), DEFAULT_ABOUT.title),
-        `book-transactions-${this.month()}.pdf`, 'application/pdf');
+      const where = await saveFile(await bookMovesPdf(yearReaders, String(year), DEFAULT_ABOUT.title),
+        `book-transactions-${year}.pdf`, 'application/pdf');
       this.ui.toast(`PDF saved to ${where}`);
     } catch (err) {
       this.ui.toast(err instanceof HttpErrorResponse ? errorMessage(err, 'Could not create the PDF.')
@@ -116,6 +121,7 @@ export class BookReportPage implements ViewWillEnter {
       this.exporting.set(false);
     }
   }
+
 
   private loadYear(done?: () => void) {
     this.api.readersInYear(this.thisYear).subscribe({

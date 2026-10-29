@@ -1,5 +1,5 @@
 import { MonthReport } from './models';
-import { PdfPage, bookMovesTable, buildPdf, deflate, isPlainText, magazineTable, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
+import { PdfPage, bookMovesPdf, bookMovesTable, buildPdf, deflate, isPlainText, magazineTable, packPages, registerTable, shortPrice, textWidth } from './register-pdf';
 
 /** The PDF's objects by number, with stream contents unpacked. */
 function readPdf(pdf: Uint8Array) {
@@ -171,5 +171,18 @@ describe('bookMovesTable', () => {
     expect(t.header).toEqual(['Student', 'Book', 'Reg. no.', 'Issued on', 'Returned on']);
     expect(t.body).toEqual([['Kunal (2)', 'Book 1', 'R-1', '2 Oct 2026', '9 Oct 2026'], ['', 'Book 2', 'R-2', '2 Oct 2026', '']]);
     expect(t.totals).toEqual(['Total', '2 books, 1 student', '', '2 given', '1 back']);
+    expect(t.widths?.reduce((a, b) => a + b, 0)).toBeCloseTo(1);
+  });
+});
+
+describe('bookMovesPdf', () => {
+  it('saves the year as portrait A4 pages', async () => {
+    const issue = { id: 1, bookId: 1, bookTitle: 'Yayati', author: 'A', studentId: 1, studentName: 'Kunal More',
+      issuedByName: 'Admin', issueDate: '2026-03-02', dueDate: '2026-03-16', status: 'ISSUED' as const };
+    const bytes = await bookMovesPdf([{ studentId: 1, studentName: 'Kunal More', given: 1, returned: 0,
+      books: [{ issue, moves: [{ date: '2026-03-02', kind: 'out', issue }] }] }], '2026', 'Rahul Library');
+    const text = new TextDecoder('latin1').decode(bytes);
+    expect(text).toContain('/MediaBox [0 0 595 842]');
+    expect(text).not.toContain('/MediaBox [0 0 842 595]');
   });
 });

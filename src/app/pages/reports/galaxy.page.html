@@ -1,0 +1,42 @@
+<ion-header class="space-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard/reports/BOOKS" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Reading Galaxy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- One screen, no scrolling: every reader fits in the sky. -->
+<ion-content [scrollY]="false" class="space">
+  <!-- Stars, nebulae and the spiral galaxy, painted once per screen size. -->
+  <canvas #space class="cosmos" aria-hidden="true"></canvas>
+  <div class="sky" #sky role="list" [attr.aria-label]="(readers()?.length ?? 0) + ' readers in ' + year">
+    @for (p of planets(); track p.studentId) {
+      <div class="orbit" [style.left.px]="p.x - p.r" [style.top.px]="p.y - p.r"
+           [style.animation-duration.s]="p.duration" [style.animation-delay.s]="p.delay">
+        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" role="listitem"
+                [style.width.px]="p.r * 2" [style.height.px]="p.r * 2"
+                [attr.aria-label]="p.reader.studentName + ', ' + p.reader.books + ' book' + (p.reader.books === 1 ? '' : 's')"
+                (click)="open(p.reader)">
+          @if (p.named) {
+            <span class="name" [style.font-size.px]="p.r * 0.26">{{ p.reader.studentName }}</span>
+            <span class="books" [style.font-size.px]="p.r * 0.2">{{ p.reader.books }}</span>
+          }
+        </button>
+      </div>
+    }
+
+    @if (error()) {
+      <p class="message" role="alert">{{ error() }}</p>
+    } @else if (!readers()) {
+      <p class="message">Gathering the planets…</p>
+    } @else if (!readers()!.length) {
+      <p class="message">No books read yet in {{ year }}. The galaxy fills up as books are given.</p>
+    }
+  </div>
+
+  @if (readers()?.length) {
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · bigger planet = more books · tap one</p>
+  }
+</ion-content>

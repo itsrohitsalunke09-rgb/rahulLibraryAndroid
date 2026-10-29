@@ -165,18 +165,3 @@
 .tally { width: 40px; }
 .record { height: 54px; border-radius: var(--app-radius-sheet); }
 .tile.short { height: 56px; }
-.bubbles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 40px);
-  grid-auto-rows: 40px;
-  grid-auto-flow: dense;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 12px 0;
-}
-
-.bubble { border-radius: 50%; }
-.bubble.span-2 { grid-column: span 2; grid-row: span 2; }
-.bubble.span-3 { grid-column: span 3; grid-row: span 3; }
-
-:host(.kind-bubbles) { margin: 0; }

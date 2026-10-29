@@ -1,0 +1,85 @@
+/*
+ * The solar system's planets as CSS paint, shared by the Reading Galaxy, the reading profile and the
+ * books report banner. Add `planet-skin` and one kind (mercury … neptune) to a round element.
+ */
+.planet-skin {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+
+  /* Sunlight from the top left and shadow on the far side, so each disc reads as a sphere. */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 26%, rgb(255 255 255 / 0.38) 0%, transparent 38%),
+      radial-gradient(circle at 72% 78%, rgb(0 0 0 / 0.5) 0%, transparent 62%);
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &.mercury {
+    background:
+      radial-gradient(circle at 62% 38%, #6f6a63 0 6%, transparent 7%),
+      radial-gradient(circle at 36% 66%, #7a756d 0 8%, transparent 9%),
+      radial-gradient(circle at 70% 70%, #6a655e 0 5%, transparent 6%),
+      radial-gradient(circle at 45% 40%, #c9c4bb, #9a948c 60%, #6d6860);
+  }
+
+  &.venus {
+    background:
+      linear-gradient(165deg, transparent 30%, rgb(255 255 255 / 0.18) 40%, transparent 52%),
+      linear-gradient(150deg, #f6e2ad, #e3bd6c 45%, #c99a4c);
+  }
+
+  &.earth {
+    background:
+      radial-gradient(ellipse 22% 16% at 34% 36%, #3e9b4a 0 70%, transparent 72%),
+      radial-gradient(ellipse 16% 22% at 64% 58%, #4caf50 0 70%, transparent 72%),
+      radial-gradient(ellipse 14% 10% at 46% 78%, #8bbf4f 0 70%, transparent 72%),
+      radial-gradient(ellipse 30% 8% at 50% 10%, #f2f6f8 0 70%, transparent 72%),
+      linear-gradient(170deg, transparent 40%, rgb(255 255 255 / 0.22) 46%, transparent 52%),
+      radial-gradient(circle at 45% 45%, #3b8ce0, #1d5bb0 60%, #123d7a);
+  }
+
+  &.mars {
+    background:
+      radial-gradient(ellipse 20% 12% at 40% 42%, #8e3a22 0 70%, transparent 72%),
+      radial-gradient(ellipse 14% 9% at 66% 66%, #7a2f1d 0 70%, transparent 72%),
+      radial-gradient(ellipse 24% 7% at 50% 8%, #f1e4dc 0 70%, transparent 72%),
+      radial-gradient(circle at 45% 45%, #e07a45, #b9502b 60%, #7d3019);
+  }
+
+  &.jupiter {
+    background:
+      radial-gradient(ellipse 13% 8% at 62% 64%, #b4533a 0 70%, transparent 72%),
+      linear-gradient(180deg, #ead6b3 0 12%, #c99a6b 12% 21%, #f1e2c6 21% 33%, #b5774d 33% 42%, #ecd9b8 42% 56%,
+        #c58f60 56% 66%, #f0dfc2 66% 80%, #b98058 80% 89%, #e6d0ad 89%);
+  }
+
+  &.saturn {
+    background:
+      linear-gradient(180deg, #f3e5ba 0 18%, #dcc285 18% 30%, #f0dfac 30% 46%, #cfb173 46% 56%, #ecd8a4 56% 74%,
+        #d4b77a 74% 84%, #efdeae 84%);
+  }
+
+  &.uranus {
+    background:
+      linear-gradient(175deg, transparent 44%, rgb(255 255 255 / 0.15) 50%, transparent 56%),
+      radial-gradient(circle at 40% 38%, #cdf5f8, #84d8e2 50%, #4aa9b9);
+  }
+
+  &.neptune {
+    background:
+      radial-gradient(ellipse 14% 7% at 60% 58%, #1b2c86 0 70%, transparent 72%),
+      linear-gradient(172deg, transparent 30%, rgb(255 255 255 / 0.16) 36%, transparent 42%),
+      radial-gradient(circle at 40% 38%, #7fa8ff, #3a5fe0 55%, #1d2f94);
+  }
+}

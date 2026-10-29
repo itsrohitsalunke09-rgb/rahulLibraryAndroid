@@ -24,6 +24,8 @@ export interface RegisterTable {
   body: string[][];
   /** Last row: totals; its last cell is the month's total. */
   totals: string[];
+  /** Each column's share of the table width; unset = a wide first column and the rest equal. */
+  widths?: number[];
 }
 
 /**
@@ -400,14 +402,24 @@ export function drawTablePage(tables: { heading: string; table: RegisterTable }[
   const blocks = tables.map(m => {
     const t = m.table;
     const cols = t.header.length;
-    const firstW = orientation === 'landscape' ? 132 : 46;
-    const lastW = orientation === 'landscape' ? 50 : 56;
-    const innerW = (pageW - 2 * MARGIN - firstW - lastW) / (cols - 2);
-    const colX = [MARGIN, MARGIN + firstW];
-    for (let c = 1; c < cols - 1; c++) {
-      colX.push(colX[c] + innerW);
+    const tableW = pageW - 2 * MARGIN;
+    let innerW: number;
+    let colX: number[];
+    if (t.widths) {
+      colX = [MARGIN];
+      t.widths.forEach(share => colX.push(colX[colX.length - 1] + share * tableW));
+      colX[cols] = pageW - MARGIN;
+      innerW = (tableW * (1 - t.widths[0] - t.widths[cols - 1])) / (cols - 2);
+    } else {
+      const firstW = orientation === 'landscape' ? 132 : 46;
+      const lastW = orientation === 'landscape' ? 50 : 56;
+      innerW = (tableW - firstW - lastW) / (cols - 2);
+      colX = [MARGIN, MARGIN + firstW];
+      for (let c = 1; c < cols - 1; c++) {
+        colX.push(colX[c] + innerW);
+      }
+      colX.push(pageW - MARGIN);
     }
-    colX.push(pageW - MARGIN);
     const headFont = Math.max(6.5, Math.min(9.5, innerW * 0.3));
     const headLines = t.header.map((h, c) => (orientation === 'portrait' && c > 0
       ? wrap(h, headFont, true, colX[c + 1] - colX[c] - 4, 3) : [h]));
@@ -522,8 +534,8 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
   return buildPdf(pages);
 }
 
-/** Rows on one landscape page of the book transactions register, all the same height. */
-const BOOK_ROWS_PER_PAGE = 20;
+/** Rows on one portrait page of the book transactions register, all the same height. */
+const BOOK_ROWS_PER_PAGE = 32;
 const BOOK_ROW_HEIGHT = 20;
 
 /** "5 Oct 2026". */
@@ -550,19 +562,21 @@ export function bookMovesTable(readers: Reader[]): RegisterTable {
     ])),
     totals: ['Total', `${books} book${books === 1 ? '' : 's'}, ${readers.length} student${readers.length === 1 ? '' : 's'}`, '',
       `${given} given`, `${returned} back`],
+    // Portrait A4: room for names and titles, narrower date columns.
+    widths: [0.24, 0.34, 0.12, 0.15, 0.15],
   };
 }
 
-/** A month's book transactions as a landscape A4 PDF, student by student, 20 equal rows a page. Ready to save. */
-export function bookMovesPdf(readers: Reader[], monthName: string, library: string): Promise<Uint8Array> {
+/** Book transactions for a period (a year or a month) as a portrait A4 PDF, student by student, 32 equal rows a page. */
+export function bookMovesPdf(readers: Reader[], period: string, library: string): Promise<Uint8Array> {
   const table = bookMovesTable(readers);
   const given = readers.reduce((sum, r) => sum + r.given, 0);
   const returned = readers.reduce((sum, r) => sum + r.returned, 0);
   const pages: PdfPage[] = [];
   for (let i = 0; i < Math.max(table.body.length, 1); i += BOOK_ROWS_PER_PAGE) {
-    pages.push(drawTablePage([{ heading: monthName, table: { ...table, body: table.body.slice(i, i + BOOK_ROWS_PER_PAGE) } }],
-      library, 'landscape', `Book transactions register - ${monthName}`,
-      `Books given: ${given}, returned: ${returned}`, 'Number after a name = books that month', BOOK_ROW_HEIGHT));
+    pages.push(drawTablePage([{ heading: period, table: { ...table, body: table.body.slice(i, i + BOOK_ROWS_PER_PAGE) } }],
+      library, 'portrait', `Book transactions register - ${period}`,
+      `Books given: ${given}, returned: ${returned}`, `Number after a name = books in ${period}`, BOOK_ROW_HEIGHT));
   }
   return buildPdf(pages);
 }

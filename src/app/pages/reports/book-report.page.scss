@@ -1,88 +1,61 @@
-/* On top of the register and report styles (‹ month ›, export, note). */
+/* On top of the register and report styles (note). */
 .page-pad {
   margin: 12px 20px 0;
 }
 
-.wrap {
-  padding-bottom: 0;
-}
+/* The Reading Galaxy banner: a strip of night sky with a galaxy's glow and the top readers as small planets. */
+.galaxy {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 16px 0;
+  padding: 14px 16px;
+  border-radius: var(--app-radius-sheet);
+  background:
+    radial-gradient(1px 1px at 18% 30%, #fff9 50%, transparent 51%),
+    radial-gradient(1px 1px at 46% 78%, #fff7 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 22%, #fff8 50%, transparent 51%),
+    radial-gradient(ellipse 34% 22% at 72% 50%, rgb(255 236 210 / 0.55), rgb(170 160 255 / 0.14) 55%, transparent 75%),
+    radial-gradient(ellipse 60% 70% at 10% 90%, rgb(110 50 160 / 0.35), transparent 70%),
+    #05060f;
+  color: #fff;
+  text-decoration: none;
 
-/* "12 given · 9 returned" */
-.totals {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
+  &:active { filter: brightness(1.15); }
 
-  span {
+  .planets {
+    position: relative;
+    flex: 0 0 64px;
+    height: 48px;
+  }
+
+  .dot {
+    position: absolute;
+
+    &.p0 { left: 4px; top: 6px; width: 30px; height: 30px; }
+    &.p1 { left: 38px; top: 2px; width: 18px; height: 18px; }
+    &.p2 { left: 36px; top: 26px; width: 14px; height: 14px; }
+    &.p3 { left: 0; top: 38px; width: 9px; height: 9px; }
+    &.p4 { left: 54px; top: 22px; width: 8px; height: 8px; }
+  }
+
+  .text {
     display: flex;
-    align-items: baseline;
-    gap: 6px;
-    padding: 12px 14px;
-    border-radius: var(--app-radius-sheet);
-    font-size: 13px;
-    color: var(--app-muted);
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+
+    strong { font-size: 16px; font-weight: 600; }
+    small { font-size: 12px; color: #c9cfee; }
   }
 
-  strong {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--app-ink);
+  .chevron {
+    --icon-size: 18px;
+    color: #c9cfee;
   }
-
-  .given { background: var(--app-accent-soft); }
-  .back { background: var(--app-success-soft); }
 }
 
-/* This year's readers: circles across the full width, initials only. */
-.year {
-  padding: 4px 0 8px;
-  border-bottom: 1px solid var(--app-rule);
-}
-
-/* A packed grid: circles span 1, 2 or 3 cells, and "dense" tucks small ones into the gaps. */
-.bubbles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 40px);
-  grid-auto-rows: 40px;
-  grid-auto-flow: dense;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 12px 0;
-}
-
-.bubble {
-  --hue: 210;
-  display: grid;
-  flex: none;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: hsl(var(--hue) 70% 91%);
-  color: hsl(var(--hue) 45% 32%);
-  font: inherit;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-
-  .initials { font-size: 12px; font-weight: 700; line-height: 1; }
-
-  &.span-2 { grid-column: span 2; grid-row: span 2; .initials { font-size: 20px; } }
-  &.span-3 { grid-column: span 3; grid-row: span 3; .initials { font-size: 30px; } }
-
-  &.picked { box-shadow: 0 0 0 3px var(--app-paper), 0 0 0 5px hsl(var(--hue) 45% 45%); }
-}
-
-.caption {
-  margin: 12px 20px 4px;
-  font-size: 13px;
-  color: var(--app-muted);
-  text-align: center;
-
-  strong { color: var(--app-ink); }
-}
-
-/* The month's students: the app's usual list, with People's initials circle. */
+/* The month's students: the app's usual list (name, given · returned, books). */
 ion-item {
   --min-height: 64px;
 
@@ -90,26 +63,38 @@ ion-item {
   ion-label p { margin-top: 2px; font-size: 12px; }
 }
 
-.avatar {
-  --hue: 210;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  margin-inline-end: 14px;
-  border-radius: 50%;
-  background: hsl(var(--hue) 70% 91%);
-  color: hsl(var(--hue) 45% 32%);
-  font-size: 14px;
-  font-weight: 700;
+/* "Students 20" on the left, Export PDF on the right. */
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 20px 0 0;
+
+  .section-title { flex: 1; margin-top: 0; }
 }
 
-@media (prefers-color-scheme: dark) {
-  .bubble,
-  .avatar {
-    background: hsl(var(--hue) 28% 24%);
-    color: hsl(var(--hue) 70% 80%);
-  }
+.export-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--app-accent);
+  border-radius: 100px;
+  background: var(--app-surface);
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.6; }
+}
+
+.list-note {
+  margin: 0 24px 24px;
 }
 
 .count {
@@ -122,6 +107,3 @@ ion-item {
   white-space: nowrap;
 }
 
-.export {
-  margin-top: 4px;
-}

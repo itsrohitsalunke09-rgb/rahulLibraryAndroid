@@ -1,6 +1,7 @@
 <!-- A tab button always opens that tab's main screen, not the page last left open in it. -->
 <ion-tabs>
-  <ion-tab-bar slot="bottom" (ionTabButtonClick)="openTab($event)">
+  <!-- Hidden on full-screen pages such as the Reading Galaxy. -->
+  <ion-tab-bar slot="bottom" [class.hidden]="fullScreen()" (ionTabButtonClick)="openTab($event)">
     @if (auth.isStaff()) {
       <ion-tab-button tab="dashboard" href="/tabs/dashboard">
         <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-dashboard.svg)" aria-hidden="true"></span></span>

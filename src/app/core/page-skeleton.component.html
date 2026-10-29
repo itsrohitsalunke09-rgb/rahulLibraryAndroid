@@ -87,13 +87,6 @@
     <span class="sk button"></span>
   }
 
-  @case ('bubbles') {
-    <!-- The books report's circles: one per student, of different sizes. -->
-    <div class="bubbles">
-      @for (span of bubbleSpans; track $index) { <span class="sk bubble" [class]="'sk bubble span-' + span"></span> }
-    </div>
-  }
-
   @case ('form') {
     @for (row of items(); track $index) {
       <span class="sk line small label" [style.width.%]="row.sub - 10"></span>

@@ -134,6 +134,11 @@ export class ApiService {
     return this.http.get<ReaderCount[]>(`${this.base}/issues/readers`, { params: { year } });
   }
 
+  /** Reading Galaxy profile: one student's books given in the year, newest first. */
+  studentIssuesInYear(studentId: number, year: number) {
+    return this.http.get<BookIssue[]>(`${this.base}/issues/student/${studentId}`, { params: { year } });
+  }
+
   /** Book transactions report: issues given or returned in the month (YYYY-MM). */
   issuesMovedInMonth(month: string) {
     return this.http.get<BookIssue[]>(`${this.base}/issues/month`, { params: { month } });

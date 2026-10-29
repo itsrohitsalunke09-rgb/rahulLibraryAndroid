@@ -1,1 +1,4 @@
-
+/* Full-screen pages (the Reading Galaxy) hide the tab bar. */
+ion-tab-bar.hidden {
+  display: none;
+}
