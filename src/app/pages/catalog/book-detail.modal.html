@@ -183,7 +183,7 @@
         }
 
         <!-- Issue section; hidden while editing, as in the Edit frame. -->
-        @if (auth.isStaff() && perms.can('WRITE') && section() !== 'edit') {
+        @if (auth.isStaff() && perms.can('ISSUE_BOOK') && section() !== 'edit') {
           <div class="issue-area">
             @if (book.availableCopies < 1) {
               <p class="reason">This book is issued</p>

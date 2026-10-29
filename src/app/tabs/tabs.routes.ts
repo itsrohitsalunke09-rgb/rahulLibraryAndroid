@@ -149,6 +149,11 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/clippings.page').then(m => m.ClippingsPage),
       },
       {
+        path: 'profile/masters/assets',
+        ...ADMIN_ONLY,
+        loadComponent: () => import('../pages/config/assets.page').then(m => m.AssetsPage),
+      },
+      {
         path: 'profile/masters/permissions',
         ...ADMIN_ONLY,
         loadComponent: () => import('../pages/config/permissions.page').then(m => m.PermissionsPage),

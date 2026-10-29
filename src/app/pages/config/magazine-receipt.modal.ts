@@ -2,7 +2,7 @@ import { Component, Input, OnInit, computed, inject, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
-import { AuthService } from '../../core/auth.service';
+import { PermissionsStore } from '../../core/permissions.store';
 import { localIsoDate } from '../../core/dates';
 import { defaultPeriod, magazinePeriods, weekStartDay } from '../../core/magazine-periods';
 import { MagazineCard, MagazineReceipt, tel } from '../../core/models';
@@ -26,8 +26,8 @@ export class MagazineReceiptModal implements OnInit {
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
-  /** Only admins see the call button. */
-  protected auth = inject(AuthService);
+  /** What this role may do (Roles & permissions). */
+  protected perms = inject(PermissionsStore);
   private ui = inject(UiService);
 
   readonly today = localIsoDate();

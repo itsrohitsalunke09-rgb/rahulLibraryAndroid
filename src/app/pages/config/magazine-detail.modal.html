@@ -73,9 +73,9 @@
 
 @if (!issuesOnly) {
 <ion-footer>
-  <!-- Calling the vendor is for admins only. -->
-  <div class="bar" [class.two]="card.contactNumber && auth.isAdmin()">
-    @if (card.contactNumber && auth.isAdmin()) {
+  <!-- Calling the vendor needs the Call permission. -->
+  <div class="bar" [class.two]="card.contactNumber && perms.can('CALL')">
+    @if (card.contactNumber && perms.can('CALL')) {
       <a class="call" [href]="tel(card.contactNumber)" [attr.aria-label]="'Call about ' + card.name + ', ' + card.contactNumber">
         <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
         Call

@@ -331,6 +331,25 @@ export interface Clipping {
 
 export type ClippingRequest = Omit<Clipping, 'id'>;
 
+export type AssetCondition = 'GOOD' | 'NEEDS_REPAIR' | 'NOT_WORKING';
+export const ASSET_CONDITIONS: Record<AssetCondition, string> = {
+  GOOD: 'Good', NEEDS_REPAIR: 'Needs repair', NOT_WORKING: 'Not working',
+};
+
+/** Something the library office owns (Profile › Masters › Office assets). */
+export interface OfficeAsset {
+  id: number;
+  name: string;
+  quantity: number;
+  location?: string | null;
+  purchaseDate?: string | null;
+  price?: number | null;
+  condition: AssetCondition;
+  notes?: string | null;
+}
+
+export type AssetRequest = Omit<OfficeAsset, 'id'>;
+
 /** A student's request for a catalog book (REQUEST) or a book they'd like the library to get (SUGGESTION). */
 export interface ReaderRequest {
   id: number;

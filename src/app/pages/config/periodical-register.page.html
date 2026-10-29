@@ -40,8 +40,8 @@
                 }
               </span>
             </label>
-            <!-- Calling the vendor is for admins only. -->
-            @if (line.contactNumber && auth.isAdmin()) {
+            <!-- Calling the vendor needs the Call permission. -->
+            @if (line.contactNumber && perms.can('CALL')) {
               <a class="call" [href]="tel(line.contactNumber)" [attr.aria-label]="'Call about ' + line.name + ', ' + line.contactNumber">
                 <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
               </a>

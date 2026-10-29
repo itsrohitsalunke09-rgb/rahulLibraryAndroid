@@ -7,7 +7,7 @@ import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, ReaderCount, StudentSummary, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
-  UserAccount, UserRequest, ReaderRequest
+  UserAccount, UserRequest, ReaderRequest, OfficeAsset, AssetRequest
 } from './models';
 import type { PermissionMatrix } from './permissions.store';
 
@@ -83,6 +83,21 @@ export class ApiService {
 
   deleteClipping(id: number) {
     return changes(this.http.delete<void>(`${this.base}/clippings/${id}`));
+  }
+
+  /** Office assets master (admins). */
+  assets() {
+    return this.http.get<OfficeAsset[]>(`${this.base}/assets`);
+  }
+
+  saveAsset(asset: AssetRequest, id?: number) {
+    return changes(id
+      ? this.http.put<OfficeAsset>(`${this.base}/assets/${id}`, asset)
+      : this.http.post<OfficeAsset>(`${this.base}/assets`, asset));
+  }
+
+  deleteAsset(id: number) {
+    return changes(this.http.delete<void>(`${this.base}/assets/${id}`));
   }
 
   /** Bulk-add books from an .xlsx sheet (admin and librarian only). */

@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile/masters" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Office assets</ion-title>
+  </ion-toolbar>
+  <ion-toolbar class="with-actions">
+    <ion-searchbar placeholder="Search name or place" [debounce]="200"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+    <div slot="end" class="search-actions">
+      <button class="heading-action" aria-label="Add asset" (click)="edit()">
+        <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+      </button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (items()) {
+    @if (shown().length) {
+      <p class="list-count">{{ shown().length }} asset{{ shown().length === 1 ? '' : 's' }}{{ query() ? ' matching "' + query() + '"' : '' }}</p>
+      <ion-list inset="true" lines="full">
+        @for (a of shown(); track a.id) {
+          <ion-item button detail="false" (click)="edit(a)">
+            <ion-label>
+              <h2>{{ a.name }}</h2>
+              @if (a.location) {
+                <p>{{ a.location }}</p>
+              }
+            </ion-label>
+            <span slot="end" class="asset-end">
+              <span class="number">× {{ a.quantity }}</span>
+              @if (a.condition !== 'GOOD') {
+                <span class="condition" [class.broken]="a.condition === 'NOT_WORKING'">{{ conditions[a.condition] }}</span>
+              }
+            </span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <div class="empty-state">
+        <span class="icon empty-icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
+        @if (query()) {
+          <h2>Nothing matches "{{ query() }}"</h2>
+          <p>Search by part of the name or the place.</p>
+        } @else {
+          <h2>No office assets yet</h2>
+          <p>Add what the office owns with the + button: tables, chairs, computers, fans and so on.</p>
+        }
+      </div>
+    }
+  } @else if (!error()) {
+    <app-page-skeleton [chip]="true" />
+  }
+</ion-content>
