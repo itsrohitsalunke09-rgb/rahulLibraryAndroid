@@ -77,8 +77,8 @@ export class MagazineRegisterPage implements ViewWillEnter {
 
   /** Mark received for the magazine (its cells and issues are on that screen); its line here updates straight away. */
   async open(card: MagazineCard) {
-    // Without Write, show the magazine's year and issues instead of Mark received.
-    if (!this.perms.can('WRITE')) {
+    // Without Register, show the magazine's year and issues instead of Mark received.
+    if (!this.perms.can('REGISTER')) {
       const { MagazineDetailModal } = await import('./magazine-detail.modal');
       const view = await this.modals.create({ component: MagazineDetailModal, componentProps: { card } });
       await view.present();

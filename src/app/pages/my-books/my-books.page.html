@@ -2,10 +2,17 @@
   <ion-toolbar>
     <ion-title>My books</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
+      <ion-segment-button value="CURRENT">With me</ion-segment-button>
+      <ion-segment-button value="RETURNED">Returned</ion-segment-button>
+      <ion-segment-button value="SUGGESTED">Suggested{{ suggestions() ? ' (' + suggestions()!.length + ')' : '' }}</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-refresher slot="fixed" (ionRefresh)="issues.refresh($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
@@ -19,63 +26,100 @@
     </a>
   }
 
-  @if (issues.error()) {
-    <p class="page-error" role="alert">{{ issues.error() }}</p>
-  }
-
-  @if (issues.loaded()) {
-    @if (overdueCount()) {
-      <div class="banner" role="alert">
-        You have {{ overdueCount() }} overdue book{{ overdueCount() === 1 ? '' : 's' }}.
-        Please return {{ overdueCount() === 1 ? 'it' : 'them' }} to the library as soon as possible.
-      </div>
+  @if (tab() === 'SUGGESTED') {
+    @if (suggestionsError()) {
+      <p class="page-error" role="alert">{{ suggestionsError() }}</p>
     }
-
-    @if (issues.items().length) {
-      <h2 class="section-title">With you now</h2>
-      <ion-list inset="true" lines="full">
-        @for (issue of current(); track issue.id) {
-          <ion-item class="spine" [class]="'spine-' + (issue | statusColor)">
-            <ion-label>
-              <h2 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h2>
-              <p>{{ issue.author }}</p>
-              <p class="item-meta">Due back {{ issue.dueDate | shortDate }}</p>
-            </ion-label>
-            <div slot="end" class="end">
-              <ion-badge class="stamp" [color]="issue | statusColor">{{ issue | dueText }}</ion-badge>
-            </div>
-          </ion-item>
-        } @empty {
-          <ion-item lines="none"><ion-label color="medium">No books with you right now.</ion-label></ion-item>
-        }
-      </ion-list>
-
-      @if (returned().length) {
-        <h2 class="section-title">Returned</h2>
+    @if (suggestions(); as list) {
+      @if (list.length) {
         <ion-list inset="true" lines="full">
-          @for (issue of returned(); track issue.id) {
+          @for (s of list; track s.id) {
             <ion-item>
               <ion-label>
-                <h3 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h3>
-                <p class="item-meta">{{ issue.issueDate | shortDate }} – {{ issue.returnDate | shortDate }}</p>
+                <h2 class="marathi">{{ s.title }}</h2>
+                @if (s.author) {
+                  <p>{{ s.author }}</p>
+                }
+                @if (s.note) {
+                  <p class="note">"{{ s.note }}"</p>
+                }
+                <p class="item-meta">Suggested {{ s.createdAt.slice(0, 10) | shortDate }}</p>
               </ion-label>
-              <ion-badge slot="end" class="stamp" color="success">Returned</ion-badge>
             </ion-item>
           }
         </ion-list>
+      } @else {
+        <div class="empty-state">
+          <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
+          <h2>No suggestions yet</h2>
+          <p>Search the Catalog; if a book isn't there, you can suggest it to the librarian.</p>
+        </div>
       }
-    } @else if (!issues.error()) {
-      <div class="empty-state">
-        <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
-        <h2>No books borrowed yet</h2>
-        <p>Find a book in the Catalog and ask the librarian to issue it to you.</p>
-      </div>
+    } @else if (!suggestionsError()) {
+      <app-page-skeleton [count]="false" />
     }
   } @else {
-    <app-page-skeleton [count]="false" [chip]="true" />
-  }
+    @if (issues.error()) {
+      <p class="page-error" role="alert">{{ issues.error() }}</p>
+    }
 
-  <ion-infinite-scroll [disabled]="issues.finished()" (ionInfinite)="issues.more($event)">
-    <ion-infinite-scroll-content></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+    @if (issues.loaded()) {
+      @if (tab() === 'CURRENT') {
+        @if (overdueCount()) {
+          <div class="banner" role="alert">
+            You have {{ overdueCount() }} overdue book{{ overdueCount() === 1 ? '' : 's' }}.
+            Please return {{ overdueCount() === 1 ? 'it' : 'them' }} to the library as soon as possible.
+          </div>
+        }
+        @if (current().length) {
+          <ion-list inset="true" lines="full">
+            @for (issue of current(); track issue.id) {
+              <ion-item class="spine" [class]="'spine-' + (issue | statusColor)">
+                <ion-label>
+                  <h2 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h2>
+                  <p>{{ issue.author }}</p>
+                  <p class="item-meta">Due back {{ issue.dueDate | shortDate }}</p>
+                </ion-label>
+                <div slot="end" class="end">
+                  <ion-badge class="stamp" [color]="issue | statusColor">{{ issue | dueText }}</ion-badge>
+                </div>
+              </ion-item>
+            }
+          </ion-list>
+        } @else if (!issues.error()) {
+          <div class="empty-state">
+            <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
+            <h2>No books with you</h2>
+            <p>Find a book in the Catalog and ask the librarian to issue it to you.</p>
+          </div>
+        }
+      } @else {
+        @if (returned().length) {
+          <ion-list inset="true" lines="full">
+            @for (issue of returned(); track issue.id) {
+              <ion-item>
+                <ion-label>
+                  <h3 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h3>
+                  <p class="item-meta">{{ issue.issueDate | shortDate }} – {{ issue.returnDate | shortDate }}</p>
+                </ion-label>
+                <ion-badge slot="end" class="stamp" color="success">Returned</ion-badge>
+              </ion-item>
+            }
+          </ion-list>
+        } @else if (!issues.error()) {
+          <div class="empty-state">
+            <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
+            <h2>Nothing returned yet</h2>
+            <p>Books you give back to the library are listed here.</p>
+          </div>
+        }
+      }
+    } @else {
+      <app-page-skeleton [count]="false" [chip]="true" />
+    }
+
+    <ion-infinite-scroll [disabled]="issues.finished()" (ionInfinite)="issues.more($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  }
 </ion-content>

@@ -23,6 +23,13 @@ ion-label p {
   font-style: italic;
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-inline-start: 8px;
+}
+
 .done {
   min-width: 64px;
   height: 36px;
@@ -35,6 +42,8 @@ ion-label p {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+
+  &.delete { color: var(--ion-color-danger); }
 
   &:disabled { opacity: 0.5; }
 }

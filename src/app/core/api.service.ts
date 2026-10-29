@@ -159,6 +159,11 @@ export class ApiService {
     return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests`);
   }
 
+  /** The signed-in student's own open suggestions, newest first. */
+  mySuggestions() {
+    return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests/suggestions/mine`);
+  }
+
   /** A student asks to borrow a catalog book. */
   requestBook(bookId: number) {
     return changes(this.http.post<ReaderRequest>(`${this.base}/reader-requests/books/${bookId}`, {}));

@@ -12,7 +12,7 @@ describe('IssueBookModal', () => {
   let issueBook: ReturnType<typeof vi.fn>;
   let dismiss: ReturnType<typeof vi.fn>;
 
-  function render() {
+  function render(student?: UserAccount) {
     issueBook = vi.fn(() => of({ id: 1 }));
     dismiss = vi.fn();
     TestBed.configureTestingModule({
@@ -24,6 +24,7 @@ describe('IssueBookModal', () => {
     });
     const fixture = TestBed.createComponent(IssueBookModal);
     fixture.componentInstance.book = book;
+    fixture.componentInstance.student = student;
     fixture.detectChanges();
     return fixture;
   }
@@ -33,6 +34,13 @@ describe('IssueBookModal', () => {
     const button = fixture.nativeElement.querySelector('button.primary') as HTMLButtonElement;
     expect(button.disabled).toBe(true);
     expect(button.textContent).toContain('Choose a student');
+  });
+
+  it('startsWithTheRequestingStudentChosen', () => {
+    const fixture = render(asha);
+    const button = fixture.nativeElement.querySelector('button.primary') as HTMLButtonElement;
+    expect(button.disabled).toBe(false);
+    expect(button.textContent).toContain('Issue to Asha Patil');
   });
 
   it('handsBackTheChosenStudentAndPeriodAtOnce', () => {

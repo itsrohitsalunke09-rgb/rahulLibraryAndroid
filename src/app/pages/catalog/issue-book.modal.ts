@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, inject, signal } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import {
   IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonTitle, IonToolbar, ModalController
 } from '@ionic/angular';
@@ -27,8 +27,10 @@ const LOAN_PERIODS = [7, 14, 21, 30];
     MarathiPipe, InitialsPipe, AvatarHuePipe
   ],
 })
-export class IssueBookModal implements OnDestroy {
+export class IssueBookModal implements OnInit, OnDestroy {
   @Input({ required: true }) book!: Book;
+  /** Chosen up front, e.g. the student who requested the book. */
+  @Input() student?: UserAccount;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
@@ -73,6 +75,12 @@ export class IssueBookModal implements OnDestroy {
     this.searching.set(false);
     this.searched.set(false);
     this.open.set(true);
+  }
+
+  ngOnInit() {
+    if (this.student) {
+      this.choose(this.student);
+    }
   }
 
   ngOnDestroy() {

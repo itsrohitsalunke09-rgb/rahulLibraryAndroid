@@ -37,10 +37,21 @@
                 <p class="note">"{{ r.note }}"</p>
               }
             </ion-label>
-            @if (perms.can('UPDATE')) {
-              <button slot="end" type="button" class="done" [disabled]="clearing() === r.id" (click)="done(r)"
-                      [attr.aria-label]="'Mark ' + r.title + ' done'">Done</button>
-            }
+            <div slot="end" class="actions">
+              @if (r.kind === 'REQUEST' && r.bookId) {
+                @if (perms.can('REGISTER')) {
+                  <button type="button" class="done" [disabled]="clearing() === r.id" (click)="issue(r)"
+                          [attr.aria-label]="'Issue ' + r.title + ' to ' + r.studentName">Issue book</button>
+                }
+              } @else if (perms.can('UPDATE')) {
+                <button type="button" class="done" [disabled]="clearing() === r.id" (click)="done(r)"
+                        [attr.aria-label]="'Mark ' + r.title + ' done'">Done</button>
+              }
+              @if (perms.can('DELETE')) {
+                <button type="button" class="done delete" [disabled]="clearing() === r.id" (click)="done(r, true)"
+                        [attr.aria-label]="'Delete ' + r.title">Delete</button>
+              }
+            </div>
           </ion-item>
         }
       </ion-list>

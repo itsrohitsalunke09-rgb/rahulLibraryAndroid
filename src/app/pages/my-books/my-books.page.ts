@@ -1,18 +1,22 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
-  IonLabel, IonList, IonRefresher, IonRefresherContent, 
-  IonTitle, IonToolbar, ViewWillEnter
+  IonLabel, IonList, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton,
+  IonTitle, IonToolbar, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { bookmarksOutline } from 'ionicons/icons';
 import { ApiService } from '../../core/api.service';
-import { BookIssue } from '../../core/models';
+import { BookIssue, ReaderRequest } from '../../core/models';
+import { errorMessage } from '../../core/ui.service';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PermissionsStore } from '../../core/permissions.store';
 import { RouterLink } from '@angular/router';
+
+/** Tabs: books with the student, books given back, and books they suggested. */
+type Tab = 'CURRENT' | 'RETURNED' | 'SUGGESTED';
 
 @Component({
   selector: 'app-my-books',
@@ -20,7 +24,7 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['my-books.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
+    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe,
     PageSkeletonComponent, RouterLink,
   ],
@@ -29,6 +33,11 @@ export class MyBooksPage implements ViewWillEnter {
   private api = inject(ApiService);
   /** The Reading Galaxy shows here when the student role has Galaxy view. */
   protected perms = inject(PermissionsStore);
+
+  readonly tab = signal<Tab>('CURRENT');
+  /** The student's own open suggestions; null until loaded. */
+  readonly suggestions = signal<ReaderRequest[] | null>(null);
+  readonly suggestionsError = signal('');
 
   readonly issues = new PagedList<BookIssue>((page, size) => this.api.myIssues(page, size), 'Could not load your books.');
   /** Books still with the student, most urgent (earliest due) first; history is listed separately. */
@@ -44,5 +53,34 @@ export class MyBooksPage implements ViewWillEnter {
 
   ionViewWillEnter() {
     this.issues.revisit();
+    this.loadSuggestions();
+  }
+
+  setTab(value: unknown) {
+    if (value === 'CURRENT' || value === 'RETURNED' || value === 'SUGGESTED') {
+      this.tab.set(value);
+    }
+  }
+
+  refresh(event: RefresherCustomEvent) {
+    if (this.tab() === 'SUGGESTED') {
+      this.loadSuggestions(() => event.target.complete());
+    } else {
+      this.issues.refresh(event);
+    }
+  }
+
+  private loadSuggestions(done?: () => void) {
+    this.api.mySuggestions().subscribe({
+      next: list => {
+        this.suggestionsError.set('');
+        this.suggestions.set(list);
+        done?.();
+      },
+      error: err => {
+        this.suggestionsError.set(errorMessage(err, 'Could not load your suggestions.'));
+        done?.();
+      },
+    });
   }
 }
