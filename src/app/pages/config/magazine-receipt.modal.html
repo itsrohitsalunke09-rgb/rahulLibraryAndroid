@@ -69,8 +69,9 @@
     @if (error()) {
       <p class="form-error" role="alert">{{ error() }}</p>
     }
-    <div class="actions" [class.two]="card.contactNumber">
-      @if (card.contactNumber) {
+    <!-- Calling the vendor is for admins only. -->
+    <div class="actions" [class.two]="card.contactNumber && auth.isAdmin()">
+      @if (card.contactNumber && auth.isAdmin()) {
         <a class="call" [href]="tel(card.contactNumber)" [attr.aria-label]="'Call about ' + card.name + ', ' + card.contactNumber">
           <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
           Call

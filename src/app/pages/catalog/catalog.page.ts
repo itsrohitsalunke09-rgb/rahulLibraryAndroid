@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-  IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
+  AlertController, IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
@@ -10,7 +10,7 @@ import { searchClippings, yearsLabel } from '../../core/clippings';
 import { Book, Clipping, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
-import { errorMessage } from '../../core/ui.service';
+import { UiService, errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
@@ -30,6 +30,8 @@ import { ImportBooksModal } from './import-books.modal';
 export class CatalogPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
+  private alerts = inject(AlertController);
+  private ui = inject(UiService);
   protected auth = inject(AuthService);
   /** What this role may do (Roles & permissions). */
   protected perms = inject(PermissionsStore);
@@ -91,6 +93,37 @@ export class CatalogPage implements ViewWillEnter {
       next: list => { this.papers.set(list); done?.(); },
       error: err => { this.papersError.set(errorMessage(err, 'Could not load newspapers and magazines.')); done?.(); },
     });
+  }
+
+  /** A student suggests a book the catalog doesn't have; the title starts as what they searched. */
+  async suggest() {
+    const alert = await this.alerts.create({
+      header: 'Suggest a book',
+      subHeader: 'The librarian will see it on the Dashboard.',
+      inputs: [
+        { name: 'title', placeholder: 'Title *', value: this.query(), attributes: { maxlength: 200 } },
+        { name: 'author', placeholder: 'Author (optional)', attributes: { maxlength: 200 } },
+        { name: 'note', type: 'textarea', placeholder: 'Why this book? (optional)', attributes: { maxlength: 300 } },
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Send',
+          handler: (v: { title: string; author: string; note: string }) => {
+            if (!v.title?.trim()) {
+              this.ui.toast('Enter the book\u2019s title.', 'error');
+              return false;
+            }
+            this.api.suggestBook({ title: v.title.trim(), author: v.author?.trim() || undefined, note: v.note?.trim() || undefined }).subscribe({
+              next: () => this.ui.toast('Thanks! Your suggestion is sent to the librarian.'),
+              error: err => this.ui.error(err, 'Could not send the suggestion.'),
+            });
+            return true;
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   search(value: string | null | undefined) {

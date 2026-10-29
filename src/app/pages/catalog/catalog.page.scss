@@ -94,3 +94,34 @@ ion-back-button {
   --color: var(--app-ink);
   --icon-font-size: 22px;
 }
+
+/* Students: suggest a book the catalog doesn't have. */
+.suggest {
+  margin-top: 16px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 100px;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.suggest-line {
+  margin: 4px 24px 20px;
+  font-size: 13px;
+  color: var(--app-muted);
+  text-align: center;
+
+  .link {
+    padding: 4px;
+    border: 0;
+    background: none;
+    color: var(--app-accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}

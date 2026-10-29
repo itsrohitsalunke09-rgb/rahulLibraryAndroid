@@ -1,0 +1,40 @@
+ion-back-button {
+  --color: var(--app-ink);
+  --icon-font-size: 22px;
+}
+
+ion-label h2,
+ion-label p {
+  white-space: normal;
+}
+
+.author {
+  color: var(--app-muted);
+}
+
+.meta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+.note {
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.done {
+  min-width: 64px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--app-rule);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; }
+}

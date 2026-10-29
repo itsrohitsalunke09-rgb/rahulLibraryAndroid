@@ -9,7 +9,7 @@ import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
 import { Freshness } from '../../core/freshness';
 import { YearSelectComponent } from '../../core/year-select.component';
-import { Dashboard, DayRegister, IssueCounts, MagazineCard } from '../../core/models';
+import { Dashboard, DayRegister, IssueCounts, MagazineCard, ReaderRequest } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
@@ -55,10 +55,16 @@ export class DashboardPage implements ViewWillEnter {
   /** Newspapers received today and magazines that came this month; null until loaded. */
   readonly papers = signal<PaperSummary | null>(null);
   readonly papersError = signal('');
+  /** Students' book requests and suggestions, newest first; null until loaded. */
+  readonly wishes = signal<ReaderRequest[] | null>(null);
+  readonly wishesError = signal('');
+  readonly requestCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'REQUEST').length);
+  readonly suggestionCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'SUGGESTION').length);
   /** Year for the issue numbers; starts on the current year, null = all years. */
   readonly year = signal<number | null>(new Date().getFullYear());
   private request?: Subscription;
   private papersRequest?: Subscription;
+  private wishesRequest?: Subscription;
   private freshness = new Freshness();
 
   ionViewWillEnter() {
@@ -123,6 +129,19 @@ export class DashboardPage implements ViewWillEnter {
       }
     });
     this.loadPapers();
+    this.loadWishes();
+  }
+
+  /** Separate too: the requests card shows its own error. */
+  private loadWishes() {
+    this.wishesRequest?.unsubscribe();
+    this.wishesRequest = this.api.readerRequests().subscribe({
+      next: list => {
+        this.wishesError.set('');
+        this.wishes.set(list);
+      },
+      error: err => this.wishesError.set(errorMessage(err, 'Could not load requests and suggestions.')),
+    });
   }
 
   /** Separate from the book numbers, so a newspaper error never hides the rest of the dashboard. */
@@ -165,7 +184,6 @@ function toTiles(s: Dashboard): Tile[] {
     { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/issues', query: { status: 'OVERDUE' } },
     { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/issues', query: { status: 'OUT' } },
     { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/config/catalog' },
-    { label: 'Total copies', value: s.totalCopies, symbol: 'assets/icons/copies.svg', tone: 'medium', group: 'more', link: '/tabs/config/catalog' },
     { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/people' },
   ];
 }

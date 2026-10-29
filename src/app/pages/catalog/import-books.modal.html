@@ -55,18 +55,18 @@
       <section class="card">
         <h3 class="heading first">Prepare the sheet</h3>
         <p class="hint">
-          Use the first row for headings and put one book on each row after it, with the columns in this order.
-          Fields marked * are required.
+          Use the first row for headings and put one book on each row after it. Columns are found by their
+          heading, in any order; other columns (like Total Copies or Description) are skipped. Fields marked * are required.
         </p>
         <p class="hint">
           <strong>Category No.</strong> is the number from Config → Book categories, e.g. 456 or 456.83.
           The book shows that category's name. A number that is not in the list adds the book without a category.
         </p>
-        <ol class="columns">
+        <ul class="columns">
           @for (c of columns; track c.name) {
             <li [class.required]="c.required">{{ c.name }}{{ c.required ? ' *' : '' }}</li>
           }
-        </ol>
+        </ul>
       </section>
 
       <!-- File picker. -->

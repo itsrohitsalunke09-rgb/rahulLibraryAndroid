@@ -14,7 +14,7 @@ export type BookFormModel = { [K in keyof BookRequest]: BookRequest[K] | string 
 /** Form values for an existing book (or an empty new one). */
 export function bookFormFrom(book?: Book): BookFormModel {
   if (!book) {
-    return { title: '', author: '', totalCopies: 1, categoryChoice: '' };
+    return { title: '', author: '', categoryChoice: '' };
   }
   const { id, availableCopies, ...fields } = book;
   return { ...fields, categoryChoice: categoryChoiceOf(book) };
@@ -36,12 +36,8 @@ function categoryChoiceOf(book: Book): string {
 export function toBookRequest(form: BookFormModel): { request: BookRequest } | { error: string } {
   const title = text(form.title);
   const author = text(form.author);
-  const totalCopies = num(form.totalCopies);
   if (!title || !author) {
     return { error: 'Title and author are required.' };
-  }
-  if (!totalCopies || !Number.isInteger(totalCopies) || totalCopies < 1 || totalCopies > 10000) {
-    return { error: 'Total copies must be a whole number from 1 to 10,000.' };
   }
   // Optional numbers: checked only when filled in.
   const year = num(form.publicationYear);
@@ -67,11 +63,9 @@ export function toBookRequest(form: BookFormModel): { request: BookRequest } | {
     request: {
       title,
       author,
-      totalCopies,
       // A master category is sent by id; an old text category is kept as text.
       categoryId: choice && choice !== KEEP_TEXT_CATEGORY ? Number(choice) : undefined,
       category: choice === KEEP_TEXT_CATEGORY ? text(form.category) : undefined,
-      description: text(form.description),
       date: text(form.date),
       registrationNumber: text(form.registrationNumber),
       publication: text(form.publication),

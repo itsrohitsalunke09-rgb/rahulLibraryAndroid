@@ -7,7 +7,7 @@ import { markDataChanged } from './freshness';
 import {
   Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, ReaderCount, StudentSummary, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
-  UserAccount, UserRequest
+  UserAccount, UserRequest, ReaderRequest
 } from './models';
 import type { PermissionMatrix } from './permissions.store';
 
@@ -137,6 +137,26 @@ export class ApiService {
 
   savePermissions(matrix: PermissionMatrix) {
     return this.http.put<PermissionMatrix>(`${this.base}/permissions`, matrix);
+  }
+
+  /** Students' book requests and suggestions, newest first (staff). */
+  readerRequests() {
+    return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests`);
+  }
+
+  /** A student asks to borrow a catalog book. */
+  requestBook(bookId: number) {
+    return changes(this.http.post<ReaderRequest>(`${this.base}/reader-requests/books/${bookId}`, {}));
+  }
+
+  /** A student suggests a book the library doesn't have. */
+  suggestBook(suggestion: { title: string; author?: string; note?: string }) {
+    return changes(this.http.post<ReaderRequest>(`${this.base}/reader-requests/suggestions`, suggestion));
+  }
+
+  /** Staff: a request or suggestion dealt with. */
+  clearReaderRequest(id: number) {
+    return changes(this.http.delete<void>(`${this.base}/reader-requests/${id}`));
   }
 
   /** Books report circles: how many books each student was given in the year, the most first. */

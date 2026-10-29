@@ -119,6 +119,13 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/periodical-report.page').then(m => m.PeriodicalReportPage),
       },
       {
+        // Students' book requests and suggestions (from the Dashboard card).
+        path: 'dashboard/requests',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/dashboard/reader-requests.page').then(m => m.ReaderRequestsPage),
+      },
+      {
         path: 'dashboard/reports/galaxy',
         ...STAFF_ONLY,
         ...GALAXY,

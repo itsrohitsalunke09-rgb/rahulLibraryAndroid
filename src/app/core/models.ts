@@ -60,8 +60,7 @@ export interface Book {
   /** Linked master category (null for none or an old text-only category). */
   categoryId?: number | null;
   categoryNumber?: string | null;
-  description?: string;
-  totalCopies: number;
+  /** Each book is one physical book: 1 on the shelf, 0 while issued. */
   availableCopies: number;
   date?: string;
   registrationNumber?: string;
@@ -331,6 +330,19 @@ export interface Clipping {
 }
 
 export type ClippingRequest = Omit<Clipping, 'id'>;
+
+/** A student's request for a catalog book (REQUEST) or a book they'd like the library to get (SUGGESTION). */
+export interface ReaderRequest {
+  id: number;
+  kind: 'REQUEST' | 'SUGGESTION';
+  studentId: number;
+  studentName: string;
+  bookId?: number | null;
+  title: string;
+  author?: string | null;
+  note?: string | null;
+  createdAt: string;
+}
 
 /** A tel: link for a phone number as typed ("+91 98765-43210" → "tel:+919876543210"). */
 export function tel(number: string): string {

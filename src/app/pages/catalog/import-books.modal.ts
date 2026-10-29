@@ -4,10 +4,10 @@ import { ApiService } from '../../core/api.service';
 import { BookImportResult } from '../../core/models';
 import { errorMessage } from '../../core/ui.service';
 
-/** Sheet columns, in the order the server reads them (same as the website's template). */
+/** Headings the server reads; columns are found by heading, in any order. */
 const COLUMNS: { name: string; required?: boolean }[] = [
   { name: 'Title', required: true }, { name: 'Author', required: true }, { name: 'Category No.' },
-  { name: 'Total Copies', required: true }, { name: 'Description' }, { name: 'Date (yyyy-MM-dd)' },
+  { name: 'Date (yyyy-MM-dd)' },
   { name: 'Registration Number' }, { name: 'Publication' }, { name: 'Publication Year' }, { name: 'Page Count' },
   { name: 'Seller' }, { name: 'Receipt Number' }, { name: 'Price' },
 ];

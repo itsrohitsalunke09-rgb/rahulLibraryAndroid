@@ -32,12 +32,8 @@
           @if (book.availableCopies < 1) {
             <span class="icon" style="--icon: url(assets/icons/clock.svg); --icon-size: 14px" aria-hidden="true"></span>
           }
-          {{ book.availableCopies }} of {{ book.totalCopies }} available
+          {{ book.availableCopies > 0 ? 'Available' : 'Issued' }}
         </span>
-
-        @if (book.description) {
-          <p class="description" [class.marathi]="book.category | marathi">{{ book.description }}</p>
-        }
 
         @switch (section()) {
           @case ('details') {
@@ -96,13 +92,6 @@
                 </span>
               </label>
               <label class="form-field">
-                <span class="form-label">Description</span>
-                <span class="form-box tall">
-                  <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
-                  <textarea rows="3" [class.marathi]="book.category | marathi" name="description" [(ngModel)]="form.description"></textarea>
-                </span>
-              </label>
-              <label class="form-field">
                 <span class="form-label">Category</span>
                 <span class="form-box select">
                   <span class="icon" style="--icon: url(assets/icons/tag.svg)" aria-hidden="true"></span>
@@ -118,22 +107,13 @@
                   <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
                 </span>
               </label>
-              <div class="form-pair">
-                <label class="form-field">
-                  <span class="form-label">Total copies</span>
-                  <span class="form-box">
-                    <span class="icon" style="--icon: url(assets/icons/copies.svg)" aria-hidden="true"></span>
-                    <input type="number" min="1" inputmode="numeric" name="totalCopies" [(ngModel)]="form.totalCopies" />
-                  </span>
-                </label>
-                <label class="form-field">
-                  <span class="form-label">Registration no.</span>
-                  <span class="form-box">
-                    <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
-                    <input name="registrationNumber" [(ngModel)]="form.registrationNumber" />
-                  </span>
-                </label>
-              </div>
+              <label class="form-field">
+                <span class="form-label">Registration no.</span>
+                <span class="form-box">
+                  <span class="icon" style="--icon: url(assets/icons/field-at.svg)" aria-hidden="true"></span>
+                  <input name="registrationNumber" [(ngModel)]="form.registrationNumber" />
+                </span>
+              </label>
               <label class="form-field">
                 <span class="form-label">Publication</span>
                 <span class="form-box">
@@ -206,11 +186,26 @@
         @if (auth.isStaff() && perms.can('WRITE') && section() !== 'edit') {
           <div class="issue-area">
             @if (book.availableCopies < 1) {
-              <p class="reason">No copies available to issue</p>
+              <p class="reason">This book is issued</p>
             }
             <button class="issue" [disabled]="book.availableCopies < 1 || busy()" (click)="issue()">
               <span class="icon" style="--icon: url(assets/icons/send.svg); --icon-size: 19px" aria-hidden="true"></span>
               Issue to a student
+            </button>
+          </div>
+        }
+
+        <!-- Students ask the librarian for the book; it shows on the staff Dashboard. -->
+        @if (!auth.isStaff() && section() !== 'edit') {
+          <div class="issue-area">
+            @if (requested()) {
+              <p class="reason">Requested. The librarian will see your request.</p>
+            } @else if (book.availableCopies < 1) {
+              <p class="reason">This book is issued now; request it to be next in line.</p>
+            }
+            <button class="issue" [disabled]="requested() || busy()" (click)="request()">
+              <span class="icon" style="--icon: url(assets/icons/send.svg); --icon-size: 19px" aria-hidden="true"></span>
+              {{ requested() ? 'Requested' : 'Request this book' }}
             </button>
           </div>
         }
@@ -246,7 +241,7 @@
             <p>
               This will permanently remove this book record.
               @if (borrowers().length) {
-                It is currently issued to {{ borrowers().join(', ') }}. Mark those copies returned before deleting it.
+                It is currently issued to {{ borrowers().join(', ') }}. Mark it returned before deleting it.
               } @else {
                 Its issue history will be deleted too.
               }

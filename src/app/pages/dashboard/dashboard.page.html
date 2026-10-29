@@ -60,6 +60,31 @@
         </button>
       }
 
+      <!-- Students' requests for catalog books and suggestions of new ones; tap for the full list. -->
+      <h2 class="section">Requests &amp; suggestions</h2>
+      @if (wishes(); as w) {
+        <button class="wishes" (click)="go('/tabs/dashboard/requests')">
+          <span class="wish-counts">
+            <span class="wish-count"><strong>{{ requestCount() }}</strong> request{{ requestCount() === 1 ? '' : 's' }}</span>
+            <span class="wish-count"><strong>{{ suggestionCount() }}</strong> suggestion{{ suggestionCount() === 1 ? '' : 's' }}</span>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+          </span>
+          @for (r of w.slice(0, 3); track r.id) {
+            <span class="wish">
+              <span class="kind" [class.suggestion]="r.kind === 'SUGGESTION'">{{ r.kind === 'REQUEST' ? 'Request' : 'Suggestion' }}</span>
+              <span class="wish-title marathi">{{ r.title }}</span>
+              <span class="wish-who">{{ r.studentName }}</span>
+            </span>
+          } @empty {
+            <span class="wish-empty">No requests or suggestions from students yet.</span>
+          }
+        </button>
+      } @else if (wishesError()) {
+        <p class="papers-empty">{{ wishesError() }}</p>
+      } @else {
+        <div class="wishes skeleton"><ion-skeleton-text [animated]="true"></ion-skeleton-text></div>
+      }
+
       <!-- Newspapers: dailies received today. Magazines: the others that came at least once this month. -->
       <h2 class="section">Newspapers &amp; magazines</h2>
       @if (papers(); as p) {

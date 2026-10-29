@@ -165,3 +165,29 @@
 .tally { width: 40px; }
 .record { height: 54px; border-radius: var(--app-radius-sheet); }
 .tile.short { height: 56px; }
+
+/* ---- Dashboard cards ---- */
+.dash-tile,
+.dash-banner,
+.dash-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.dash-tile { min-height: 110px; justify-content: space-between; }
+.dash-banner { min-height: 96px; }
+.value { width: 38%; height: 24px; }
+.value.wide { width: 48%; }
+.track { height: 8px; border-radius: 100px; }
+.track.thin { height: 5px; }
+.counts { justify-content: flex-start; gap: 16px; }
+
+.dash-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-rule);
+}

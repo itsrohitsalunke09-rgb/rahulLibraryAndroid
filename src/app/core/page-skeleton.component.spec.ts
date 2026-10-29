@@ -32,8 +32,11 @@ describe('PageSkeletonComponent', () => {
   it('drawsTheShapeOfEachKindOfPage', () => {
     expect(render({ kind: 'cards' }).querySelectorAll('.photo').length).toBe(3);
     expect(render({ kind: 'register' }).querySelectorAll('.box').length).toBe(4);
-    expect(render({ kind: 'dashboard' }).querySelectorAll('.tile').length).toBe(4);
-    expect(render({ kind: 'dashboard' }).querySelector('.record')).not.toBeNull();
+    const dashboard = render({ kind: 'dashboard' });
+    expect(dashboard.querySelectorAll('.dash-tile').length).toBe(4);
+    // The Requests & suggestions card, with its rows.
+    expect(dashboard.querySelectorAll('.dash-list .dash-row').length).toBe(3);
+    expect(dashboard.querySelector('.record')).not.toBeNull();
     expect(render({ kind: 'report', rows: 2 }).querySelectorAll('.cell').length).toBe(62);
     expect(render({ kind: 'strips', rows: 1 }).querySelectorAll('.cell').length).toBe(53);
     expect(render({ kind: 'form', rows: 5 }).querySelectorAll('.field').length).toBe(5);

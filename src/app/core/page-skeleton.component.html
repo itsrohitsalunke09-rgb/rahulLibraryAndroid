@@ -57,10 +57,37 @@
   }
 
   @case ('dashboard') {
-    <div class="tiles"><span class="sk tile"></span><span class="sk tile"></span></div>
-    <span class="sk banner"></span>
+    <!-- Drawn like the Dashboard's own cards: number tiles, the transactions card, requests, papers, library. -->
+    <div class="tiles">
+      @for (t of [1, 2]; track t) {
+        <div class="card flat dash-tile">
+          <span class="title-row"><span class="sk line value"></span><span class="sk dot"></span></span>
+          <span class="sk line small" style="width: 64%"></span>
+        </div>
+      }
+    </div>
+    <div class="card flat dash-banner">
+      <span class="title-row"><span class="sk line value wide"></span><span class="sk line tally"></span></span>
+      <span class="sk track"></span>
+      <span class="sk line small" style="width: 30%"></span>
+    </div>
+    <span class="sk heading" style="width: 46%"></span>
+    <div class="card flat dash-list">
+      <span class="title-row counts"><span class="sk line" style="width: 28%"></span><span class="sk line" style="width: 32%"></span></span>
+      @for (row of [1, 2, 3]; track row) {
+        <span class="dash-row"><span class="sk pill"></span><span class="sk line" [style.width.%]="70 - row * 10"></span></span>
+      }
+    </div>
     <span class="sk heading" style="width: 52%"></span>
-    <div class="tiles"><span class="sk tile"></span><span class="sk tile"></span></div>
+    <div class="tiles">
+      @for (t of [1, 2]; track t) {
+        <div class="card flat dash-tile">
+          <span class="title-row"><span class="sk line value"></span><span class="sk dot"></span></span>
+          <span class="sk line small" style="width: 58%"></span>
+          <span class="sk track thin"></span>
+        </div>
+      }
+    </div>
     <span class="sk record"></span>
     <span class="sk heading" style="width: 22%"></span>
     <div class="card rows flat">

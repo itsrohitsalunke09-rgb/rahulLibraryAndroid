@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -17,7 +18,7 @@ import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinke
 import { PermissionsStore } from '../../core/permissions.store';
 import { IssueBookModal, IssueChoice } from './issue-book.modal';
 
-/** What the book card shows below the description (Figma: Details / Issue history / Edit expanded). */
+/** What the book card shows below the title (Figma: Details / Issue history / Edit expanded). */
 type Section = 'none' | 'details' | 'history' | 'edit';
 
 /**
@@ -49,6 +50,8 @@ export class BookDetailModal implements OnInit {
   readonly current = signal<Book | null>(null);
   readonly history = signal<BookIssue[] | null>(null);
   readonly busy = signal(false);
+  /** The student has asked for this book (this visit, or found already asked). */
+  readonly requested = signal(false);
   readonly section = signal<Section>('none');
   readonly menuOpen = signal(false);
   readonly confirmingDelete = signal(false);
@@ -138,7 +141,7 @@ export class BookDetailModal implements OnInit {
     }
     // Show the copy as gone at once; if the server refuses, put the book back as it was.
     const before = this.current()!;
-    this.setBook({ ...before, availableCopies: Math.max(0, before.availableCopies - 1) });
+    this.setBook({ ...before, availableCopies: 0 });
     this.api.issueBook(before.id, data.student.id, data.days).subscribe({
       next: () => {
         this.ui.toast(`Issued to ${data.student.fullName}.`);
@@ -148,6 +151,27 @@ export class BookDetailModal implements OnInit {
       error: err => {
         this.setBook(before);
         this.ui.error(err, 'Could not issue the book.');
+      }
+    });
+  }
+
+  /** A student asks the library for this book; staff see it on their Dashboard. */
+  request() {
+    this.busy.set(true);
+    this.api.requestBook(this.current()!.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.requested.set(true);
+        this.ui.toast('Request sent to the librarian.');
+      },
+      error: err => {
+        this.busy.set(false);
+        if (err instanceof HttpErrorResponse && err.status === 409) {
+          this.requested.set(true);
+          this.ui.toast('You have already requested this book.');
+          return;
+        }
+        this.ui.error(err, 'Could not send the request.');
       }
     });
   }

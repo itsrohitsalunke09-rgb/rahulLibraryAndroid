@@ -7,7 +7,7 @@ import { UiService } from '../../core/ui.service';
 import { IssueBookModal } from './issue-book.modal';
 
 describe('IssueBookModal', () => {
-  const book = { id: 7, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', totalCopies: 3, availableCopies: 2 } as Book;
+  const book = { id: 7, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', availableCopies: 1 } as Book;
   const asha = { id: 3, username: 'asha', fullName: 'Asha Patil', role: 'STUDENT', active: true } as UserAccount;
   let issueBook: ReturnType<typeof vi.fn>;
   let dismiss: ReturnType<typeof vi.fn>;

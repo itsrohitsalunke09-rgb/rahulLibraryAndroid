@@ -2,19 +2,11 @@ import { Book } from '../../core/models';
 import { KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest } from './book-request';
 import { publicationYears } from './book-form.modal';
 
-const book: Book = { id: 9, title: 'Gitanjali', author: 'Tagore', totalCopies: 2, availableCopies: 1 };
+const book: Book = { id: 9, title: 'Gitanjali', author: 'Tagore', availableCopies: 1 };
 
 describe('toBookRequest', () => {
   it('requires a title and an author', () => {
     expect(toBookRequest({ ...bookFormFrom(), title: '  ', author: 'Tagore' })).toEqual({ error: 'Title and author are required.' });
-  });
-
-  it('requires at least one copy', () => {
-    const form = { ...bookFormFrom(), title: 'Gitanjali', author: 'Tagore' };
-    const msg = { error: 'Total copies must be a whole number from 1 to 10,000.' };
-    expect(toBookRequest({ ...form, totalCopies: '0' })).toEqual(msg);
-    expect(toBookRequest({ ...form, totalCopies: '' })).toEqual(msg);
-    expect(toBookRequest({ ...form, totalCopies: '2.5' })).toEqual(msg);
   });
 
   it('checks the year, pages and price only when filled in', () => {
@@ -31,7 +23,7 @@ describe('toBookRequest', () => {
     const form = { ...bookFormFrom(book), title: ' Gitanjali ', categoryChoice: '4', category: 'Poetry', price: '120.5', pageCount: '' };
     const result = toBookRequest(form);
     expect('request' in result && result.request).toMatchObject({
-      title: 'Gitanjali', totalCopies: 2, categoryId: 4, category: undefined, price: 120.5, pageCount: undefined
+      title: 'Gitanjali', categoryId: 4, category: undefined, price: 120.5, pageCount: undefined
     });
   });
 

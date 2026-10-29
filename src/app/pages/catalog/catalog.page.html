@@ -148,19 +148,25 @@
             </ion-label>
             <div slot="end" class="availability">
               <ion-badge class="chip" [color]="book.availableCopies > 0 ? 'success' : 'warning'">
-                {{ book.availableCopies > 0 ? 'Available' : 'All issued' }}
+                {{ book.availableCopies > 0 ? 'Available' : 'Issued' }}
               </ion-badge>
-              <span class="copies">{{ book.availableCopies }} of {{ book.totalCopies }}</span>
             </div>
           </ion-item>
         }
       </ion-list>
+      @if (query() && !auth.isStaff() && books.finished()) {
+        <p class="suggest-line">Not the book you want? <button type="button" class="link" (click)="suggest()">Suggest a book</button></p>
+      }
     } @else if (!books.error()) {
       <div class="empty-state">
         <span class="icon empty-icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span>
         @if (query()) {
           <h2>No books match "{{ query() }}"</h2>
           <p>Try part of the title, the author's name or a registration number.</p>
+          @if (!auth.isStaff()) {
+            <!-- Not in the library: students can ask for it. -->
+            <button type="button" class="suggest" (click)="suggest()">Suggest this book</button>
+          }
         } @else {
           <h2>No books in the catalog yet</h2>
           <p>{{ perms.can('WRITE') ? 'Add the first book with the + button.' : 'Check back once the librarian has added books.' }}</p>

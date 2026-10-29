@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Requests &amp; suggestions</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="kind()" (ionChange)="setKind($event.detail.value)">
+      <ion-segment-button value="REQUEST">Requests{{ all() ? ' (' + count('REQUEST') + ')' : '' }}</ion-segment-button>
+      <ion-segment-button value="SUGGESTION">Suggestions{{ all() ? ' (' + count('SUGGESTION') + ')' : '' }}</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (all()) {
+    @if (shown().length) {
+      <ion-list inset="true" lines="full">
+        @for (r of shown(); track r.id) {
+          <ion-item>
+            <ion-label>
+              <h2 class="marathi">{{ r.title }}</h2>
+              @if (r.author) {
+                <p class="author marathi">{{ r.author }}</p>
+              }
+              <p class="meta">{{ r.studentName }} · {{ formatDate(r.createdAt.slice(0, 10)) }}</p>
+              @if (r.note) {
+                <p class="note">"{{ r.note }}"</p>
+              }
+            </ion-label>
+            @if (perms.can('UPDATE')) {
+              <button slot="end" type="button" class="done" [disabled]="clearing() === r.id" (click)="done(r)"
+                      [attr.aria-label]="'Mark ' + r.title + ' done'">Done</button>
+            }
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!error()) {
+      <div class="empty-state">
+        <span class="icon empty-icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
+        @if (kind() === 'REQUEST') {
+          <h2>No book requests</h2>
+          <p>Students ask for a book from its card in the Catalog.</p>
+        } @else {
+          <h2>No suggestions</h2>
+          <p>Students suggest a book when a Catalog search doesn't find it.</p>
+        }
+      </div>
+    }
+  } @else if (!error()) {
+    <app-page-skeleton [count]="false" />
+  }
+</ion-content>

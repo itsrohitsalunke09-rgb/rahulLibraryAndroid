@@ -9,7 +9,7 @@ import { UiService } from '../../core/ui.service';
 import { BookDetailModal } from './book-detail.modal';
 
 describe('BookDetailModal', () => {
-  const book = { id: 7, title: 'Wings of Fire', author: 'Kalam', totalCopies: 1, availableCopies: 1 } as Book;
+  const book = { id: 7, title: 'Wings of Fire', author: 'Kalam', availableCopies: 1 } as Book;
   const afterIssue = { ...book, availableCopies: 0 };
   const asha = { id: 3, fullName: 'Asha Patil' } as UserAccount;
 
