@@ -31,7 +31,7 @@ type Tab = 'CURRENT' | 'RETURNED' | 'SUGGESTED';
 })
 export class MyBooksPage implements ViewWillEnter {
   private api = inject(ApiService);
-  /** The Reading Galaxy shows here when the student role has Galaxy view. */
+  /** The Reading Galaxy shows here when the student role has Read. */
   protected perms = inject(PermissionsStore);
 
   readonly tab = signal<Tab>('CURRENT');

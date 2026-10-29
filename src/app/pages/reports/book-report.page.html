@@ -17,7 +17,7 @@
   }
 
   <!-- This year's readers live in the Reading Galaxy: a planet per student, on its own screen. -->
-  @if (perms.can('GALAXY_VIEW')) {
+  @if (perms.can('READ')) {
   <a class="galaxy" routerLink="/tabs/dashboard/reports/galaxy">
     <span class="planets" aria-hidden="true">
       @for (r of (yearReaders() ?? []).slice(0, 5); track r.studentId; let i = $index) {

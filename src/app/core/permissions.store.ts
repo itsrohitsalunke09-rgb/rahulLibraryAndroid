@@ -4,23 +4,22 @@ import { AuthService } from './auth.service';
 import { Role } from './models';
 
 /** What a role may do; set per role in Profile › Masters › Roles & permissions. */
-export type Permission = 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'GALAXY_VIEW' | 'CALL' | 'REGISTER';
+export type Permission = 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'CALL' | 'REGISTER';
 export type PermissionMatrix = Record<Role, Permission[]>;
 
 export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
-  { key: 'READ', label: 'Read', hint: 'See the catalog, news, issues, people, registers and reports' },
+  { key: 'READ', label: 'Read', hint: 'See the catalog, news, issues, people, registers, reports and the Reading Galaxy' },
   { key: 'WRITE', label: 'Add', hint: 'Add books and people' },
   { key: 'UPDATE', label: 'Update', hint: 'Edit books and people' },
-  { key: 'DELETE', label: 'Delete', hint: 'Delete books, people and magazine issues' },
-  { key: 'GALAXY_VIEW', label: 'Galaxy view', hint: 'Open the Reading Galaxy' },
-  { key: 'REGISTER', label: 'Register', hint: 'Issue and return books; mark newspapers and magazines received' },
+  { key: 'DELETE', label: 'Delete', hint: 'Delete books, people and requests' },
+  { key: 'REGISTER', label: 'Register', hint: 'Issue and return books; mark and remove newspapers and magazines received' },
   { key: 'CALL', label: 'Call', hint: 'Phone a newspaper or magazine vendor' },
 ];
 
 /** The same defaults as the server's, used until the real ticks have loaded. */
 export const DEFAULT_PERMISSIONS: PermissionMatrix = {
-  ADMIN: ['READ', 'WRITE', 'UPDATE', 'DELETE', 'GALAXY_VIEW', 'REGISTER', 'CALL'],
-  LIBRARIAN: ['READ', 'WRITE', 'UPDATE', 'GALAXY_VIEW', 'REGISTER'],
+  ADMIN: ['READ', 'WRITE', 'UPDATE', 'DELETE', 'REGISTER', 'CALL'],
+  LIBRARIAN: ['READ', 'WRITE', 'UPDATE', 'REGISTER'],
   STUDENT: ['READ'],
 };
 

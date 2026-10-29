@@ -53,7 +53,7 @@
           <li>
             <span class="no marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
             <span class="when">{{ label(r) }}</span>
-            @if (perms.can('DELETE')) {
+            @if (perms.can('REGISTER')) {
             <button type="button" class="remove" [disabled]="removing() === r.id"
                     [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : label(r))" (click)="remove(r)">
               <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
@@ -62,7 +62,7 @@
           </li>
         }
       </ul>
-      @if (perms.can('DELETE')) {
+      @if (perms.can('REGISTER')) {
         <p class="hint">Tap × on an issue marked by mistake.</p>
       }
     } @else {

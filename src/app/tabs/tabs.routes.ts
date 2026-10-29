@@ -12,8 +12,6 @@ const STAFF_ONLY = { canMatch: [roleGuard(STAFF_ROLES)], data: { preload: STAFF_
 const ADMIN_ONLY = { canMatch: [roleGuard(['ADMIN'])], data: { preload: ['ADMIN'] satisfies PreloadFor } };
 /** Screens that show data: need Read in Roles & permissions. */
 const READ = { canActivate: [permissionGuard('READ')] };
-/** The Reading Galaxy: needs Galaxy view. */
-const GALAXY = { canActivate: [permissionGuard('GALAXY_VIEW')] };
 
 export const routes: Routes = [
   {
@@ -128,7 +126,7 @@ export const routes: Routes = [
       {
         path: 'dashboard/reports/galaxy',
         ...STAFF_ONLY,
-        ...GALAXY,
+        ...READ,
         loadComponent: () => import('../pages/reports/galaxy.page').then(m => m.GalaxyPage),
       },
       {
@@ -171,10 +169,10 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/my-books/my-books.page').then(m => m.MyBooksPage),
       },
       {
-        // Students reach the Reading Galaxy from My books, when given Galaxy view; their own planet twinkles.
+        // Students reach the Reading Galaxy from My books, their own planet twinkles and only it opens.
         path: 'my-books/galaxy',
         canMatch: [roleGuard(['STUDENT'])],
-        ...GALAXY,
+        ...READ,
         loadComponent: () => import('../pages/reports/galaxy.page').then(m => m.GalaxyPage),
       },
       {

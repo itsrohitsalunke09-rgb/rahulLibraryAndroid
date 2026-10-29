@@ -36,13 +36,13 @@ describe('PermissionsStore', () => {
     const perms = create();
     perms.refresh();
     expect(perms.can('DELETE')).toBe(true);
-    expect(perms.can('GALAXY_VIEW')).toBe(true);
+    expect(perms.can('CALL')).toBe(true);
   });
 
   it('keepsTheTicksOnThePhoneForNextStart', () => {
     role.set('STUDENT');
-    create({ ADMIN: [], LIBRARIAN: [], STUDENT: ['READ', 'GALAXY_VIEW'] }).refresh();
+    create({ ADMIN: [], LIBRARIAN: [], STUDENT: ['READ', 'CALL'] }).refresh();
     TestBed.resetTestingModule();
-    expect(create().can('GALAXY_VIEW')).toBe(true);
+    expect(create().can('CALL')).toBe(true);
   });
 });
