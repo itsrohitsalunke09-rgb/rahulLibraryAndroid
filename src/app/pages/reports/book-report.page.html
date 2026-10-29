@@ -20,7 +20,7 @@
   <a class="galaxy" routerLink="/tabs/dashboard/reports/galaxy">
     <span class="planets" aria-hidden="true">
       @for (r of (yearReaders() ?? []).slice(0, 5); track r.studentId; let i = $index) {
-        <span [class]="'dot planet-skin p' + i + ' ' + kind(r.studentId)"></span>
+        <span [class]="'dot planet-skin p' + i + ' ' + tiers().get(r.studentId)" [style.--hue]="hue(r.studentId)"></span>
       }
     </span>
     <span class="text">
@@ -30,37 +30,40 @@
     <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
   </a>
 
-  @if (issues()) {
-    @if (readers().length) {
-      <!-- Students heading with the month's PDF on the right. -->
+  @if (students(); as list) {
+    @if (list.length) {
+      <!-- Students heading with the year PDF on the right. -->
       <div class="list-head">
-        <h2 class="section-title">Students <span class="group-count">{{ readers().length }} · {{ monthName(month()) }}</span></h2>
+        <h2 class="section-title">Students <span class="group-count">{{ list.length }} · all years</span></h2>
         <button type="button" class="export-pdf" [disabled]="exporting()" (click)="exportPdf()"
                 aria-label="Export a year as PDF">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 16px" aria-hidden="true"></span>
           Export PDF
         </button>
       </div>
-      <!-- One line per student, like People; tap for their books this month. -->
+      <!-- One line per student: totals across all years; tap for their books. -->
       <ion-list inset="true" lines="full">
-        @for (r of readers(); track r.studentId) {
-          <ion-item button detail="false" (click)="open(r)">
+        @for (s of list; track s.studentId) {
+          <ion-item button detail="false" (click)="open(s)">
             <ion-label>
-              <h2>{{ r.studentName }}</h2>
-              <p>{{ r.given }} given · {{ r.returned }} returned</p>
+              <h2>{{ s.studentName }}</h2>
+              <p>
+                {{ s.issued }} issued · {{ s.returned }} returned
+                @if (s.overdue) { · <span class="overdue">{{ s.overdue }} overdue</span> }
+              </p>
             </ion-label>
-            <span slot="end" class="count">{{ r.books.length }} book{{ r.books.length === 1 ? '' : 's' }}</span>
+            <span slot="end" class="count">{{ s.total }} book{{ s.total === 1 ? '' : 's' }}</span>
           </ion-item>
         }
       </ion-list>
       <p class="note list-note">Export PDF asks for a year, then lists student by student every book given or returned in it: registration number, issued on and returned on.</p>
     } @else {
       <div class="empty-state">
-        <h2>No books given or returned</h2>
-        <p>Nothing moved yet in {{ monthName(month()) }}.</p>
+        <h2>No books given yet</h2>
+        <p>Students show here once books are issued to them.</p>
       </div>
     }
   } @else if (!error()) {
-    <app-page-skeleton [avatar]="true" [chip]="true" [rows]="6" />
+    <app-page-skeleton [count]="false" [chip]="true" [rows]="6" />
   }
 </ion-content>

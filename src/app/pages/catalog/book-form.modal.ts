@@ -30,13 +30,15 @@ export class BookFormModal implements OnInit {
   protected readonly keepText = KEEP_TEXT_CATEGORY;
   readonly saving = signal(false);
   readonly error = signal('');
+  /** Publication years, newest first, back to 1800 (plus an older year already on the book). */
+  years: number[] = [];
 
   ngOnInit() {
     this.form = bookFormFrom(this.book);
+    this.years = publicationYears(new Date().getFullYear(), this.book?.publicationYear);
     this.oldCategory = unlinkedCategory(this.book);
     this.categories.load(true);
   }
-
 
   cancel() {
     this.modals.dismiss(null, 'cancel');
@@ -62,4 +64,10 @@ export class BookFormModal implements OnInit {
       }
     });
   }
+}
+
+/** The publication year choices: this year back to 1800, with a book's older year kept so it isn't lost. */
+export function publicationYears(thisYear: number, current?: number | null): number[] {
+  const years = Array.from({ length: thisYear - 1800 + 1 }, (_, i) => thisYear - i);
+  return current && current < 1800 ? [...years, current] : years;
 }

@@ -1,4 +1,4 @@
-import { layoutGalaxy } from './galaxy';
+import { layoutGalaxy, planetHue, planetName, planetTiers } from './galaxy';
 
 describe('layoutGalaxy', () => {
   function check(count: number, width: number, height: number) {
@@ -38,11 +38,33 @@ describe('layoutGalaxy', () => {
     expect(layoutGalaxy([], 360, 640)).toEqual([]);
   });
 
-  it('keepsTheClearCircleFree', () => {
-    const readers = Array.from({ length: 40 }, (_, i) => ({ studentId: i + 1, books: 1 + (i % 9) }));
-    const core = { x: 180, y: 300, r: 50 };
-    const planets = layoutGalaxy(readers, 360, 640, 4, 0.32, core);
+  it('pinsAStudentAtTheirSpot', () => {
+    const readers = Array.from({ length: 40 }, (_, i) => ({ studentId: i + 1, books: 40 - i }));
+    const planets = layoutGalaxy(readers, 360, 640, 4, 0.32, { studentId: 1, x: 180, y: 300 });
     expect(planets.length).toBe(40);
-    expect(planets.every(p => Math.hypot(p.x - core.x, p.y - core.y) >= core.r + p.r)).toBe(true);
+    const sun = planets.find(p => p.studentId === 1)!;
+    expect([Math.round(sun.x), Math.round(sun.y)]).toEqual([180, 300]);
+  });
+});
+
+describe('planetTiers', () => {
+  it('givesBodiesByBookCountTheMostIsTheSun', () => {
+    const tiers = planetTiers([{ studentId: 1, books: 24 }, { studentId: 2, books: 20 }, { studentId: 3, books: 20 }, { studentId: 4, books: 3 }]);
+    expect(tiers.get(1)).toBe('sun');
+    expect(tiers.get(2)).toBe('jupiter');
+    expect(tiers.get(3)).toBe('jupiter');
+    expect(tiers.get(4)).toBe('saturn');
+    expect(planetName('saturn')).toBe('Saturn');
+  });
+
+  it('paintsReadersBelowTheFourteenthCountInTheirOwnColour', () => {
+    const readers = Array.from({ length: 20 }, (_, i) => ({ studentId: i + 1, books: 40 - i }));
+    const tiers = planetTiers(readers);
+    expect(tiers.get(14)).toBe('ceres');
+    expect(tiers.get(15)).toBe('other');
+    expect(planetName('other')).toBe('');
+    expect(planetHue(15)).toBe(planetHue(15));
+    expect(planetHue(15)).toBeGreaterThanOrEqual(0);
+    expect(planetHue(15)).toBeLessThan(360);
   });
 });

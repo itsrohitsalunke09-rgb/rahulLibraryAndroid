@@ -4,8 +4,8 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { formatDate } from '../../core/dates';
-import { planetKind } from '../../core/galaxy';
-import { BookIssue, ReaderCount } from '../../core/models';
+import { PlanetKind, planetHue, planetName } from '../../core/galaxy';
+import { BookIssue, ReaderCount, issueStatus } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { MarathiPipe } from '../../core/pipes';
 import { errorMessage } from '../../core/ui.service';
@@ -26,22 +26,30 @@ export class ReaderProfileModal implements OnInit {
   @Input({ required: true }) rank!: number;
   @Input({ required: true }) readers!: number;
   @Input({ required: true }) year!: number;
+  /** The student's body in the galaxy (Sun, planet or dwarf planet, by rank). */
+  @Input({ required: true }) kind!: PlanetKind;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
   readonly formatDate = formatDate;
-  /** Drawn as the same planet as in the galaxy. */
-  get kind() {
-    return planetKind(this.reader.studentId);
+  readonly planetName = planetName;
+  get hue() {
+    return planetHue(this.reader.studentId);
   }
 
   readonly books = signal<BookIssue[] | null>(null);
   readonly error = signal('');
-  readonly out = computed(() => (this.books() ?? []).filter(b => !b.returnDate).length);
+  readonly status = issueStatus;
+  /** Books in each state: Issued, Overdue, Returned. */
+  readonly count = computed(() => {
+    const list = this.books() ?? [];
+    return { issued: list.filter(b => b.status === 'ISSUED').length, overdue: list.filter(b => b.status === 'OVERDUE').length,
+      returned: list.filter(b => b.status === 'RETURNED').length };
+  });
   readonly favourite = computed(() => favouriteCategory(this.books() ?? []));
 
   ngOnInit() {
-    this.api.studentIssuesInYear(this.reader.studentId, this.year).subscribe({
+    this.api.studentIssues(this.reader.studentId, this.year).subscribe({
       next: list => this.books.set(list),
       error: err => this.error.set(errorMessage(err, 'Could not load the books.')),
     });

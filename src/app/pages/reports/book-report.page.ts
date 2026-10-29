@@ -7,10 +7,10 @@ import {
 } from '@ionic/angular';
 import { DEFAULT_ABOUT } from '../../core/about-content';
 import { ApiService } from '../../core/api.service';
-import { Reader, bookMoves, readers } from '../../core/book-moves';
+import { bookMoves, readers } from '../../core/book-moves';
 import { localIsoDate } from '../../core/dates';
-import { planetKind } from '../../core/galaxy';
-import { BookIssue, ReaderCount } from '../../core/models';
+import { planetHue, planetTiers } from '../../core/galaxy';
+import { ReaderCount, StudentSummary } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { RouterLink } from '@angular/router';
 import { bookMovesPdf } from '../../core/register-pdf';
@@ -20,8 +20,8 @@ import { StudentBooksModal } from './student-books.modal';
 
 /**
  * पुस्तकांची देवाण घेवाण. On top, the way into the Reading Galaxy (this year's readers as planets).
- * Below, this month's books given and returned, one line per student (tap for their books), with the
- * month's register as a PDF.
+ * Below, every student who has had books, with their totals across all years (tap for their books),
+ * and a year's register as a PDF.
  */
 @Component({
   selector: 'app-book-report',
@@ -41,18 +41,17 @@ export class BookReportPage implements ViewWillEnter {
   readonly today = localIsoDate();
   readonly thisYear = Number(this.today.slice(0, 4));
   readonly thisMonth = this.today.slice(0, 7);
-  /** The list and PDF cover this month. */
-  readonly month = signal(this.thisMonth);
-  readonly issues = signal<BookIssue[] | null>(null);
+  /** Every student's totals across all years, the most books first; null until loaded. */
+  readonly students = signal<StudentSummary[] | null>(null);
   readonly error = signal('');
   readonly exporting = signal(false);
 
   /** This year's books per student, the most first (for the Reading Galaxy banner); null until loaded. */
   readonly yearReaders = signal<ReaderCount[] | null>(null);
 
-  readonly kind = planetKind;
-  readonly moves = computed(() => bookMoves(this.issues() ?? [], this.month()));
-  readonly readers = computed(() => readers(this.moves()));
+  /** The banner's top readers drawn as their bodies (the Sun first). */
+  readonly tiers = computed(() => planetTiers(this.yearReaders() ?? []));
+  readonly hue = planetHue;
 
   ionViewWillEnter() {
     this.load();
@@ -66,20 +65,11 @@ export class BookReportPage implements ViewWillEnter {
     this.loadYear(settled);
   }
 
-  /** A student's books for the month, in a popup. */
-  async open(reader: Reader) {
-    const modal = await this.modals.create({
-      component: StudentBooksModal,
-      componentProps: { reader, monthName: this.monthName(this.month()) },
-    });
+  /** A student's books across all years, in a popup. */
+  async open(student: StudentSummary) {
+    const modal = await this.modals.create({ component: StudentBooksModal, componentProps: { student } });
     await modal.present();
   }
-
-  /** "October 2026". */
-  monthName(month: string) {
-    return new Date(month + '-01T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-  }
-
 
   /** Asks which year, then saves that year's books given and returned, student by student, as a portrait PDF. */
   async exportPdf() {
@@ -122,7 +112,6 @@ export class BookReportPage implements ViewWillEnter {
     }
   }
 
-
   private loadYear(done?: () => void) {
     this.api.readersInYear(this.thisYear).subscribe({
       next: list => { this.yearReaders.set(list); done?.(); },
@@ -131,20 +120,10 @@ export class BookReportPage implements ViewWillEnter {
   }
 
   private load(done?: () => void) {
-    const month = this.month();
-    this.issues.set(null);
     this.error.set('');
-    this.api.issuesMovedInMonth(month).subscribe({
-      next: list => {
-        if (month === this.month()) {
-          this.issues.set(list);
-        }
-        done?.();
-      },
-      error: err => {
-        this.error.set(errorMessage(err, 'Could not load the month.'));
-        done?.();
-      },
+    this.api.studentSummaries().subscribe({
+      next: list => { this.students.set(list); done?.(); },
+      error: err => { this.error.set(errorMessage(err, 'Could not load the students.')); done?.(); },
     });
   }
 }

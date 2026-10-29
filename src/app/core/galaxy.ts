@@ -31,11 +31,11 @@ function seeded(seed: number): () => number {
  * Places every student as a non-overlapping planet inside a width × height box (one screen, no
  * scrolling). Area grows with books read. Each planet lands on a random spot anywhere in the box (the
  * same spot every visit); the biggest are placed first so the small ones fill the gaps around them.
- * If a planet can't fit, everything shrinks a little and is placed again. keepClear is a circle (px)
- * no planet may cover, e.g. the bright core of the painted galaxy.
+ * If a planet can't fit, everything shrinks a little and is placed again. pin puts one student's
+ * planet at a set spot (the Sun at the painted galaxy's core) when it fits there.
  */
 export function layoutGalaxy(readers: { studentId: number; books: number }[], width: number, height: number, gap = 4,
-                             maxFill = 0.5, keepClear?: { x: number; y: number; r: number }): Planet[] {
+                             maxFill = 0.5, pin?: { studentId: number; x: number; y: number }): Planet[] {
   if (!readers.length || width < 40 || height < 40) {
     return [];
   }
@@ -64,11 +64,12 @@ export function layoutGalaxy(readers: { studentId: number; books: number }[], wi
     const fits = sorted.every(reader => {
       const r = Math.min(Math.max(MIN_R, k * Math.sqrt(Math.max(reader.books, 1))), Math.min(width, height) / 2 - gap);
       const random = seeded(hash(reader.studentId));
+      const pinned = pin?.studentId === reader.studentId;
       for (let i = 0; i < TRIES; i++) {
-        const x = r + random() * (width - 2 * r);
-        const y = r + random() * (height - 2 * r);
-        const clear = !keepClear || (keepClear.x - x) ** 2 + (keepClear.y - y) ** 2 >= (keepClear.r + r) ** 2;
-        if (clear && free(x, y, r)) {
+        // A pinned planet tries its own spot first (kept inside the box), then random ones like the rest.
+        const x = pinned && i === 0 ? Math.min(Math.max(pin.x, r), width - r) : r + random() * (width - 2 * r);
+        const y = pinned && i === 0 ? Math.min(Math.max(pin.y, r), height - r) : r + random() * (height - 2 * r);
+        if (free(x, y, r)) {
           const planet = { studentId: reader.studentId, x, y, r };
           placed.push(planet);
           around(x, y, r, key => void cells.set(key, [...(cells.get(key) ?? []), planet]));
@@ -90,10 +91,45 @@ export function floatTiming(studentId: number): { duration: number; delay: numbe
   return { duration: 5 + (h % 40) / 10, delay: -((h >> 8) % 60) / 10 };
 }
 
-/** The solar system's planets; each student is always drawn as the same one. */
-const KINDS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'] as const;
-export type PlanetKind = (typeof KINDS)[number];
+/**
+ * The Sun, planets and dwarf planets from biggest to smallest. They go to the year's book counts in order:
+ * the most books is the Sun, the next count down is Jupiter, and so on to Ceres. Readers below those
+ * fourteen counts are plain planets in their own colour.
+ */
+export const PLANET_GUIDE = [
+  { kind: 'sun', name: 'Sun', meaning: 'Most books' },
+  { kind: 'jupiter', name: 'Jupiter', meaning: '2nd most books' },
+  { kind: 'saturn', name: 'Saturn', meaning: '3rd most' },
+  { kind: 'uranus', name: 'Uranus', meaning: '4th most' },
+  { kind: 'neptune', name: 'Neptune', meaning: '5th most' },
+  { kind: 'earth', name: 'Earth', meaning: '6th most' },
+  { kind: 'venus', name: 'Venus', meaning: '7th most' },
+  { kind: 'mars', name: 'Mars', meaning: '8th most' },
+  { kind: 'mercury', name: 'Mercury', meaning: '9th most' },
+  { kind: 'pluto', name: 'Pluto', meaning: '10th most · dwarf planet' },
+  { kind: 'eris', name: 'Eris', meaning: '11th most · dwarf planet' },
+  { kind: 'haumea', name: 'Haumea', meaning: '12th most · dwarf planet' },
+  { kind: 'makemake', name: 'Makemake', meaning: '13th most · dwarf planet' },
+  { kind: 'ceres', name: 'Ceres', meaning: '14th most · dwarf planet' },
+] as const;
+/** A body of the solar system, or 'other' for a plain planet in the student's own colour. */
+export type PlanetKind = (typeof PLANET_GUIDE)[number]['kind'] | 'other';
 
-export function planetKind(studentId: number): PlanetKind {
-  return KINDS[hash(studentId) % KINDS.length];
+/**
+ * Each student's body for the year by book count: the highest count is the Sun, the next Jupiter, and so
+ * on; students with the same count share a body; counts below the fourteenth are 'other'.
+ */
+export function planetTiers(readers: { studentId: number; books: number }[]): Map<number, PlanetKind> {
+  const counts = [...new Set(readers.map(r => r.books))].sort((a, b) => b - a);
+  return new Map(readers.map(r => [r.studentId, PLANET_GUIDE[counts.indexOf(r.books)]?.kind ?? 'other']));
+}
+
+/** "Jupiter" for "jupiter"; empty for a plain coloured planet. */
+export function planetName(kind: PlanetKind): string {
+  return PLANET_GUIDE.find(t => t.kind === kind)?.name ?? '';
+}
+
+/** The colour (hue, 0–359) of a student's plain planet: random-looking but the same every visit. */
+export function planetHue(studentId: number): number {
+  return hash(studentId + 7919) % 360;
 }

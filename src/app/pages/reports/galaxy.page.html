@@ -4,6 +4,9 @@
       <ion-back-button defaultHref="/tabs/dashboard/reports/BOOKS" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Reading Galaxy</ion-title>
+    <ion-buttons slot="end">
+      <button type="button" class="guide-button" aria-label="Planet guide" (click)="guideOpen.set(true)">i</button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,13 +18,15 @@
     @for (p of planets(); track p.studentId) {
       <div class="orbit" [style.left.px]="p.x - p.r" [style.top.px]="p.y - p.r"
            [style.animation-duration.s]="p.duration" [style.animation-delay.s]="p.delay">
-        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" role="listitem"
+        <button type="button" class="planet planet-skin" [class]="'planet planet-skin ' + p.kind" role="listitem" [style.--hue]="p.hue"
                 [style.width.px]="p.r * 2" [style.height.px]="p.r * 2"
                 [attr.aria-label]="p.reader.studentName + ', ' + p.reader.books + ' book' + (p.reader.books === 1 ? '' : 's')"
                 (click)="open(p.reader)">
           @if (p.named) {
-            <span class="name" [style.font-size.px]="p.r * 0.26">{{ p.reader.studentName }}</span>
-            <span class="books" [style.font-size.px]="p.r * 0.2">{{ p.reader.books }}</span>
+            @if (planetName(p.kind); as name) {
+              <span class="name" [style.font-size.px]="p.r * 0.28">{{ name }}</span>
+            }
+            <span class="books" [style.font-size.px]="p.r * 0.2">{{ p.reader.books }} book{{ p.reader.books === 1 ? '' : 's' }}</span>
           }
         </button>
       </div>
@@ -37,6 +42,33 @@
   </div>
 
   @if (readers()?.length) {
-    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · bigger planet = more books · tap one</p>
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · tap i for the guide</p>
+  }
+
+  <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->
+  @if (guideOpen()) {
+    <div class="guide-backdrop" (click)="guideOpen.set(false)">
+      <section class="guide" role="dialog" aria-label="Planet guide" (click)="$event.stopPropagation()">
+        <header>
+          <h2>Planet guide</h2>
+          <button type="button" class="close" aria-label="Close" (click)="guideOpen.set(false)">&times;</button>
+        </header>
+        <p class="intro">Bodies go from biggest to smallest, like the real solar system, by this year's book counts: the most books is the Sun, the next count Jupiter, and so on. Students with the same count share a body.</p>
+        <ul>
+          @for (g of guide; track g.kind) {
+            <li>
+              <span [class]="'swatch planet-skin ' + g.kind" aria-hidden="true"></span>
+              <strong>{{ g.name }}</strong>
+              <span class="meaning">{{ g.meaning }}</span>
+            </li>
+          }
+          <li>
+            <span class="swatch planet-skin other" style="--hue: 150" aria-hidden="true"></span>
+            <strong>Coloured planets</strong>
+            <span class="meaning">Everyone after the 14th</span>
+          </li>
+        </ul>
+      </section>
+    </div>
   }
 </ion-content>

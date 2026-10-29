@@ -4,6 +4,15 @@
   color: var(--app-muted);
 }
 
+.overdue {
+  color: var(--app-rust);
+  font-weight: 600;
+}
+
+.pad {
+  margin: 16px 24px;
+}
+
 ion-item {
   --min-height: 60px;
 
@@ -20,7 +29,7 @@ ion-item {
   }
 }
 
-/* With student (blue) or Returned (green). */
+/* Issued (blue), Overdue (red) or Returned (green). */
 .kind {
   padding: 3px 10px;
   border-radius: 100px;
@@ -29,6 +38,11 @@ ion-item {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
+
+  &.late {
+    background: var(--app-rust-soft);
+    color: var(--app-rust);
+  }
 
   &.back {
     background: var(--app-success-soft);

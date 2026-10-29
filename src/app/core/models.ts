@@ -90,6 +90,16 @@ export interface BookIssue {
   registrationNumber?: string | null;
 }
 
+/** A student's books across all years: total, and how many are returned, still issued, or overdue. */
+export interface StudentSummary {
+  studentId: number;
+  studentName: string;
+  total: number;
+  returned: number;
+  issued: number;
+  overdue: number;
+}
+
 /** A student and how many books they were given in a year (the books report's circles). */
 export interface ReaderCount {
   studentId: number;
@@ -330,3 +340,10 @@ export function tel(number: string): string {
 export const MARATHI_FREQUENCY: Record<PeriodicalFrequency, string> = {
   DAILY: 'दैनिके', WEEKLY: 'साप्ताहिक', FORTNIGHTLY: 'पाक्षिक', MONTHLY: 'मासिक',
 };
+
+/** A book's state for a pill: Issued (out, not yet due), Overdue (out, past due) or Returned. */
+export function issueStatus(issue: Pick<BookIssue, 'status'>): { label: 'Issued' | 'Overdue' | 'Returned'; tone: 'out' | 'late' | 'back' } {
+  return issue.status === 'RETURNED' ? { label: 'Returned', tone: 'back' }
+    : issue.status === 'OVERDUE' ? { label: 'Overdue', tone: 'late' }
+      : { label: 'Issued', tone: 'out' };
+}

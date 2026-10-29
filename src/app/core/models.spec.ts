@@ -1,4 +1,4 @@
-import { byFrequency, onlyFrequency } from './models';
+import { byFrequency, onlyFrequency, issueStatus } from './models';
 
 describe('byFrequency', () => {
   it('groups in daily-to-monthly order and skips empty frequencies', () => {
@@ -23,5 +23,13 @@ describe('onlyFrequency', () => {
     const weekly = onlyFrequency(report, 'WEEKLY');
     expect(weekly.rows.map(r => r.periodicalId)).toEqual([2]);
     expect([weekly.totalIssues, weekly.totalAmount]).toEqual([2, 90]);
+  });
+});
+
+describe('issueStatus', () => {
+  it('namesTheThreeStates', () => {
+    expect(issueStatus({ status: 'ISSUED' }).label).toBe('Issued');
+    expect(issueStatus({ status: 'OVERDUE' })).toEqual({ label: 'Overdue', tone: 'late' });
+    expect(issueStatus({ status: 'RETURNED' }).tone).toBe('back');
   });
 });

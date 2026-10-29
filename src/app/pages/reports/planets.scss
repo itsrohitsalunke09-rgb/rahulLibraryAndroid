@@ -82,4 +82,61 @@
       linear-gradient(172deg, transparent 30%, rgb(255 255 255 / 0.16) 36%, transparent 42%),
       radial-gradient(circle at 40% 38%, #7fa8ff, #3a5fe0 55%, #1d2f94);
   }
+
+  /* A plain planet in the student's own colour (readers below the fourteen named bodies). */
+  &.other {
+    --hue: 210;
+    background:
+      linear-gradient(170deg, transparent 38%, hsl(var(--hue) 70% 85% / 0.25) 46%, transparent 54%),
+      radial-gradient(circle at 42% 40%, hsl(var(--hue) 75% 72%), hsl(var(--hue) 60% 48%) 58%, hsl(var(--hue) 55% 28%));
+  }
+
+  /* The Sun shines: no dark side, a mottled surface and a warm glow around it. */
+  &.sun {
+    overflow: visible;
+    background:
+      radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.25) 0 4%, transparent 5%),
+      radial-gradient(circle at 62% 30%, rgb(255 140 0 / 0.35) 0 5%, transparent 6%),
+      radial-gradient(circle at 55% 68%, rgb(255 120 0 / 0.3) 0 6%, transparent 7%),
+      radial-gradient(circle at 45% 45%, #fff6c4, #ffd23f 35%, #ff9a1f 72%, #e8590c);
+    box-shadow: 0 0 18px 4px rgb(255 190 70 / 0.7), 0 0 50px 14px rgb(255 140 0 / 0.35);
+
+    &::after {
+      background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.45) 0%, transparent 45%);
+    }
+  }
+
+  /* Dwarf planets: small, icy or rocky. */
+  &.pluto {
+    background:
+      radial-gradient(ellipse 20% 17% at 58% 60%, #f4e6cf 0 70%, transparent 72%),
+      radial-gradient(ellipse 14% 12% at 44% 64%, #f0dfc4 0 70%, transparent 72%),
+      radial-gradient(circle at 45% 42%, #d1b08a, #9c7653 60%, #5f4330);
+  }
+
+  &.eris {
+    background:
+      radial-gradient(circle at 60% 60%, #c9c9d4 0 6%, transparent 7%),
+      radial-gradient(circle at 42% 40%, #fbfbff, #d7d8e2 55%, #9c9db0);
+  }
+
+  &.haumea {
+    background:
+      radial-gradient(ellipse 12% 9% at 62% 46%, #b5584a 0 70%, transparent 72%),
+      linear-gradient(120deg, #ece6dc, #c9c0b2 55%, #8f877b);
+  }
+
+  &.makemake {
+    background:
+      radial-gradient(ellipse 18% 10% at 40% 60%, #8e4a2c 0 70%, transparent 72%),
+      radial-gradient(circle at 45% 42%, #d8946a, #a95e38 58%, #6d3820);
+  }
+
+  &.ceres {
+    background:
+      radial-gradient(circle at 60% 40%, #f5f5f2 0 4%, transparent 5%),
+      radial-gradient(circle at 38% 62%, #5c5a56 0 7%, transparent 8%),
+      radial-gradient(circle at 66% 70%, #5a5854 0 5%, transparent 6%),
+      radial-gradient(circle at 45% 45%, #a4a19b, #77746f 60%, #4a4844);
+  }
 }

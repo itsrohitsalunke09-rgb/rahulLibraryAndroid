@@ -18,6 +18,12 @@
     font-size: 13px;
     color: var(--app-muted);
   }
+
+  .body-name {
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--app-accent);
+  }
 }
 
 .planet {
@@ -43,8 +49,8 @@
     color: var(--app-muted);
   }
 
-  span + span { background: var(--app-yellow-soft); }
-  span:last-child { background: var(--app-success-soft); }
+  .late { background: var(--app-rust-soft); }
+  .back { background: var(--app-success-soft); }
 
   strong {
     font-size: 22px;
@@ -81,6 +87,11 @@ ion-item {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
+
+  &.late {
+    background: var(--app-rust-soft);
+    color: var(--app-rust);
+  }
 
   &.back {
     background: var(--app-success-soft);

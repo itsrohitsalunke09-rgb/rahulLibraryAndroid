@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
-  Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, ReaderCount, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
+  Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, ReaderCount, StudentSummary, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
@@ -134,9 +134,14 @@ export class ApiService {
     return this.http.get<ReaderCount[]>(`${this.base}/issues/readers`, { params: { year } });
   }
 
-  /** Reading Galaxy profile: one student's books given in the year, newest first. */
-  studentIssuesInYear(studentId: number, year: number) {
-    return this.http.get<BookIssue[]>(`${this.base}/issues/student/${studentId}`, { params: { year } });
+  /** One student's books, newest first: given in the year, or all years without one. */
+  studentIssues(studentId: number, year?: number) {
+    return this.http.get<BookIssue[]>(`${this.base}/issues/student/${studentId}`, { params: year ? { year } : {} });
+  }
+
+  /** Books report list: every student's totals by status across all years, the most books first. */
+  studentSummaries() {
+    return this.http.get<StudentSummary[]>(`${this.base}/issues/students`);
   }
 
   /** Book transactions report: issues given or returned in the month (YYYY-MM). */

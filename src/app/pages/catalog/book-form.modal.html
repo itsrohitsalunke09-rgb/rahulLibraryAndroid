@@ -90,9 +90,15 @@
       <div class="form-pair">
         <label class="form-field">
           <span class="form-label">Publication year</span>
-          <span class="form-box">
+          <span class="form-box select">
             <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
-            <input name="publicationYear" type="number" inputmode="numeric" [(ngModel)]="form.publicationYear" />
+            <select name="publicationYear" [(ngModel)]="form.publicationYear">
+              <option value="">Not known</option>
+              @for (y of years; track y) {
+                <option [ngValue]="y">{{ y }}</option>
+              }
+            </select>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           </span>
         </label>
         <label class="form-field">
