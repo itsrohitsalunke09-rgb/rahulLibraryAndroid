@@ -10,10 +10,10 @@ export type PermissionMatrix = Record<Role, Permission[]>;
 export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
   { key: 'READ', label: 'Read', hint: 'See the catalog, news, issues, people, registers and reports' },
   { key: 'WRITE', label: 'Add', hint: 'Add books and people' },
-  { key: 'UPDATE', label: 'Update', hint: 'Edit books and people, mark books returned' },
+  { key: 'UPDATE', label: 'Update', hint: 'Edit books and people' },
   { key: 'DELETE', label: 'Delete', hint: 'Delete books, people and magazine issues' },
   { key: 'GALAXY_VIEW', label: 'Galaxy view', hint: 'Open the Reading Galaxy' },
-  { key: 'REGISTER', label: 'Register', hint: 'Issue books; mark newspapers and magazines received' },
+  { key: 'REGISTER', label: 'Register', hint: 'Issue and return books; mark newspapers and magazines received' },
   { key: 'CALL', label: 'Call', hint: 'Phone a newspaper or magazine vendor' },
 ];
 

@@ -46,8 +46,8 @@
       <ion-list inset="true" lines="full">
         @for (issue of issues.items(); track issue.id) {
           <!-- A book still out is marked returned by tapping its row (after a confirmation). -->
-          <ion-item [button]="issue.status !== 'RETURNED'" detail="false" [disabled]="returning() === issue.id"
-                    (click)="issue.status !== 'RETURNED' && perms.can('UPDATE') && markReturned(issue)">
+          <ion-item [button]="issue.status !== 'RETURNED' && perms.can('REGISTER')" detail="false" [disabled]="returning() === issue.id"
+                    (click)="issue.status !== 'RETURNED' && perms.can('REGISTER') && markReturned(issue)">
             <ion-label>
               <h2 [class.marathi]="issue.category | marathi">{{ issue.bookTitle }}</h2>
               <p class="author">{{ issue.studentName }}</p>
