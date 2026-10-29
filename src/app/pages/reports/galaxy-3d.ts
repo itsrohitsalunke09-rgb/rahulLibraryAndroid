@@ -147,13 +147,13 @@ export async function start3d(
   let fitted = false;
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  // Smooth handling: a soft glide after letting go, a calmer drag and pinch, and no two-finger
-  // panning, which nudged the galaxy off-centre during a pinch.
+  // Smooth handling: a soft glide after letting go, and a calmer drag, pinch and two-finger move
+  // (one finger turns the galaxy; two fingers pinch to zoom and slide it up, down or sideways).
   controls.enableDamping = true;
   controls.dampingFactor = 0.035;
   controls.rotateSpeed = 0.6;
   controls.zoomSpeed = 0.4;
-  controls.enablePan = false;
+  controls.panSpeed = 0.6;
   controls.minDistance = 18;
   controls.maxDistance = 420;
   controls.autoRotate = true;
