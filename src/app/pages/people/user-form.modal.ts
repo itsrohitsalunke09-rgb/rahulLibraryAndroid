@@ -10,6 +10,7 @@ import { eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { localIsoDate } from '../../core/dates';
 import { PHOTO_DECODE_ERROR, resizePhoto } from '../../core/image-resize';
 import { Role, UserAccount, UserRequest } from '../../core/models';
 import { RoleLabelPipe } from '../../core/pipes';
@@ -49,7 +50,9 @@ export class UserFormModal implements OnInit, OnDestroy {
   /** What this role may do (Roles & permissions). */
   protected perms = inject(PermissionsStore);
 
-  form: UserRequest = { username: '', fullName: '', email: '', phone: '', role: 'STUDENT', active: true, password: '' };
+  form: UserRequest = { username: '', fullName: '', email: '', phone: '', dateOfBirth: '', role: 'STUDENT', active: true, password: '' };
+  /** No birthdays in the future. */
+  readonly today = localIsoDate();
   /** Librarians can't create or promote admins (enforced by the backend too). */
   roles: Role[] = [];
   readonly saving = signal(false);
@@ -73,7 +76,7 @@ export class UserFormModal implements OnInit, OnDestroy {
     if (this.user) {
       const u = this.user;
       this.form = {
-        username: u.username, fullName: u.fullName, email: u.email ?? '', phone: u.phone ?? '',
+        username: u.username, fullName: u.fullName, email: u.email ?? '', phone: u.phone ?? '', dateOfBirth: u.dateOfBirth ?? '',
         role: u.role, active: u.active, password: ''
       };
       this.loadAadhaar(u.id);
@@ -167,6 +170,10 @@ export class UserFormModal implements OnInit, OnDestroy {
       this.error.set('Enter a valid email address, or leave it empty.');
       return;
     }
+    if (f.dateOfBirth && f.dateOfBirth > this.today) {
+      this.error.set('Date of birth can’t be in the future.');
+      return;
+    }
     // Only check numbers being entered or changed, so old records with other formats can still be edited.
     if (f.phone && f.phone !== this.user?.phone && !/^\d{10}$/.test(f.phone)) {
       this.error.set('Phone must be a 10-digit mobile number.');
@@ -178,6 +185,7 @@ export class UserFormModal implements OnInit, OnDestroy {
       username: f.username.trim(),
       email: f.email?.trim() || undefined,
       phone: f.phone || undefined,
+      dateOfBirth: f.dateOfBirth || undefined,
       password: f.password || undefined,
     };
     this.saving.set(true);

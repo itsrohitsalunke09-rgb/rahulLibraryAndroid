@@ -13,17 +13,17 @@
   </ion-toolbar>
   @if (!query()) {
     <ion-toolbar>
+      <!-- The year comes first: the page opens on it, and it narrows the other tabs too. -->
       <ion-segment [value]="filter()" (ionChange)="setFilter($event.detail.value)" [scrollable]="true">
-        <ion-segment-button value="OUT">Out{{ count('OUT') !== null ? ' (' + count('OUT') + ')' : '' }}</ion-segment-button>
-        <ion-segment-button value="OVERDUE">Overdue{{ count('OVERDUE') !== null ? ' (' + count('OVERDUE') + ')' : '' }}</ion-segment-button>
-        <ion-segment-button value="RETURNED">Returned{{ count('RETURNED') !== null ? ' (' + count('RETURNED') + ')' : '' }}</ion-segment-button>
-        <ion-segment-button value="ALL">All{{ count('ALL') !== null ? ' (' + count('ALL') + ')' : '' }}</ion-segment-button>
         <ion-segment-button value="YEAR" (click)="openYears($event)">
           <span class="year-label">
-            {{ year() ?? 'Year' }}
+            {{ year() }}{{ count('YEAR') !== null ? ' (' + count('YEAR') + ')' : '' }}
             <span class="icon year-caret" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
           </span>
         </ion-segment-button>
+        <ion-segment-button value="OUT">Out{{ count('OUT') !== null ? ' (' + count('OUT') + ')' : '' }}</ion-segment-button>
+        <ion-segment-button value="OVERDUE">Overdue{{ count('OVERDUE') !== null ? ' (' + count('OVERDUE') + ')' : '' }}</ion-segment-button>
+        <ion-segment-button value="RETURNED">Returned{{ count('RETURNED') !== null ? ' (' + count('RETURNED') + ')' : '' }}</ion-segment-button>
       </ion-segment>
     </ion-toolbar>
   }
@@ -33,9 +33,8 @@
   <!-- Opened by the Year tab; kept outside the header so focusing it never
        scrolls the tab row out of sight. Picks which year's issues (by issued date) to show. -->
   <ion-select #yearSelect class="year-select" interface="popover" aria-label="Issue year"
-              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year() ?? 0"
-              (ionChange)="setYear($event.detail.value)" (ionCancel)="yearCancelled()">
-    <ion-select-option [value]="0">All years</ion-select-option>
+              [interfaceOptions]="{ cssClass: 'year-popover' }" [value]="year()"
+              (ionChange)="setYear($event.detail.value)">
     @for (y of years(); track y) {
       <ion-select-option [value]="y">{{ y }}</ion-select-option>
     }

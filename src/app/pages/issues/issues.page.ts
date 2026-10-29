@@ -21,10 +21,10 @@ import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
 /**
  * OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number.
- * YEAR = every issue made in the chosen year (by issued date), any status.
+ * YEAR = every issue made in the chosen year (by issued date), any status; the tab the page opens on.
  */
-type Filter = 'OUT' | 'OVERDUE' | 'RETURNED' | 'ALL' | 'YEAR';
-const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'ALL', 'YEAR'];
+type Filter = 'OUT' | 'OVERDUE' | 'RETURNED' | 'YEAR';
+const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'YEAR'];
 
 @Component({
   selector: 'app-issues',
@@ -45,13 +45,11 @@ export class IssuesPage implements ViewWillEnter {
   protected perms = inject(PermissionsStore);
   private router = inject(Router);
 
-  readonly filter = signal<Filter>('ALL');
-  /** Year that narrows every tab; starts on the current year, null = all years. */
-  readonly year = signal<number | null>(new Date().getFullYear());
+  readonly filter = signal<Filter>('YEAR');
+  /** Year that narrows every tab; starts on the current year. */
+  readonly year = signal(new Date().getFullYear());
   readonly years = signal(issueYears());
   private readonly yearSelect = viewChild('yearSelect', { read: ElementRef<HTMLIonSelectElement> });
-  /** Tab to go back to if the year list is closed without picking a year. */
-  private beforeYear: Filter = 'ALL';
   readonly query = signal('');
   readonly counts = signal<IssueCounts | null>(null);
   readonly returning = signal<number | null>(null);
@@ -65,7 +63,8 @@ export class IssuesPage implements ViewWillEnter {
         return;
       }
       const status = params.get('status') as Filter | null;
-      const year = Number(params.get('year')) || null;
+      // No year in the link: stay on the year shown.
+      const year = Number(params.get('year')) || this.year();
       let changed = false;
       if (status && FILTERS.includes(status) && status !== this.filter()) {
         this.filter.set(status);
@@ -94,12 +93,7 @@ export class IssuesPage implements ViewWillEnter {
     if (!FILTERS.includes(value as Filter) || value === this.filter()) {
       return;
     }
-    if (value === 'YEAR') {
-      // The tab's click opens the year dropdown; the list changes once a year is picked.
-      this.beforeYear = this.filter();
-      this.filter.set('YEAR');
-      return;
-    }
+    // The Year tab's click also opens the year dropdown, to pick another year.
     this.filter.set(value as Filter);
     this.issues.reset();
   }
@@ -111,35 +105,13 @@ export class IssuesPage implements ViewWillEnter {
 
   setYear(value: unknown) {
     const year = Number(value);
-    if (!Number.isInteger(year)) {
-      return;
-    }
-    // "All years" in the list.
-    if (year === 0) {
-      this.clearYear();
+    if (!Number.isInteger(year) || year <= 0) {
       return;
     }
     this.year.set(year);
     this.filter.set('YEAR');
     this.issues.reset();
     this.loadCounts();
-  }
-
-  /** Removes the year so the tabs show issues from every year again. */
-  clearYear() {
-    this.year.set(null);
-    if (this.filter() === 'YEAR') {
-      this.filter.set('ALL');
-    }
-    this.issues.reset();
-    this.loadCounts();
-  }
-
-  yearCancelled() {
-    // Closed without a choice: stay on the year already shown, or go back to the previous tab.
-    if (this.year() == null) {
-      this.filter.set(this.beforeYear);
-    }
   }
 
   search(value: string | null | undefined) {
@@ -199,10 +171,9 @@ export class IssuesPage implements ViewWillEnter {
     const year = this.year();
     switch (this.filter()) {
       case 'OUT': return this.api.issuesOut(page, size, year);
-      case 'OVERDUE': return year ? this.api.issuesInYear(year, page, size, 'OVERDUE') : this.api.issues(page, size, 'OVERDUE');
-      case 'RETURNED': return year ? this.api.issuesInYear(year, page, size, 'RETURNED') : this.api.issues(page, size, 'RETURNED');
-      case 'YEAR': return year ? this.api.issuesInYear(year, page, size) : this.api.issuesOut(page, size);
-      default: return year ? this.api.issuesInYear(year, page, size) : this.api.issues(page, size);
+      case 'OVERDUE': return this.api.issuesInYear(year, page, size, 'OVERDUE');
+      case 'RETURNED': return this.api.issuesInYear(year, page, size, 'RETURNED');
+      default: return this.api.issuesInYear(year, page, size);
     }
   }
 

@@ -87,10 +87,10 @@ export class DashboardPage implements ViewWillEnter {
     this.load();
   }
 
-  /** Issues on its All tab, narrowed to the year chosen here (no year = every year). */
+  /** Issues on its Year tab, for the year chosen here (no year chosen = the year Issues already shows). */
   openTransactions() {
     const year = this.year();
-    this.router.navigate(['/tabs/issues'], { queryParams: year ? { status: 'ALL', year } : { status: 'ALL' } });
+    this.router.navigate(['/tabs/issues'], { queryParams: year ? { status: 'YEAR', year } : { status: 'YEAR' } });
   }
 
   go(link: string) {

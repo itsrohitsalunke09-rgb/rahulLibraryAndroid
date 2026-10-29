@@ -51,6 +51,13 @@
         </span>
         <span class="form-helper">10 digits, used for WhatsApp reminders</span>
       </label>
+      <label class="form-field">
+        <span class="form-label">Date of birth</span>
+        <span class="form-box">
+          <span class="icon" style="--icon: url(assets/icons/field-calendar.svg)" aria-hidden="true"></span>
+          <input name="dateOfBirth" type="date" [max]="today" [(ngModel)]="form.dateOfBirth" />
+        </span>
+      </label>
     </div>
 
     <h3 class="form-section">Aadhaar card</h3>
