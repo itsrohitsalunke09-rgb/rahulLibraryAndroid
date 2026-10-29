@@ -9,7 +9,7 @@ import { AuthService } from '../core/auth.service';
 import { GalaxyReadersStore } from '../core/galaxy-readers.store';
 import { PermissionsStore } from '../core/permissions.store';
 
-const FULL_SCREEN = ['/tabs/dashboard/reports/galaxy'];
+const FULL_SCREEN = ['/tabs/dashboard/reports/galaxy', '/tabs/my-books/galaxy'];
 
 @Component({
   selector: 'app-tabs',

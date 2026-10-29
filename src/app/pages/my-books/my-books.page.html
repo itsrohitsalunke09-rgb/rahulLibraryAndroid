@@ -3,9 +3,11 @@
     <ion-title>My books</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
-      <ion-segment-button value="CURRENT">With me</ion-segment-button>
-      <ion-segment-button value="RETURNED">Returned</ion-segment-button>
+    <!-- Counts on every tab, as on Issues and Requests & suggestions. -->
+    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)" [scrollable]="true">
+      <ion-segment-button value="CURRENT">With me{{ issues.loaded() ? ' (' + current().length + ')' : '' }}</ion-segment-button>
+      <ion-segment-button value="RETURNED">Returned{{ issues.loaded() ? ' (' + returned().length + ')' : '' }}</ion-segment-button>
+      <ion-segment-button value="REQUESTED">Requests{{ requests() ? ' (' + requests()!.length + ')' : '' }}</ion-segment-button>
       <ion-segment-button value="SUGGESTED">Suggested{{ suggestions() ? ' (' + suggestions()!.length + ')' : '' }}</ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -26,11 +28,11 @@
     </a>
   }
 
-  @if (tab() === 'SUGGESTED') {
+  @if (tab() === 'REQUESTED' || tab() === 'SUGGESTED') {
     @if (suggestionsError()) {
       <p class="page-error" role="alert">{{ suggestionsError() }}</p>
     }
-    @if (suggestions(); as list) {
+    @if (tab() === 'REQUESTED' ? requests() : suggestions(); as list) {
       @if (list.length) {
         <ion-list inset="true" lines="full">
           @for (s of list; track s.id) {
@@ -43,11 +45,19 @@
                 @if (s.note) {
                   <p class="note">"{{ s.note }}"</p>
                 }
-                <p class="item-meta">Suggested {{ s.createdAt.slice(0, 10) | shortDate }}</p>
+                <p class="item-meta">{{ s.kind === 'REQUEST' ? 'Requested' : 'Suggested' }} {{ s.createdAt.slice(0, 10) | shortDate }}</p>
               </ion-label>
+              <!-- Done: the librarian has dealt with it (for a request, usually by issuing the book). -->
+              <ion-badge slot="end" class="stamp" [color]="s.doneAt ? 'success' : 'medium'">{{ s.doneAt ? 'Done' : 'Waiting' }}</ion-badge>
             </ion-item>
           }
         </ion-list>
+      } @else if (tab() === 'REQUESTED') {
+        <div class="empty-state">
+          <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>
+          <h2>No requests yet</h2>
+          <p>Open a book in the Catalog and tap Request to ask the librarian for it.</p>
+        </div>
       } @else {
         <div class="empty-state">
           <ion-icon name="bookmarks-outline" aria-hidden="true"></ion-icon>

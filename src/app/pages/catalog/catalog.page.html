@@ -39,7 +39,7 @@
   @if (tab() === 'books') {
   <ion-toolbar class="search-bar" [class.with-actions]="perms.can('WRITE')">
     <span class="icon search-icon" style="--icon: url(assets/icons/search.svg); --icon-size: 18px" aria-hidden="true"></span>
-    <ion-searchbar
+    <ion-searchbar #bookSearch
       placeholder="Title, author, reg. no."
       searchIcon=""
       [debounce]="350"

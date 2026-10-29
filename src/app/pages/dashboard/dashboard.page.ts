@@ -58,8 +58,9 @@ export class DashboardPage implements ViewWillEnter {
   /** Students' book requests and suggestions, newest first; null until loaded. */
   readonly wishes = signal<ReaderRequest[] | null>(null);
   readonly wishesError = signal('');
-  readonly requestCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'REQUEST').length);
-  readonly suggestionCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'SUGGESTION').length);
+  /** Still open: ones marked done stay on the list but no longer count. */
+  readonly requestCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'REQUEST' && !w.doneAt).length);
+  readonly suggestionCount = computed(() => (this.wishes() ?? []).filter(w => w.kind === 'SUGGESTION' && !w.doneAt).length);
   /** Year for the issue numbers; starts on the current year, null = all years. */
   readonly year = signal<number | null>(new Date().getFullYear());
   private request?: Subscription;

@@ -1,13 +1,10 @@
-<ion-header class="space-header">
+<ion-header>
   <ion-toolbar>
     <!-- Staff come from the books report, students from My books. -->
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="meId === undefined ? '/tabs/dashboard/reports/BOOKS' : '/tabs/my-books'" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Reading Galaxy</ion-title>
-    <ion-buttons slot="end">
-      <button type="button" class="guide-button" aria-label="Planet guide" (click)="guideOpen.set(true)">i</button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -28,6 +25,8 @@
   @if (readers()?.length) {
     <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader ·{{ meId !== undefined ? ' you twinkle ·' : '' }} drag to turn · i for the guide</p>
   }
+
+  <button type="button" class="guide-button" aria-label="Planet guide" (click)="guideOpen.set(true)">i</button>
 
   <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->
   @if (guideOpen()) {

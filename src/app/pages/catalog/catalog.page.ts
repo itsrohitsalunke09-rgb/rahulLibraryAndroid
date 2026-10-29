@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import {
   AlertController, IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
@@ -35,6 +35,7 @@ export class CatalogPage implements ViewWillEnter {
   protected auth = inject(AuthService);
   /** What this role may do (Roles & permissions). */
   protected perms = inject(PermissionsStore);
+  private searchbar = viewChild<IonSearchbar>('bookSearch');
 
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
@@ -115,7 +116,15 @@ export class CatalogPage implements ViewWillEnter {
               return false;
             }
             this.api.suggestBook({ title: v.title.trim(), author: v.author?.trim() || undefined, note: v.note?.trim() || undefined }).subscribe({
-              next: () => this.ui.toast('Thanks! Your suggestion is sent to the librarian.'),
+              next: () => {
+                this.ui.toast('Thanks! Your suggestion is sent to the librarian.');
+                // Back to the whole catalog: the search that found nothing is done with.
+                const box = this.searchbar();
+                if (box) {
+                  box.value = '';
+                }
+                this.search('');
+              },
               error: err => this.ui.error(err, 'Could not send the suggestion.'),
             });
             return true;

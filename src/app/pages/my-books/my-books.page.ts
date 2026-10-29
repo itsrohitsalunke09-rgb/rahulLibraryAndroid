@@ -15,8 +15,8 @@ import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PermissionsStore } from '../../core/permissions.store';
 import { RouterLink } from '@angular/router';
 
-/** Tabs: books with the student, books given back, and books they suggested. */
-type Tab = 'CURRENT' | 'RETURNED' | 'SUGGESTED';
+/** Tabs: books with the student, books given back, and books they requested or suggested. */
+type Tab = 'CURRENT' | 'RETURNED' | 'REQUESTED' | 'SUGGESTED';
 
 @Component({
   selector: 'app-my-books',
@@ -35,8 +35,10 @@ export class MyBooksPage implements ViewWillEnter {
   protected perms = inject(PermissionsStore);
 
   readonly tab = signal<Tab>('CURRENT');
-  /** The student's own open suggestions; null until loaded. */
-  readonly suggestions = signal<ReaderRequest[] | null>(null);
+  /** The student's own requests and suggestions, done ones included; null until loaded. */
+  private readonly wishes = signal<ReaderRequest[] | null>(null);
+  readonly requests = computed(() => this.wishes()?.filter(w => w.kind === 'REQUEST') ?? null);
+  readonly suggestions = computed(() => this.wishes()?.filter(w => w.kind === 'SUGGESTION') ?? null);
   readonly suggestionsError = signal('');
 
   readonly issues = new PagedList<BookIssue>((page, size) => this.api.myIssues(page, size), 'Could not load your books.');
@@ -57,13 +59,13 @@ export class MyBooksPage implements ViewWillEnter {
   }
 
   setTab(value: unknown) {
-    if (value === 'CURRENT' || value === 'RETURNED' || value === 'SUGGESTED') {
+    if (value === 'CURRENT' || value === 'RETURNED' || value === 'REQUESTED' || value === 'SUGGESTED') {
       this.tab.set(value);
     }
   }
 
   refresh(event: RefresherCustomEvent) {
-    if (this.tab() === 'SUGGESTED') {
+    if (this.tab() === 'REQUESTED' || this.tab() === 'SUGGESTED') {
       this.loadSuggestions(() => event.target.complete());
     } else {
       this.issues.refresh(event);
@@ -71,14 +73,14 @@ export class MyBooksPage implements ViewWillEnter {
   }
 
   private loadSuggestions(done?: () => void) {
-    this.api.mySuggestions().subscribe({
+    this.api.myReaderRequests().subscribe({
       next: list => {
         this.suggestionsError.set('');
-        this.suggestions.set(list);
+        this.wishes.set(list);
         done?.();
       },
       error: err => {
-        this.suggestionsError.set(errorMessage(err, 'Could not load your suggestions.'));
+        this.suggestionsError.set(errorMessage(err, 'Could not load your requests and suggestions.'));
         done?.();
       },
     });

@@ -159,9 +159,9 @@ export class ApiService {
     return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests`);
   }
 
-  /** The signed-in student's own open suggestions, newest first. */
-  mySuggestions() {
-    return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests/suggestions/mine`);
+  /** The signed-in student's own requests and suggestions, done ones included, newest first. */
+  myReaderRequests() {
+    return this.http.get<ReaderRequest[]>(`${this.base}/reader-requests/mine`);
   }
 
   /** A student asks to borrow a catalog book. */
@@ -174,7 +174,12 @@ export class ApiService {
     return changes(this.http.post<ReaderRequest>(`${this.base}/reader-requests/suggestions`, suggestion));
   }
 
-  /** Staff: a request or suggestion dealt with. */
+  /** Staff: a request or suggestion dealt with; it stays listed, marked done. */
+  markReaderRequestDone(id: number) {
+    return changes(this.http.put<ReaderRequest>(`${this.base}/reader-requests/${id}/done`, {}));
+  }
+
+  /** Staff: delete a request or suggestion. */
   clearReaderRequest(id: number) {
     return changes(this.http.delete<void>(`${this.base}/reader-requests/${id}`));
   }

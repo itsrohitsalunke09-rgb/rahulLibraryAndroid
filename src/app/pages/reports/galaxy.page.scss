@@ -1,16 +1,6 @@
-/* Night-sky header so the screen reads as one piece of space. */
-.space-header ion-toolbar {
-  --background: #020309;
-  --color: #eef1ff;
-  --border-width: 0;
-}
-
-.space-header ion-title {
-  color: #eef1ff;
-}
-
+/* The app's usual header, so it stands out from the night sky below. */
 ion-back-button {
-  --color: #eef1ff;
+  --color: var(--app-ink);
   --icon-font-size: 22px;
 }
 
@@ -49,14 +39,17 @@ ion-content.space {
   text-align: center;
 }
 
-/* The "i" for the planet guide, in the header. */
+/* The "i" for the planet guide, floating at the bottom right above the legend. */
 .guide-button {
-  width: 30px;
-  height: 30px;
-  margin-inline-end: 10px;
+  position: absolute;
+  right: 16px;
+  bottom: calc(44px + env(safe-area-inset-bottom));
+  z-index: 5;
+  width: 44px;
+  height: 44px;
   border: 1.5px solid #c9cfee;
   border-radius: 50%;
-  background: transparent;
+  background: rgb(12 14 30 / 0.85);
   color: #eef1ff;
   font: italic 700 15px/1 Georgia, serif;
   cursor: pointer;

@@ -361,6 +361,8 @@ export interface ReaderRequest {
   author?: string | null;
   note?: string | null;
   createdAt: string;
+  /** When staff marked it done; empty while open. */
+  doneAt?: string | null;
 }
 
 /** A tel: link for a phone number as typed ("+91 98765-43210" → "tel:+919876543210"). */

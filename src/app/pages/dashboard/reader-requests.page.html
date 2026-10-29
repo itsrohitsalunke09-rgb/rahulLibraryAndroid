@@ -26,7 +26,7 @@
     @if (shown().length) {
       <ion-list inset="true" lines="full">
         @for (r of shown(); track r.id) {
-          <ion-item>
+          <ion-item [class.is-done]="r.doneAt">
             <ion-label>
               <h2 class="marathi">{{ r.title }}</h2>
               @if (r.author) {
@@ -38,12 +38,14 @@
               }
             </ion-label>
             <div slot="end" class="actions">
-              @if (r.kind === 'REQUEST' && r.bookId) {
+              @if (r.doneAt) {
+                <span class="done-badge">Done</span>
+              } @else if (r.kind === 'REQUEST' && r.bookId) {
                 @if (perms.can('REGISTER')) {
                   <button type="button" class="done" [disabled]="clearing() === r.id" (click)="issue(r)"
                           [attr.aria-label]="'Issue ' + r.title + ' to ' + r.studentName">Issue book</button>
                 }
-              } @else if (perms.can('UPDATE')) {
+              } @else if (perms.can('DONE')) {
                 <button type="button" class="done" [disabled]="clearing() === r.id" (click)="done(r)"
                         [attr.aria-label]="'Mark ' + r.title + ' done'">Done</button>
               }

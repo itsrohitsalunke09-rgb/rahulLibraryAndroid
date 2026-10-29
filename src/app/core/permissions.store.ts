@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { Role } from './models';
 
 /** What a role may do; set per role in Profile › Masters › Roles & permissions. */
-export type Permission = 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'CALL' | 'REGISTER';
+export type Permission = 'READ' | 'WRITE' | 'UPDATE' | 'DELETE' | 'CALL' | 'REGISTER' | 'DONE';
 export type PermissionMatrix = Record<Role, Permission[]>;
 
 export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
@@ -13,13 +13,14 @@ export const PERMISSIONS: { key: Permission; label: string; hint: string }[] = [
   { key: 'UPDATE', label: 'Update', hint: 'Edit books and people' },
   { key: 'DELETE', label: 'Delete', hint: 'Delete books, people and requests' },
   { key: 'REGISTER', label: 'Register', hint: 'Issue and return books; mark and remove newspapers and magazines received' },
+  { key: 'DONE', label: 'Done', hint: "Mark students' book requests and suggestions done" },
   { key: 'CALL', label: 'Call', hint: 'Phone a newspaper or magazine vendor' },
 ];
 
 /** The same defaults as the server's, used until the real ticks have loaded. */
 export const DEFAULT_PERMISSIONS: PermissionMatrix = {
-  ADMIN: ['READ', 'WRITE', 'UPDATE', 'DELETE', 'REGISTER', 'CALL'],
-  LIBRARIAN: ['READ', 'WRITE', 'UPDATE', 'REGISTER'],
+  ADMIN: ['READ', 'WRITE', 'UPDATE', 'DELETE', 'REGISTER', 'DONE', 'CALL'],
+  LIBRARIAN: ['READ', 'WRITE', 'UPDATE', 'REGISTER', 'DONE'],
   STUDENT: ['READ'],
 };
 

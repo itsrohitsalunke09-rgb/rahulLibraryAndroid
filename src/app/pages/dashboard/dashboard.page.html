@@ -94,7 +94,7 @@
               </button>
             }
             @if (p.magazines.total) {
-              <button class="metric paper magazines" (click)="go('/tabs/config/periodicals/magazines')">
+              <button class="metric paper magazines" (click)="go('/tabs/config')">
                 <span class="metric-top">
                   <span class="value">{{ p.magazines.received }}<small>/{{ p.magazines.total }}</small></span>
                   <span class="icon" style="--icon: url(assets/icons/book.svg)" aria-hidden="true"></span>
@@ -136,6 +136,15 @@
             <span class="icon" [style.--icon]="'url(' + tile.symbol + ')'" aria-hidden="true"></span>
             <span class="record-label">{{ tile.label }}</span>
             <span class="count">{{ tile.value }}</span>
+            <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+          </button>
+        }
+        <!-- Every newspaper and magazine subscribed in the master; opens the Registers. -->
+        @if (papers(); as p) {
+          <button class="record" (click)="go('/tabs/config')">
+            <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>
+            <span class="record-label">Newspapers &amp; magazines</span>
+            <span class="count">{{ p.newspapers.total + p.magazines.total }}</span>
             <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
           </button>
         }
