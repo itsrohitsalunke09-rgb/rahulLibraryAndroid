@@ -389,7 +389,7 @@ export function drawRegisterPage(months: { report: MonthReport; monthName: strin
  * bottom-right total is highlighted.
  */
 export function drawTablePage(tables: { heading: string; table: RegisterTable }[], library: string, orientation: Orientation,
-                              title: string, footer: string, footNote: string): PdfPage {
+                              title: string, footer: string, footNote: string, maxRowHeight = Infinity): PdfPage {
   const [pageW, pageH] = A4[orientation];
   const page = new PdfPage(pageW, pageH);
 
@@ -416,7 +416,8 @@ export function drawTablePage(tables: { heading: string; table: RegisterTable }[
   });
   const tablesTop = HEAD + 6;
   const fixed = blocks.reduce((sum, b) => sum + BLOCK_TITLE + b.headH, 0) + BLOCK_GAP * (blocks.length - 1);
-  const rowH = (pageH - tablesTop - FOOT - fixed) / blocks.reduce((sum, b) => sum + b.rows, 0);
+  // Rows share the page height, up to maxRowHeight (so a short last page doesn't get tall rows).
+  const rowH = Math.min(maxRowHeight, (pageH - tablesTop - FOOT - fixed) / blocks.reduce((sum, b) => sum + b.rows, 0));
 
   let top = tablesTop;
   for (const b of blocks) {
@@ -521,36 +522,38 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
   return buildPdf(pages);
 }
 
-/** Rows on one landscape page of the book transactions register. */
-const BOOK_ROWS_PER_PAGE = 22;
+/** Rows on one landscape page of the book transactions register, all the same height. */
+const BOOK_ROWS_PER_PAGE = 20;
+const BOOK_ROW_HEIGHT = 20;
 
-/** "5 Oct". */
-function shortDate(iso?: string): string {
-  return iso ? `${Number(iso.slice(8))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}` : '';
+/** "5 Oct 2026". */
+function dateText(iso?: string | null): string {
+  return iso ? `${Number(iso.slice(8))} ${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : '';
 }
 
 /**
- * The month's book transactions, student by student (busiest first): each book with the day it was
- * given and the day it came back, when those fall in the month. The name shows on a student's first row.
+ * The month's book transactions, student by student (busiest first): each book with its
+ * registration number and the days it was issued and returned. The name shows on a student's first row.
  */
 export function bookMovesTable(readers: Reader[]): RegisterTable {
   const given = readers.reduce((sum, r) => sum + r.given, 0);
   const returned = readers.reduce((sum, r) => sum + r.returned, 0);
   const books = readers.reduce((sum, r) => sum + r.books.length, 0);
   return {
-    header: ['Student', 'Book', 'Given', 'Returned'],
+    header: ['Student', 'Book', 'Reg. no.', 'Issued on', 'Returned on'],
     body: readers.flatMap(r => r.books.map((b, i) => [
       i === 0 ? `${r.studentName} (${r.books.length})` : '',
       b.issue.bookTitle,
-      shortDate(b.moves.find(m => m.kind === 'out')?.date),
-      shortDate(b.moves.find(m => m.kind === 'back')?.date),
+      b.issue.registrationNumber ?? '',
+      dateText(b.issue.issueDate),
+      dateText(b.issue.returnDate),
     ])),
-    totals: ['Total', `${books} book${books === 1 ? '' : 's'}, ${readers.length} student${readers.length === 1 ? '' : 's'}`,
-      `${given} given`, `${returned}`],
+    totals: ['Total', `${books} book${books === 1 ? '' : 's'}, ${readers.length} student${readers.length === 1 ? '' : 's'}`, '',
+      `${given} given`, `${returned} back`],
   };
 }
 
-/** A month's book transactions as a landscape A4 PDF, student by student, 22 rows a page. Ready to save. */
+/** A month's book transactions as a landscape A4 PDF, student by student, 20 equal rows a page. Ready to save. */
 export function bookMovesPdf(readers: Reader[], monthName: string, library: string): Promise<Uint8Array> {
   const table = bookMovesTable(readers);
   const given = readers.reduce((sum, r) => sum + r.given, 0);
@@ -559,7 +562,7 @@ export function bookMovesPdf(readers: Reader[], monthName: string, library: stri
   for (let i = 0; i < Math.max(table.body.length, 1); i += BOOK_ROWS_PER_PAGE) {
     pages.push(drawTablePage([{ heading: monthName, table: { ...table, body: table.body.slice(i, i + BOOK_ROWS_PER_PAGE) } }],
       library, 'landscape', `Book transactions register - ${monthName}`,
-      `Books given: ${given}, returned: ${returned}`, 'Number after a name = books that month'));
+      `Books given: ${given}, returned: ${returned}`, 'Number after a name = books that month', BOOK_ROW_HEIGHT));
   }
   return buildPdf(pages);
 }

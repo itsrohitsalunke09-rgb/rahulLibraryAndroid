@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ reader.studentName }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p class="summary">
+    {{ monthName }} · {{ reader.books.length }} book{{ reader.books.length === 1 ? '' : 's' }} ·
+    {{ reader.given }} given · {{ reader.returned }} returned
+  </p>
+  <ion-list inset="true" lines="full">
+    @for (b of reader.books; track b.issue.id) {
+      <ion-item>
+        <ion-label>
+          <h2 [class.marathi]="b.issue.category | marathi">{{ b.issue.bookTitle }}</h2>
+          <p>
+            @if (b.issue.registrationNumber) { Reg. no. {{ b.issue.registrationNumber }} · }
+            Issued {{ formatDate(b.issue.issueDate) }}
+            @if (b.issue.returnDate) { · Returned {{ formatDate(b.issue.returnDate) }} }
+          </p>
+        </ion-label>
+        <span slot="end" class="kind" [class.back]="b.issue.returnDate">{{ b.issue.returnDate ? 'Returned' : 'With student' }}</span>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

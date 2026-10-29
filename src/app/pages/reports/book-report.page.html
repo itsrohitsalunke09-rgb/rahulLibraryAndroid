@@ -12,6 +12,42 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  @if (error()) {
+    <p class="form-error page-pad" role="alert">{{ error() }}</p>
+  }
+
+  <!-- This year's readers across the full width: a circle per student, bigger for more books. -->
+  <section class="year">
+    <h2 class="section-title">{{ thisYear }} readers
+      @if (yearReaders(); as list) { <span class="group-count">{{ list.length }} student{{ list.length === 1 ? '' : 's' }}</span> }
+    </h2>
+    @if (yearReaders(); as list) {
+      @if (list.length) {
+        <div class="bubbles" role="list" aria-label="Students by books this year">
+          @for (r of cloud(); track r.studentId) {
+            <button type="button" class="bubble" role="listitem" [class.picked]="picked()?.studentId === r.studentId"
+                    [style.--hue]="r.studentName | avatarHue" [class]="'bubble span-' + span(r.books)"
+                    [attr.aria-label]="r.studentName + ', ' + r.books + ' book' + (r.books === 1 ? '' : 's') + ' this year'"
+                    (click)="pick(r)">
+              <span class="initials">{{ r.studentName | initials }}</span>
+            </button>
+          }
+        </div>
+        <p class="caption">
+          @if (picked(); as p) {
+            <strong>{{ p.studentName }}</strong> · {{ p.books }} book{{ p.books === 1 ? '' : 's' }} in {{ thisYear }}
+          } @else {
+            Bigger circle = more books this year. Tap one to see who it is.
+          }
+        </p>
+      } @else {
+        <p class="caption">No books given yet in {{ thisYear }}.</p>
+      }
+    } @else if (!error()) {
+      <app-page-skeleton kind="bubbles" />
+    }
+  </section>
+
   <div class="wrap">
     <div class="day">
       <button type="button" class="step" aria-label="Previous month" (click)="shift(-1)">‹</button>
@@ -22,75 +58,44 @@
       <button type="button" class="step" aria-label="Next month" [disabled]="month() >= thisMonth" (click)="shift(1)">›</button>
     </div>
 
-    @if (error()) {
-      <p class="form-error" role="alert">{{ error() }}</p>
-    }
-
     @if (issues()) {
       <div class="totals">
         <span class="given"><strong>{{ given() }}</strong> given</span>
         <span class="back"><strong>{{ moves().length - given() }}</strong> returned</span>
       </div>
+    }
+  </div>
 
-      @if (moves().length) {
-        <!-- A circle per student, bigger for more books; tap one to see just their books. -->
-        <div class="card bubbles" role="list" aria-label="Students by books this month">
-          @for (r of circles(); track r.studentId) {
-            <button type="button" class="reader" role="listitem" [class.picked]="selected() === r.studentId"
-                    [class.faded]="selected() !== null && selected() !== r.studentId"
-                    [attr.aria-pressed]="selected() === r.studentId"
-                    [attr.aria-label]="r.studentName + ', ' + r.books.length + ' book' + (r.books.length === 1 ? '' : 's')"
-                    (click)="select(r.studentId)">
-              <span class="bubble" [style.--hue]="r.studentName | avatarHue"
-                    [style.width.px]="size(r.books.length)" [style.height.px]="size(r.books.length)">
-                <span class="initials">{{ r.studentName | initials }}</span>
-                <span class="n">{{ r.books.length }}</span>
-              </span>
-              <span class="who">{{ r.studentName }}</span>
-            </button>
-          }
-        </div>
-        @if (readers().length > circles().length) {
-          <button type="button" class="more" (click)="allCircles.set(true)">Show all {{ readers().length }} students</button>
+  @if (issues()) {
+    @if (readers().length) {
+      <h2 class="section-title">Students <span class="group-count">{{ readers().length }}</span></h2>
+      <!-- One line per student, like People; tap for their books this month. -->
+      <ion-list inset="true" lines="full">
+        @for (r of readers(); track r.studentId) {
+          <ion-item button detail="false" (click)="open(r)">
+            <div slot="start" class="avatar" [style.--hue]="r.studentName | avatarHue" aria-hidden="true">{{ r.studentName | initials }}</div>
+            <ion-label>
+              <h2>{{ r.studentName }}</h2>
+              <p>{{ r.given }} given · {{ r.returned }} returned</p>
+            </ion-label>
+            <span slot="end" class="count">{{ r.books.length }} book{{ r.books.length === 1 ? '' : 's' }}</span>
+          </ion-item>
         }
-        <p class="hint">{{ selected() === null ? 'Tap a student to see only their books.' : 'Tap the circle again to see everyone.' }}</p>
-
-        @for (r of shown(); track r.studentId) {
-          <h2 class="group-title">{{ r.studentName }}
-            <span class="group-count">{{ r.books.length }} book{{ r.books.length === 1 ? '' : 's' }} · {{ r.given }} given · {{ r.returned }} returned</span>
-          </h2>
-          <div class="card">
-            @for (b of booksOf(r); track b.issue.id) {
-              <div class="move">
-                <span class="what">
-                  <span class="name" [class.marathi]="b.issue.category | marathi">{{ b.issue.bookTitle }}</span>
-                  <span class="meta">
-                    @for (m of b.moves; track m.kind) {
-                      {{ m.kind === 'out' ? 'Given' : 'Returned' }} {{ formatDate(m.date).replace(' ' + month().slice(0, 4), '') }}@if (!$last) { · }
-                    }
-                  </span>
-                </span>
-                <span class="kind" [class]="b.moves[b.moves.length - 1].kind">{{ b.moves[b.moves.length - 1].kind === 'out' ? 'With student' : 'Returned' }}</span>
-              </div>
-            }
-            @if (booksOf(r).length < r.books.length) {
-              <button type="button" class="more in-card" (click)="showAllBooks(r.studentId)">Show all {{ r.books.length }} books</button>
-            }
-          </div>
-        }
+      </ion-list>
+      <div class="wrap">
         <button type="button" class="secondary export" [disabled]="exporting()" (click)="exportPdf()">
           <span class="icon" style="--icon: url(assets/icons/import.svg); --icon-size: 18px" aria-hidden="true"></span>
           Export PDF…
         </button>
-        <p class="note">The PDF lists, student by student, every book given or returned in {{ monthName(month()) }}, with the dates and totals.</p>
-      } @else {
-        <div class="empty-state">
-          <h2>No books given or returned</h2>
-          <p>Nothing moved in {{ monthName(month()) }}. Use ‹ to see an earlier month.</p>
-        </div>
-      }
-    } @else if (!error()) {
-      <app-page-skeleton kind="moves" />
+        <p class="note">The PDF lists, student by student, every book given or returned in {{ monthName(month()) }}: registration number, issued on and returned on.</p>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <h2>No books given or returned</h2>
+        <p>Nothing moved in {{ monthName(month()) }}. Use ‹ to see an earlier month.</p>
+      </div>
     }
-  </div>
+  } @else if (!error()) {
+    <app-page-skeleton [avatar]="true" [chip]="true" [rows]="6" />
+  }
 </ion-content>

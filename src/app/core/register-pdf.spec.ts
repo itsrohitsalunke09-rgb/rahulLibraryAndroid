@@ -158,18 +158,18 @@ describe('magazineTable', () => {
 });
 
 describe('bookMovesTable', () => {
-  it('lists books student by student, the name once, with given and returned days', () => {
+  it('lists books student by student, the name once, with reg. no. and issued and returned dates', () => {
     const issue = (id: number, studentName: string) => ({ id, bookId: id, bookTitle: 'Book ' + id, author: 'A', studentId: id, studentName,
-      issuedByName: 'Admin', issueDate: '2026-10-02', dueDate: '2026-10-16', status: 'ISSUED' as const });
-    const kunal = issue(1, 'Kunal');
+      issuedByName: 'Admin', issueDate: '2026-10-02', dueDate: '2026-10-16', status: 'ISSUED' as const, registrationNumber: 'R-' + id });
+    const kunal = { ...issue(1, 'Kunal'), returnDate: '2026-10-09' };
     const t = bookMovesTable([
       { studentId: 1, studentName: 'Kunal', given: 2, returned: 1, books: [
         { issue: kunal, moves: [{ date: '2026-10-02', kind: 'out', issue: kunal }, { date: '2026-10-09', kind: 'back', issue: kunal }] },
         { issue: issue(2, 'Kunal'), moves: [{ date: '2026-10-05', kind: 'out', issue: issue(2, 'Kunal') }] },
       ] },
     ]);
-    expect(t.header).toEqual(['Student', 'Book', 'Given', 'Returned']);
-    expect(t.body).toEqual([['Kunal (2)', 'Book 1', '2 Oct', '9 Oct'], ['', 'Book 2', '5 Oct', '']]);
-    expect(t.totals).toEqual(['Total', '2 books, 1 student', '2 given', '1']);
+    expect(t.header).toEqual(['Student', 'Book', 'Reg. no.', 'Issued on', 'Returned on']);
+    expect(t.body).toEqual([['Kunal (2)', 'Book 1', 'R-1', '2 Oct 2026', '9 Oct 2026'], ['', 'Book 2', 'R-2', '2 Oct 2026', '']]);
+    expect(t.totals).toEqual(['Total', '2 books, 1 student', '', '2 given', '1 back']);
   });
 });

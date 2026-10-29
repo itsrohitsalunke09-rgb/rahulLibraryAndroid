@@ -87,23 +87,10 @@
     <span class="sk button"></span>
   }
 
-  @case ('moves') {
-    <div class="tiles"><span class="sk tile short"></span><span class="sk tile short"></span></div>
-    <!-- A circle per student, of different sizes. -->
-    <div class="card bubbles">
-      @for (size of bubbleSizes; track $index) { <span class="sk bubble" [style.width.px]="size" [style.height.px]="size"></span> }
-    </div>
-    <span class="sk heading" style="width: 30%"></span>
-    <div class="card rows">
-      @for (row of items(); track $index) {
-        <div class="row">
-          <span class="text">
-            <span class="sk line" [style.width.%]="row.title"></span>
-            <span class="sk line small" [style.width.%]="row.sub"></span>
-          </span>
-          <span class="sk pill"></span>
-        </div>
-      }
+  @case ('bubbles') {
+    <!-- The books report's circles: one per student, of different sizes. -->
+    <div class="bubbles">
+      @for (span of bubbleSpans; track $index) { <span class="sk bubble" [class]="'sk bubble span-' + span"></span> }
     </div>
   }
 

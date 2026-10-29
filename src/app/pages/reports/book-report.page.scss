@@ -1,6 +1,10 @@
-/* On top of the register and report styles (‹ month ›, card, day cells, export, note). */
-.day {
-  margin-bottom: 14px;
+/* On top of the register and report styles (‹ month ›, export, note). */
+.page-pad {
+  margin: 12px 20px 0;
+}
+
+.wrap {
+  padding-bottom: 0;
 }
 
 /* "12 given · 9 returned" */
@@ -8,7 +12,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-top: 14px;
 
   span {
     display: flex;
@@ -30,123 +34,94 @@
   .back { background: var(--app-success-soft); }
 }
 
-/* A circle per student, sized by the books they had this month (initials and count inside). */
+/* This year's readers: circles across the full width, initials only. */
+.year {
+  padding: 4px 0 8px;
+  border-bottom: 1px solid var(--app-rule);
+}
+
+/* A packed grid: circles span 1, 2 or 3 cells, and "dense" tucks small ones into the gaps. */
 .bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 40px);
+  grid-auto-rows: 40px;
+  grid-auto-flow: dense;
   justify-content: center;
-  gap: 14px 10px;
-  padding: 16px 12px;
-}
-
-.reader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 6px;
-  max-width: 128px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--app-ink);
-  font: inherit;
-  cursor: pointer;
-  transition: opacity 0.2s;
-
-  &.faded { opacity: 0.4; }
-  &.picked .bubble { box-shadow: 0 0 0 3px var(--app-surface), 0 0 0 5px hsl(var(--hue) 45% 45%); }
-
-  .who {
-    max-width: 100%;
-    overflow: hidden;
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  padding: 12px 12px 0;
 }
 
-/* Soft hues, like the People avatars. */
 .bubble {
   --hue: 210;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: hsl(var(--hue) 70% 91%);
   color: hsl(var(--hue) 45% 32%);
+  font: inherit;
+  cursor: pointer;
   transition: box-shadow 0.2s;
 
-  .initials { font-size: 15px; font-weight: 700; }
-  .n { font-size: 12px; font-weight: 600; opacity: 0.8; }
+  .initials { font-size: 12px; font-weight: 700; line-height: 1; }
+
+  &.span-2 { grid-column: span 2; grid-row: span 2; .initials { font-size: 20px; } }
+  &.span-3 { grid-column: span 3; grid-row: span 3; .initials { font-size: 30px; } }
+
+  &.picked { box-shadow: 0 0 0 3px var(--app-paper), 0 0 0 5px hsl(var(--hue) 45% 45%); }
+}
+
+.caption {
+  margin: 12px 20px 4px;
+  font-size: 13px;
+  color: var(--app-muted);
+  text-align: center;
+
+  strong { color: var(--app-ink); }
+}
+
+/* The month's students: the app's usual list, with People's initials circle. */
+ion-item {
+  --min-height: 64px;
+
+  ion-label h2 { font-size: 15px; font-weight: 500; }
+  ion-label p { margin-top: 2px; font-size: 12px; }
+}
+
+.avatar {
+  --hue: 210;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-inline-end: 14px;
+  border-radius: 50%;
+  background: hsl(var(--hue) 70% 91%);
+  color: hsl(var(--hue) 45% 32%);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 @media (prefers-color-scheme: dark) {
-  .bubble {
+  .bubble,
+  .avatar {
     background: hsl(var(--hue) 28% 24%);
     color: hsl(var(--hue) 70% 80%);
   }
 }
 
-.hint {
-  margin: 8px 4px 0;
+.count {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
   font-size: 12px;
-  color: var(--app-muted);
-  text-align: center;
-}
-
-/* One row per book given or returned. */
-.move {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 60px;
-
-  & + & {
-    border-top: 1px solid var(--app-rule);
-  }
-
-  .what {
-    flex: 1;
-  }
-
-  .kind {
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 600;
-
-    &.out { background: var(--app-accent-soft); color: var(--app-accent); }
-    &.back { background: var(--app-success-soft); color: var(--ion-color-success); }
-  }
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .export {
-  margin-top: 14px;
-}
-
-/* "Show all 200 students" / "Show all 23 books". */
-.more {
-  display: block;
-  margin: 10px auto 0;
-  padding: 8px 16px;
-  border: 1px solid var(--app-accent);
-  border-radius: 100px;
-  background: var(--app-surface);
-  color: var(--app-accent);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &.in-card {
-    width: 100%;
-    margin: 0;
-    border: 0;
-    border-top: 1px solid var(--app-rule);
-    border-radius: 0;
-    background: transparent;
-    padding: 12px 0;
-  }
+  margin-top: 4px;
 }

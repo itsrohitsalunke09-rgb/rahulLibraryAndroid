@@ -87,6 +87,14 @@ export interface BookIssue {
   returnDate?: string;
   status: IssueStatus;
   category?: string;
+  registrationNumber?: string | null;
+}
+
+/** A student and how many books they were given in a year (the books report's circles). */
+export interface ReaderCount {
+  studentId: number;
+  studentName: string;
+  books: number;
 }
 
 export interface Dashboard {

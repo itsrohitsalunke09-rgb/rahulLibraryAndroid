@@ -53,7 +53,17 @@ export function readers(moves: BookMove[]): Reader[] {
     .sort((a, b) => b.books.length - a.books.length || a.studentName.localeCompare(b.studentName));
 }
 
-/** Circle size (px) for a student with this many books: the busiest gets the biggest; area grows with the count. */
-export function bubbleSize(books: number, most: number, min = 56, max = 120): number {
-  return Math.round(min + (max - min) * Math.sqrt(books / Math.max(most, 1)));
+/** Grid cells a student's circle spans (1 to 3, square), by books against the busiest reader. */
+export function bubbleSpan(books: number, most: number): 1 | 2 | 3 {
+  const share = books / Math.max(most, 1);
+  return share > 0.66 ? 3 : share > 0.33 ? 2 : 1;
+}
+
+/**
+ * The circles in a mixed order, so big and small ones share rows and fill the width. The order comes
+ * from each student's id, so it stays the same between visits instead of jumping around.
+ */
+export function mixed<T extends { studentId: number }>(items: T[]): T[] {
+  const key = (id: number) => Math.imul(id ^ 0x9e3779b9, 0x85ebca6b) >>> 0;
+  return [...items].sort((a, b) => key(a.studentId) - key(b.studentId));
 }

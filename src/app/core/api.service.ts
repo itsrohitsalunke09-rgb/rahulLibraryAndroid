@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { AboutContent } from './about-content';
 import { markDataChanged } from './freshness';
 import {
-  Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
+  Book, BookCategory, BookCategoryRequest, Clipping, ClippingRequest, ReaderCount, BookImportResult, BookIssue, BookRequest, Dashboard, DayRegister, IssueCounts, IssueStatus,
   MagazineCard, MagazineReceipt, MagazineReceiptRequest, MonthReport, NewsStory, NewsStoryRequest, Page, Periodical, PeriodicalRequest, PeriodicalSummary, ProfileUpdate, RegisterEntry, Role, UnlinkedCategory,
   UserAccount, UserRequest
 } from './models';
@@ -127,6 +127,11 @@ export class ApiService {
       params = params.set('year', year);
     }
     return this.http.get<Page<BookIssue>>(`${this.base}/issues/issued`, { params });
+  }
+
+  /** Books report circles: how many books each student was given in the year, the most first. */
+  readersInYear(year: number) {
+    return this.http.get<ReaderCount[]>(`${this.base}/issues/readers`, { params: { year } });
   }
 
   /** Book transactions report: issues given or returned in the month (YYYY-MM). */
