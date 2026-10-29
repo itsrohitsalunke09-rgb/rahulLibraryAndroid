@@ -134,7 +134,8 @@ export async function start3d(
 ): Promise<Galaxy3d> {
   const surfaces = await prepare3d() as Map<PlanetKind, CanvasImageSource>;
   const renderer = new WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // 1.5× is sharp on a phone and keeps frames coming during a drag (2× dropped frames).
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(host.clientWidth, host.clientHeight);
   host.appendChild(renderer.domElement);
 
@@ -146,13 +147,29 @@ export async function start3d(
   let fitted = false;
 
   const controls = new OrbitControls(camera, renderer.domElement);
+  // Smooth handling: a soft glide after letting go, a calmer drag and pinch, and no two-finger
+  // panning, which nudged the galaxy off-centre during a pinch.
   controls.enableDamping = true;
-  // Gentle pinch and wheel: half of Three.js's default speed.
-  controls.zoomSpeed = 0.5;
+  controls.dampingFactor = 0.035;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 0.4;
+  controls.enablePan = false;
   controls.minDistance = 18;
   controls.maxDistance = 420;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.21;
+  // The slow turn pauses while a finger is down (it fought the drag), and comes back 3 s after.
+  let resumeTurn: ReturnType<typeof setTimeout> | undefined;
+  const onStart = () => {
+    clearTimeout(resumeTurn);
+    controls.autoRotate = false;
+  };
+  const onEnd = () => {
+    clearTimeout(resumeTurn);
+    resumeTurn = setTimeout(() => controls.autoRotate = true, 3000);
+  };
+  controls.addEventListener('start', onStart);
+  controls.addEventListener('end', onEnd);
 
   const round = texture(paintGlow('rgba(255,255,255,1)', 'rgba(255,255,255,0.5)', 32));
   stars(scene, round);
@@ -272,7 +289,8 @@ export async function start3d(
       twinkle.material.opacity = 0.35 + 0.65 * glow;
       twinkle.scale.setScalar(Math.max(twinkle.parent!.children[0].scale.x, 1.2) * (8 + 6 * glow));
     }
-    controls.update();
+    // The time step keeps the slow turn steady even when a frame is late.
+    controls.update(dt);
     renderer.render(scene, camera);
     frame = requestAnimationFrame(tick);
   };
@@ -281,6 +299,9 @@ export async function start3d(
   return {
     dispose() {
       cancelAnimationFrame(frame);
+      clearTimeout(resumeTurn);
+      controls.removeEventListener('start', onStart);
+      controls.removeEventListener('end', onEnd);
       resize.disconnect();
       renderer.domElement.removeEventListener('pointerdown', onDown);
       renderer.domElement.removeEventListener('pointerup', onUp);
