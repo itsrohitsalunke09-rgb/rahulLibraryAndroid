@@ -1,4 +1,4 @@
-import { layoutGalaxy, planetHue, planetName, planetTiers } from './galaxy';
+import { clampView, layoutGalaxy, planetHue, planetName, planetTiers, zoomAt } from './galaxy';
 
 describe('layoutGalaxy', () => {
   function check(count: number, width: number, height: number) {
@@ -66,5 +66,20 @@ describe('planetTiers', () => {
     expect(planetHue(15)).toBe(planetHue(15));
     expect(planetHue(15)).toBeGreaterThanOrEqual(0);
     expect(planetHue(15)).toBeLessThan(360);
+  });
+});
+
+describe('galaxy zoom', () => {
+  it('zoomsAroundThePointAndKeepsItStill', () => {
+    const v = zoomAt({ scale: 1, x: 0, y: 0 }, 2, 100, 200, 360, 640);
+    expect(v).toEqual({ scale: 2, x: -100, y: -200 });
+    // The point under the fingers is the same spot of the galaxy before and after.
+    expect((100 - v.x) / v.scale).toBe(100);
+  });
+
+  it('staysBetweenWholeAndFourTimesAndCoversTheScreen', () => {
+    expect(zoomAt({ scale: 3, x: -500, y: -900 }, 3, 0, 0, 360, 640).scale).toBe(4);
+    expect(zoomAt({ scale: 1.5, x: -100, y: -100 }, 0.1, 0, 0, 360, 640)).toEqual({ scale: 1, x: 0, y: 0 });
+    expect(clampView({ scale: 2, x: 50, y: -2000 }, 360, 640)).toEqual({ scale: 2, x: 0, y: -640 });
   });
 });

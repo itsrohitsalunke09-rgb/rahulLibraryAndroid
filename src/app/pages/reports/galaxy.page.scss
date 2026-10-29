@@ -18,6 +18,21 @@ ion-content.space {
   --background: #020309;
 }
 
+/* The visible window, and the world inside it that zooms and moves as one. */
+.viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
 /* The painted sky behind everything. */
 .cosmos {
   position: absolute;
@@ -93,12 +108,16 @@ ion-content.space {
   text-align: center;
 }
 
+/* Over a fade so it stays readable above zoomed-in planets. */
 .legend {
   position: absolute;
-  right: 12px;
-  bottom: 8px;
-  left: 12px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
   margin: 0;
+  padding: 14px 12px 8px;
+  background: linear-gradient(transparent, rgb(2 3 9 / 0.9) 45%);
   color: #aab2d8;
   font-size: 12px;
   text-align: center;
@@ -173,4 +192,30 @@ ion-content.space {
 
   .swatch { width: 22px; height: 22px; }
   .meaning { color: #aab2d8; }
+}
+
+/* + / − / reset, above the legend on the right. */
+.zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 44px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 50%;
+    background: rgb(12 14 30 / 0.75);
+    color: #eef1ff;
+    font: 600 20px/1 system-ui, sans-serif;
+    cursor: pointer;
+
+    &:disabled { opacity: 0.35; }
+  }
+
+  .reset { font-size: 18px; }
 }

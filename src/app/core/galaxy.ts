@@ -6,8 +6,8 @@ export interface Planet {
   r: number;
 }
 
-/** Smallest planet radius, so ~200 students still show as tappable dots. */
-const MIN_R = 9;
+/** Smallest planet radius, small enough that 1, 2 and 3 books still look different (zoom in to tap the tiny ones). */
+const MIN_R = 6;
 /** Random spots tried per planet before the whole galaxy is shrunk and laid out again. */
 const TRIES = 1600;
 
@@ -132,4 +132,30 @@ export function planetName(kind: PlanetKind): string {
 /** The colour (hue, 0–359) of a student's plain planet: random-looking but the same every visit. */
 export function planetHue(studentId: number): number {
   return hash(studentId + 7919) % 360;
+}
+
+/** How far the galaxy is zoomed (1 = whole galaxy, up to 4×) and moved, in screen px. */
+export interface GalaxyView {
+  scale: number;
+  x: number;
+  y: number;
+}
+
+export const MAX_ZOOM = 4;
+
+/** Keeps the zoomed galaxy covering the screen: no empty strip at any edge. */
+export function clampView(view: GalaxyView, width: number, height: number): GalaxyView {
+  const scale = Math.min(Math.max(view.scale, 1), MAX_ZOOM);
+  return {
+    scale,
+    x: Math.min(0, Math.max(width * (1 - scale), view.x)),
+    y: Math.min(0, Math.max(height * (1 - scale), view.y)),
+  };
+}
+
+/** Zooms by a factor around a point on screen (a pinch's middle, the wheel's pointer), which stays put. */
+export function zoomAt(view: GalaxyView, factor: number, px: number, py: number, width: number, height: number): GalaxyView {
+  const scale = Math.min(Math.max(view.scale * factor, 1), MAX_ZOOM);
+  const ratio = scale / view.scale;
+  return clampView({ scale, x: px - (px - view.x) * ratio, y: py - (py - view.y) * ratio }, width, height);
 }

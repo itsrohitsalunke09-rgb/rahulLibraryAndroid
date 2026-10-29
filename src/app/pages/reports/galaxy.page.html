@@ -12,6 +12,10 @@
 
 <!-- One screen, no scrolling: every reader fits in the sky. -->
 <ion-content [scrollY]="false" class="space">
+  <!-- Pinch, drag, wheel or double-tap to zoom (up to 4×) and move around; a drag never opens a profile. -->
+  <div class="viewport" #viewport (pointerdown)="down($event)" (pointermove)="move($event)" (pointerup)="up($event)"
+       (pointercancel)="up($event)" (wheel)="wheel($event)">
+  <div class="world" [style.transform]="transform()">
   <!-- Stars, nebulae and the spiral galaxy, painted once per screen size. -->
   <canvas #space class="cosmos" aria-hidden="true"></canvas>
   <div class="sky" #sky role="list" [attr.aria-label]="(readers()?.length ?? 0) + ' readers in ' + year">
@@ -40,9 +44,21 @@
       <p class="message">No books read yet in {{ year }}. The galaxy fills up as books are given.</p>
     }
   </div>
+  </div>
+  </div>
 
   @if (readers()?.length) {
-    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · tap i for the guide</p>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button type="button" aria-label="Zoom in" [disabled]="view().scale >= maxZoom" (click)="zoomBy(1.6)">+</button>
+      <button type="button" aria-label="Zoom out" [disabled]="view().scale <= 1" (click)="zoomBy(1 / 1.6)">&minus;</button>
+      @if (view().scale > 1) {
+        <button type="button" class="reset" aria-label="Show the whole galaxy" (click)="reset()">&#8634;</button>
+      }
+    </div>
+  }
+
+  @if (readers()?.length) {
+    <p class="legend">{{ year }} · {{ readers()!.length }} reader{{ readers()!.length === 1 ? '' : 's' }} · the Sun is the #1 reader · pinch to zoom · i for the guide</p>
   }
 
   <!-- Which body means what: the Sun, planets and dwarf planets by real size, for bands of readers. -->
