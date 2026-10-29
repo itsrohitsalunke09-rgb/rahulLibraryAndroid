@@ -38,6 +38,8 @@ export class BookDetailModal implements OnInit {
   @Input({ required: true }) book!: Book;
   /** Told about every change right away, so the list is current however the popup closes (the phone's back button skips close()). */
   @Input() onChange?: (book: Book) => void;
+  /** The student already has an open request for this book: show it as requested, with no call to make. */
+  @Input() alreadyRequested = false;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
@@ -74,6 +76,7 @@ export class BookDetailModal implements OnInit {
 
   ngOnInit() {
     this.current.set(this.book);
+    this.requested.set(this.alreadyRequested);
     if (this.auth.isStaff()) {
       this.loadHistory();
     }

@@ -38,6 +38,7 @@ export class CatalogPage implements ViewWillEnter {
   protected perms = inject(PermissionsStore);
   private searchbar = viewChild<IonSearchbar>('bookSearch');
   private router = inject(Router);
+  private readonly openRequests = signal(new Set<number>());
 
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
@@ -60,6 +61,10 @@ export class CatalogPage implements ViewWillEnter {
   ionViewWillEnter() {
     // Reload only when stale, so availability is current without refetching on every tab switch.
     this.books.revisit();
+    // Fresh each visit: staff may have marked a request done since, which lets the student ask again.
+    if (!this.auth.isStaff()) {
+      this.loadOpenRequests();
+    }
   }
 
   setTab(value: unknown) {
@@ -140,14 +145,27 @@ export class CatalogPage implements ViewWillEnter {
   async open(book: Book) {
     // An issue or an edit updates just this row, the moment it happens.
     const onChange = (changed: Book) => this.books.replace(b => b.id === changed.id, changed);
-    const modal = await this.modals.create({ component: BookDetailModal, componentProps: { book, onChange } });
+    const alreadyRequested = this.openRequests().has(book.id);
+    const modal = await this.modals.create({ component: BookDetailModal, componentProps: { book, onChange, alreadyRequested } });
     await modal.present();
     const { role } = await modal.onWillDismiss<Book>();
     if (role === 'deleted') {
       this.books.remove(b => b.id === book.id);
     } else if (role === 'requested') {
+      this.openRequests.update(ids => new Set(ids).add(book.id));
       this.showMine('REQUESTED');
     }
+  }
+
+  /** Students: the books they have an open (not yet done) request for, so Book details won't ask again. */
+  private loadOpenRequests() {
+    this.api.myReaderRequests().subscribe({
+      next: list => this.openRequests.set(new Set(list
+        .filter(r => r.kind === 'REQUEST' && !r.doneAt && r.bookId != null)
+        .map(r => r.bookId!))),
+      // Not fatal: the server still refuses a second request (409).
+      error: () => {},
+    });
   }
 
   /** After a request or suggestion: clear the search and open My books on the matching tab. */
