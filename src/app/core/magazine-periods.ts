@@ -89,18 +89,18 @@ export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>
   const from = parse(r.periodFrom);
   const to = parse(r.periodTo);
   const day = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
-  // A monthly's combined issue: published on a day, covering to the end of a later month ("5 Oct 2026 · Oct–Nov").
-  const toMonthEnd = addDays(to, 1).getDate() === 1;
-  if (toMonthEnd && (to.getFullYear() * 12 + to.getMonth()) > (from.getFullYear() * 12 + from.getMonth()) && from.getDate() !== 1) {
-    return `${day(from)} ${from.getFullYear()} · ${MONTHS[from.getMonth()]}–${MONTHS[to.getMonth()]}`;
+  // A monthly's combined issue: from the 1st of an earlier month to its published day ("5 Nov 2026 · Oct–Nov").
+  // (A week or fortnight starting on the 1st never reaches the next month.)
+  if (from.getDate() === 1 && (to.getFullYear() * 12 + to.getMonth()) > (from.getFullYear() * 12 + from.getMonth())) {
+    return `${day(to)} ${to.getFullYear()} · ${MONTHS[from.getMonth()]}–${MONTHS[to.getMonth()]}`;
   }
   return r.periodFrom === r.periodTo
     ? `${day(from)} ${from.getFullYear()}`
     : `${day(from)}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${day(to)} ${to.getFullYear()}`;
 }
 
-/** The last day of the month `months - 1` after a date's month: monthsEnd('2026-10-05', 2) = '2026-11-30'. */
-export function monthsEnd(date: string, months: number): string {
+/** The 1st of the month `months - 1` before a date's month: monthsStart('2026-11-05', 2) = '2026-10-01'. */
+export function monthsStart(date: string, months: number): string {
   const d = parse(date);
-  return localIsoDate(new Date(d.getFullYear(), d.getMonth() + months, 0));
+  return localIsoDate(new Date(d.getFullYear(), d.getMonth() - (months - 1), 1));
 }

@@ -57,14 +57,14 @@
           <input type="date" name="publishedOn" [max]="today" [(ngModel)]="publishedOn" />
         </span>
       </label>
-      <!-- A combined issue (जोड अंक) counts as received for every month it covers. -->
+      <!-- A combined issue (जोड अंक) counts as received for its month and the past months it covers. -->
       <label class="field">
         <span class="label">Covers</span>
         <span class="box">
           <select name="months" [(ngModel)]="months">
             <option [ngValue]="1">1 month</option>
-            <option [ngValue]="2">2 months (जोड अंक)</option>
-            <option [ngValue]="3">3 months</option>
+            <option [ngValue]="2">2 months: this and the last (जोड अंक)</option>
+            <option [ngValue]="3">3 months: this and the 2 before</option>
           </select>
         </span>
       </label>

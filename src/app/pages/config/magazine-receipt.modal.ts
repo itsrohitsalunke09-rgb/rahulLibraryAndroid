@@ -4,7 +4,7 @@ import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, Io
 import { ApiService } from '../../core/api.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { localIsoDate } from '../../core/dates';
-import { defaultPeriod, magazinePeriods, monthsEnd, weekStartDay } from '../../core/magazine-periods';
+import { defaultPeriod, magazinePeriods, monthsStart, weekStartDay } from '../../core/magazine-periods';
 import { MagazineCard, MagazineReceipt, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -104,16 +104,16 @@ export class MagazineReceiptModal implements OnInit {
       this.error.set('Enter the copies (1 to 99).');
       return;
     }
-    // Monthly issues are dated by their published day (to the end of the last month a combined issue
-    // covers); weekly ones by the week they cover.
+    // Monthly issues are dated by their published day; a combined one reaches back to the 1st of the
+    // earliest past month it covers (Oct–Nov published 5 Nov: 1 Oct to 5 Nov). Weekly: the week covered.
     const [from, to] = this.monthly
-      ? [this.publishedOn, this.months > 1 ? monthsEnd(this.publishedOn, this.months) : this.publishedOn]
+      ? [this.months > 1 ? monthsStart(this.publishedOn, this.months) : this.publishedOn, this.publishedOn]
       : [this.periodFrom, this.periodTo];
     if (!from || !to) {
       this.error.set(this.monthly ? 'Enter the published date.' : 'Enter the from and to dates.');
       return;
     }
-    if (from > this.today) {
+    if ((this.monthly ? this.publishedOn : from) > this.today) {
       this.error.set(this.monthly ? 'The published date can’t be in the future.' : '"From" can’t be in the future.');
       return;
     }
@@ -123,7 +123,9 @@ export class MagazineReceiptModal implements OnInit {
     }
     this.saving.set(true);
     this.error.set('');
-    this.api.addMagazineReceipt(this.card.periodicalId, { issueNo, receivedOn: from, periodFrom: from, periodTo: to, copies }).subscribe({
+    // Received on: the published day for a monthly (even a combined one), the week's start for a weekly.
+    const receivedOn = this.monthly ? this.publishedOn : from;
+    this.api.addMagazineReceipt(this.card.periodicalId, { issueNo, receivedOn, periodFrom: from, periodTo: to, copies }).subscribe({
       next: receipt => {
         this.ui.toast(`${this.card.name}: अंक ${issueNo}${copies > 1 ? ` (×${copies})` : ''} received.`);
         this.modals.dismiss(receipt, 'saved');
