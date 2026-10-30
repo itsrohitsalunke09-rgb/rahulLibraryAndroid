@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>Newspaper register</ion-title>
+    <ion-title class="marathi" lang="mr">दैनिके</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -46,6 +46,13 @@
                 <span class="icon" style="--icon: url(assets/icons/field-phone.svg); --icon-size: 18px" aria-hidden="true"></span>
               </a>
             }
+            <!-- Copies that came (×1 unless more were bought); the price is per copy. -->
+            <label class="price copies">
+              <span class="sr-only">Copies of {{ line.name }}</span>
+              <span aria-hidden="true">×</span>
+              <input type="number" inputmode="numeric" min="1" max="99" step="1" [disabled]="!line.arrived"
+                     [(ngModel)]="line.copiesText" (ngModelChange)="changed()" />
+            </label>
             <label class="price">
               <span class="sr-only">Price of {{ line.name }}</span>
               <span aria-hidden="true">₹</span>

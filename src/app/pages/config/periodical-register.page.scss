@@ -49,6 +49,8 @@ ion-back-button { --color: var(--app-ink); --icon-font-size: 22px; }
 }
 .price input:disabled { color: var(--app-muted); }
 .price:focus-within { border-color: var(--ion-color-primary); }
+/* Copies: a narrow box before the price. */
+.price.copies { flex-basis: 58px; }
 
 .summary {
   display: flex; justify-content: space-between; align-items: baseline; margin: 14px 4px 12px;

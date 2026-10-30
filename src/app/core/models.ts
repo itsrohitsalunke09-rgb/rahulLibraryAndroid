@@ -254,6 +254,8 @@ export interface MagazineReceipt {
   receivedOn: string;
   periodFrom: string;
   periodTo: string;
+  /** How many of this issue came (1 unless more were bought). */
+  copies?: number;
 }
 
 export type MagazineReceiptRequest = Omit<MagazineReceipt, 'id'>;
@@ -281,6 +283,8 @@ export interface RegisterRow {
   arrived: boolean;
   price: number;
   contactNumber?: string | null;
+  /** Copies that came (1 unless more were bought); price is per copy. */
+  copies?: number;
 }
 
 export interface DayRegister {
@@ -292,6 +296,7 @@ export interface RegisterEntry {
   periodicalId: number;
   arrived: boolean;
   price: number | null;
+  copies: number;
 }
 
 export interface ReportRow {

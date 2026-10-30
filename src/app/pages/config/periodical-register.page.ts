@@ -12,8 +12,8 @@ import { UiService, errorMessage } from '../../core/ui.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 
-/** One editable line: price is a string while typing. */
-type Line = RegisterRow & { priceText: string };
+/** One editable line: price (per copy) and copies are strings while typing. */
+type Line = RegisterRow & { priceText: string; copiesText: string };
 
 /** Daily arrival register: tick what came today and what each copy cost. */
 @Component({
@@ -55,9 +55,9 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
     }
   }
 
-  /** Total cost of the ticked copies. */
+  /** Total cost of the ticked papers: price × copies. */
   total() {
-    return this.lines().filter(l => l.arrived).reduce((sum, l) => sum + (Number(l.priceText) || 0), 0);
+    return this.lines().filter(l => l.arrived).reduce((sum, l) => sum + (Number(l.priceText) || 0) * (Number(l.copiesText) || 1), 0);
   }
 
   ticked() {
@@ -110,9 +110,16 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
       this.error.set(`Enter the price for ${bad.name} (0 to 10,000).`);
       return;
     }
+    const badCopies = this.lines().find(l => l.arrived && !/^([1-9]|[1-9][0-9])$/.test(l.copiesText.trim()));
+    if (badCopies) {
+      this.error.set(`Enter the copies of ${badCopies.name} (1 to 99).`);
+      return;
+    }
     this.saving.set(true);
     this.error.set('');
-    const entries = this.lines().map(l => ({ periodicalId: l.periodicalId, arrived: l.arrived, price: l.arrived ? Number(l.priceText) : null }));
+    const entries = this.lines().map(l => ({
+      periodicalId: l.periodicalId, arrived: l.arrived, price: l.arrived ? Number(l.priceText) : null, copies: Number(l.copiesText) || 1,
+    }));
     this.api.savePeriodicalRegister(this.date(), entries).subscribe({
       next: day => {
         this.saving.set(false);
@@ -146,7 +153,7 @@ export class PeriodicalRegisterPage implements ViewWillEnter {
 
   private show(rows: RegisterRow[]) {
     this.savedCount = rows.filter(r => r.arrived).length;
-    this.lines.set(rows.map(r => ({ ...r, priceText: String(r.price) })));
+    this.lines.set(rows.map(r => ({ ...r, priceText: String(r.price), copiesText: String(r.copies ?? 1) })));
     this.dirty.set(false);
   }
 }

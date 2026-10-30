@@ -33,6 +33,8 @@ export class MagazineReceiptModal implements OnInit {
   readonly today = localIsoDate();
   /** Suggested as the one after the last recorded. */
   issueNo: number | string = '';
+  /** How many of this issue came; 1 unless more were bought. */
+  copies: number | string = 1;
   /** Monthly: the day it was published. */
   publishedOn = this.today;
   /** Weekly/fortnightly: the period it covers, this week (on the same weekday as the first issue) or half-month to start with. */
@@ -95,6 +97,11 @@ export class MagazineReceiptModal implements OnInit {
       this.error.set('Enter the issue number (अंक), e.g. 12.');
       return;
     }
+    const copies = Number(this.copies);
+    if (!Number.isInteger(copies) || copies < 1 || copies > 99) {
+      this.error.set('Enter the copies (1 to 99).');
+      return;
+    }
     // Monthly issues are dated by their published day; weekly ones by the week they cover.
     const [from, to] = this.monthly ? [this.publishedOn, this.publishedOn] : [this.periodFrom, this.periodTo];
     if (!from || !to) {
@@ -111,9 +118,9 @@ export class MagazineReceiptModal implements OnInit {
     }
     this.saving.set(true);
     this.error.set('');
-    this.api.addMagazineReceipt(this.card.periodicalId, { issueNo, receivedOn: from, periodFrom: from, periodTo: to }).subscribe({
+    this.api.addMagazineReceipt(this.card.periodicalId, { issueNo, receivedOn: from, periodFrom: from, periodTo: to, copies }).subscribe({
       next: receipt => {
-        this.ui.toast(`${this.card.name}: अंक ${issueNo} received.`);
+        this.ui.toast(`${this.card.name}: अंक ${issueNo}${copies > 1 ? ` (×${copies})` : ''} received.`);
         this.modals.dismiss(receipt, 'saved');
       },
       error: err => {

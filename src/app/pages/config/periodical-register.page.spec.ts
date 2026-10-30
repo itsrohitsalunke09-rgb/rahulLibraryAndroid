@@ -46,8 +46,8 @@ describe('PeriodicalRegisterPage', () => {
     page.lines()[1].priceText = '25';
     page.save();
     expect(api.savePeriodicalRegister).toHaveBeenCalledWith(localIsoDate(), [
-      { periodicalId: 1, arrived: true, price: 8 },
-      { periodicalId: 2, arrived: true, price: 25 },
+      { periodicalId: 1, arrived: true, price: 8, copies: 1 },
+      { periodicalId: 2, arrived: true, price: 25, copies: 1 },
     ]);
     expect(page.dirty()).toBe(false);
   });

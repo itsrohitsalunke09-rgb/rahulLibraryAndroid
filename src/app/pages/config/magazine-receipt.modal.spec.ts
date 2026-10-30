@@ -31,7 +31,7 @@ describe('MagazineReceiptModal', () => {
     expect(modal.issueNo).toBe(12);
     modal.publishedOn = '2026-10-05';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-05' });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-05', copies: 1 });
     expect(dismiss).toHaveBeenCalledWith(expect.objectContaining({ id: 9 }), 'saved');
   });
 
@@ -42,7 +42,7 @@ describe('MagazineReceiptModal', () => {
     modal.periodFrom = '2026-10-19';
     modal.periodTo = '2026-10-25';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25' });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25', copies: 1 });
   });
 
   it('newFromMovesToToTheEndOfThatIssueAndBarsEarlierDates', async () => {

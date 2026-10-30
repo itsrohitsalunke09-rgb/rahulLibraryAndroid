@@ -41,6 +41,14 @@
       </span>
     </label>
 
+    <label class="field">
+      <span class="label">Copies</span>
+      <span class="box issue">
+        <span class="prefix" aria-hidden="true">×</span>
+        <input type="number" inputmode="numeric" min="1" max="99" step="1" name="copies" [(ngModel)]="copies" />
+      </span>
+    </label>
+
     @if (monthly) {
       <label class="field">
         <span class="label">Published on</span>
