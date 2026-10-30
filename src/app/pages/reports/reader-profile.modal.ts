@@ -1,12 +1,14 @@
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, ModalController,
+  InfiniteScrollCustomEvent, IonButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
+  IonLabel, IonList, IonTitle, IonToolbar, ModalController,
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { formatDate } from '../../core/dates';
 import { PlanetKind, planetHue, planetName } from '../../core/galaxy';
 import { Book, BookIssue, ReaderCount, UserAccount, issueStatus } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { PAGE_SIZE } from '../../core/paged-list';
 import { PermissionsStore } from '../../core/permissions.store';
 import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -24,7 +26,8 @@ import { UserFormModal } from '../people/user-form.modal';
   templateUrl: 'reader-profile.modal.html',
   styleUrls: ['planets.scss', 'reader-profile.modal.scss'],
   imports: [
-    IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonList, IonItem, IonLabel,
+    IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInfiniteScroll,
+    IonInfiniteScrollContent,
     MarathiPipe, PageSkeletonComponent,
   ],
 })
@@ -62,6 +65,14 @@ export class ReaderProfileModal implements OnInit {
       returned: list.filter(b => b.status === 'RETURNED').length };
   });
   readonly favourite = computed(() => favouriteCategory(this.books() ?? []));
+  /** Rows on screen: 20 at first, 20 more each time the list is scrolled to its end (as in the Catalog). */
+  readonly showing = signal(PAGE_SIZE);
+  readonly shownBooks = computed(() => (this.books() ?? []).slice(0, this.showing()));
+
+  more(event: InfiniteScrollCustomEvent) {
+    this.showing.update(n => n + PAGE_SIZE);
+    event.target.complete();
+  }
 
   ngOnInit() {
     this.loadBooks();
@@ -110,7 +121,10 @@ export class ReaderProfileModal implements OnInit {
 
   private loadBooks() {
     this.api.studentIssues(this.reader.studentId, this.year).subscribe({
-      next: list => this.books.set(list),
+      next: list => {
+        this.showing.set(PAGE_SIZE);
+        this.books.set(list);
+      },
       error: err => this.error.set(errorMessage(err, 'Could not load the books.')),
     });
   }

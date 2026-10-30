@@ -60,7 +60,7 @@
       <p class="pad empty">No books yet.</p>
     }
     <ion-list inset="true" lines="full">
-      @for (b of list; track b.id) {
+      @for (b of shownBooks(); track b.id) {
         <ion-item>
           <ion-label>
             <h2 [class.marathi]="b.category | marathi">{{ b.bookTitle }}</h2>
@@ -74,6 +74,10 @@
         </ion-item>
       }
     </ion-list>
+    <!-- 20 more as the list nears its end, as in the Catalog. -->
+    <ion-infinite-scroll [disabled]="showing() >= list.length" (ionInfinite)="more($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   } @else {
     <app-page-skeleton [count]="false" [chip]="true" [rows]="5" />
   }
