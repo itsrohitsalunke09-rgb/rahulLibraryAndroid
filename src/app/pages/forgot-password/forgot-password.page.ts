@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowBack, eyeOutline } from 'ionicons/icons';
+import { arrowBack, eyeOutline, lockClosedOutline, mailOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/auth.service';
 import { errorMessage } from '../../core/ui.service';
 
@@ -38,7 +38,7 @@ export class ForgotPasswordPage implements OnDestroy {
   private timer?: ReturnType<typeof setInterval>;
 
   constructor() {
-    addIcons({ arrowBack, eyeOutline });
+    addIcons({ arrowBack, eyeOutline, lockClosedOutline, mailOutline });
   }
 
   ngOnDestroy() {
