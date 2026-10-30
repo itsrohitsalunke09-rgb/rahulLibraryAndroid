@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import {
   AlertController, IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
@@ -12,6 +12,7 @@ import { Orientation, registerPdf } from '../../core/register-pdf';
 import { saveFile } from '../../core/save-file';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 
 /** How far back the PDF export reaches: 3 years. */
 const EXPORT_MONTHS = 36;
@@ -23,12 +24,14 @@ const ORIENTATION_KEY = 'rahul-library.pdf-orientation';
   selector: 'app-periodical-report',
   templateUrl: 'periodical-report.page.html',
   styleUrls: ['periodical-register.page.scss', 'periodical-report.page.scss'],
-  imports: [IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, PageSkeletonComponent],
+  imports: [IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, PageSkeletonComponent, SwipeTabsDirective],
 })
 export class PeriodicalReportPage implements ViewWillEnter {
   private api = inject(ApiService);
 
   readonly thisMonth = localIsoDate().slice(0, 7);
+  /** The month's cells, which slide in when a sideways swipe changes the month. */
+  readonly cells = viewChild<ElementRef<HTMLElement>>('cellsBox');
   readonly month = signal(this.thisMonth);
   readonly report = signal<MonthReport | null>(null);
   readonly loading = signal(false);

@@ -7,7 +7,8 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [appSwipeTabs]="month() < thisMonth ? ['PREV', 'NOW', 'NEXT'] : ['PREV', 'NOW']" swipeCurrent="NOW"
+             [swipeSlide]="cells()?.nativeElement ?? null" (swipeTo)="shift($event === 'NEXT' ? 1 : -1)">
   <div class="wrap">
     <div class="day">
       <button type="button" class="step" aria-label="Previous month" (click)="shift(-1)">‹</button>
@@ -25,6 +26,8 @@
       <p class="form-error" role="alert">{{ error() }}</p>
     }
 
+    <!-- The month's cells: they slide in when a swipe changes the month. -->
+    <div #cellsBox>
     @if (loading() && !report()) {
       <app-page-skeleton kind="report" />
     } @else if (report(); as r) {
@@ -74,5 +77,6 @@
         </div>
       }
     }
+    </div>
   </div>
 </ion-content>
