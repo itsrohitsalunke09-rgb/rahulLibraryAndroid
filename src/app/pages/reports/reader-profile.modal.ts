@@ -9,6 +9,8 @@ import { PlanetKind, planetHue, planetName } from '../../core/galaxy';
 import { Book, BookIssue, ReaderCount, UserAccount, issueStatus } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PAGE_SIZE } from '../../core/paged-list';
+import { YearSelectComponent } from '../../core/year-select.component';
+import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 import { PermissionsStore } from '../../core/permissions.store';
 import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -28,7 +30,7 @@ import { UserFormModal } from '../people/user-form.modal';
   imports: [
     IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInfiniteScroll,
     IonInfiniteScrollContent,
-    MarathiPipe, PageSkeletonComponent,
+    MarathiPipe, PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective,
   ],
 })
 export class ReaderProfileModal implements OnInit {
@@ -59,22 +61,57 @@ export class ReaderProfileModal implements OnInit {
   readonly error = signal('');
   readonly status = issueStatus;
   /** Books in each state: Issued, Overdue, Returned. */
+  /** The year the list and the Issued / Returned counts cover (by issue date): the Galaxy's year, else this year. */
+  readonly shownYear = signal(new Date().getFullYear());
+  /** The tapped count card: only books in that state; null = all of the year's books. */
+  readonly filter = signal<StatusFilter | null>(null);
+  private readonly yearBooks = computed(() =>
+    (this.books() ?? []).filter(b => b.issueDate.startsWith(String(this.shownYear()))));
+  /** Issued and Returned for the chosen year; Overdue across all years (a late book needs chasing whatever its year). */
   readonly count = computed(() => {
-    const list = this.books() ?? [];
-    return { issued: list.filter(b => b.status === 'ISSUED').length, overdue: list.filter(b => b.status === 'OVERDUE').length,
-      returned: list.filter(b => b.status === 'RETURNED').length };
+    const year = this.yearBooks();
+    return { issued: year.filter(b => b.status === 'ISSUED').length,
+      overdue: (this.books() ?? []).filter(b => b.status === 'OVERDUE').length,
+      returned: year.filter(b => b.status === 'RETURNED').length };
   });
-  readonly favourite = computed(() => favouriteCategory(this.books() ?? []));
+  readonly favourite = computed(() => favouriteCategory(this.yearBooks()));
+  readonly listed = computed(() => {
+    const f = this.filter();
+    if (f === 'OVERDUE') {
+      return (this.books() ?? []).filter(b => b.status === 'OVERDUE');
+    }
+    return f ? this.yearBooks().filter(b => b.status === f) : this.yearBooks();
+  });
   /** Rows on screen: 20 at first, 20 more each time the list is scrolled to its end (as in the Catalog). */
   readonly showing = signal(PAGE_SIZE);
-  readonly shownBooks = computed(() => (this.books() ?? []).slice(0, this.showing()));
+  readonly shownBooks = computed(() => this.listed().slice(0, this.showing()));
 
   more(event: InfiniteScrollCustomEvent) {
     this.showing.update(n => n + PAGE_SIZE);
     event.target.complete();
   }
 
+  setYear(year: number) {
+    this.shownYear.set(year);
+    this.showing.set(PAGE_SIZE);
+  }
+
+  /** A sideways swipe on the list: All → Issued → Overdue → Returned, as the cards read. */
+  swipeTo(tab: string) {
+    this.filter.set(tab === 'ISSUED' || tab === 'OVERDUE' || tab === 'RETURNED' ? tab : null);
+    this.showing.set(PAGE_SIZE);
+  }
+
+  /** Tap a card to list only those books; tap it again for all. */
+  toggle(f: StatusFilter) {
+    this.filter.set(this.filter() === f ? null : f);
+    this.showing.set(PAGE_SIZE);
+  }
+
   ngOnInit() {
+    if (this.year) {
+      this.shownYear.set(this.year);
+    }
     this.loadBooks();
   }
 
@@ -120,7 +157,8 @@ export class ReaderProfileModal implements OnInit {
   }
 
   private loadBooks() {
-    this.api.studentIssues(this.reader.studentId, this.year).subscribe({
+    // Every year at once: the year chip and the all-years Overdue count filter it here.
+    this.api.studentIssues(this.reader.studentId).subscribe({
       next: list => {
         this.showing.set(PAGE_SIZE);
         this.books.set(list);
@@ -129,6 +167,9 @@ export class ReaderProfileModal implements OnInit {
     });
   }
 }
+
+/** The count cards that filter the list. */
+type StatusFilter = 'ISSUED' | 'OVERDUE' | 'RETURNED';
 
 /** The category the student read most from, if their books have categories. */
 export function favouriteCategory(books: Pick<BookIssue, 'category'>[]): string | null {

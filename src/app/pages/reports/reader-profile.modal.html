@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [appSwipeTabs]="['ALL', 'ISSUED', 'OVERDUE', 'RETURNED']" [swipeCurrent]="filter() ?? 'ALL'" (swipeTo)="swipeTo($event)">
   <section class="hero">
     <span [class]="'planet planet-skin ' + kind" [style.--hue]="hue" aria-hidden="true"></span>
     <h2>{{ reader.studentName }}</h2>
@@ -42,10 +42,14 @@
     </div>
   }
 
+  <!-- Tap a card to list only those books, tap again for all; swiping the list moves along them too. -->
   <div class="stats">
-    <span class="out"><strong>{{ books() ? count().issued : '–' }}</strong> issued</span>
-    <span class="late"><strong>{{ books() ? count().overdue : '–' }}</strong> overdue</span>
-    <span class="back"><strong>{{ books() ? count().returned : '–' }}</strong> returned</span>
+    <button type="button" class="out" [class.on]="filter() === 'ISSUED'" [attr.aria-pressed]="filter() === 'ISSUED'"
+            (click)="toggle('ISSUED')"><strong>{{ books() ? count().issued : '–' }}</strong> issued</button>
+    <button type="button" class="late" [class.on]="filter() === 'OVERDUE'" [attr.aria-pressed]="filter() === 'OVERDUE'"
+            (click)="toggle('OVERDUE')"><strong>{{ books() ? count().overdue : '–' }}</strong> overdue <small>all years</small></button>
+    <button type="button" class="back" [class.on]="filter() === 'RETURNED'" [attr.aria-pressed]="filter() === 'RETURNED'"
+            (click)="toggle('RETURNED')"><strong>{{ books() ? count().returned : '–' }}</strong> returned</button>
   </div>
 
   @if (favourite(); as f) {
@@ -54,10 +58,24 @@
 
   @if (error()) {
     <p class="form-error pad" role="alert">{{ error() }}</p>
-  } @else if (books(); as list) {
-    <h3 class="section-title">{{ year ? 'Books in ' + year : 'All transactions' }}</h3>
+  } @else if (books()) {
+    <!-- The app's year chip and dropdown, as on the Dashboard. -->
+    <app-year-select #yearPicker label="Profile year" [value]="shownYear()" (yearChange)="setYear($event)" />
+    <div class="filter-row">
+      <h3 class="section-title">
+        {{ filter() === 'OVERDUE' ? 'Overdue' : filter() === 'ISSUED' ? 'Issued' : filter() === 'RETURNED' ? 'Returned' : 'Books' }}
+        <span class="filter-text">{{ filter() === 'OVERDUE' ? 'all years' : 'issued in ' + shownYear() }}</span>
+      </h3>
+      @if (filter() !== 'OVERDUE') {
+        <button type="button" class="year-chip active" (click)="yearPicker.open($event)" aria-label="Choose year">
+          {{ shownYear() }}
+          <span class="icon" style="--icon: url(assets/icons/chevron-down.svg)" aria-hidden="true"></span>
+        </button>
+      }
+    </div>
+    @let list = listed();
     @if (!list.length) {
-      <p class="pad empty">No books yet.</p>
+      <p class="pad empty">{{ filter() ? 'No such books.' : 'No books in ' + shownYear() + '.' }}</p>
     }
     <ion-list inset="true" lines="full">
       @for (b of shownBooks(); track b.id) {
