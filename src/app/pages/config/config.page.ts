@@ -15,6 +15,6 @@ export class ConfigPage {
     { title: 'साप्ताहिक', sub: 'Mark weekly magazine issues received', link: '/tabs/config/periodicals/magazines/WEEKLY', tone: 'weekly', icon: 'book' },
     { title: 'मासिक', sub: 'Mark monthly magazine issues received', link: '/tabs/config/periodicals/magazines/MONTHLY', tone: 'monthly', icon: 'book' },
     { title: 'ग्रंथ दाखल नोंदवही', sub: 'The catalog: every book, add and edit books', link: '/tabs/config/catalog', tone: 'catalog', icon: 'tab-catalog' },
-    { title: 'सभासद', sub: 'Students, their books, issue a book, edit an account', link: '/tabs/config/members', tone: 'members', icon: 'tab-people' },
+    { title: 'ग्रंथ देव-घेव आणि सभासद वही', sub: 'Students, their books, issue a book, edit an account', link: '/tabs/config/members', tone: 'members', icon: 'tab-people' },
   ];
 }
