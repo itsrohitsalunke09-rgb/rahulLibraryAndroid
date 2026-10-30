@@ -4,7 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { IonIcon, IonLabel, IonSpinner, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { bookmarksOutline } from 'ionicons/icons';
+import { bookmarksOutline, planetOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
 import { GalaxyReadersStore } from '../core/galaxy-readers.store';
 import { PermissionsStore } from '../core/permissions.store';
@@ -30,7 +30,7 @@ export class TabsPage {
   ), { initialValue: false });
 
   constructor() {
-    addIcons({ bookmarksOutline });
+    addIcons({ bookmarksOutline, planetOutline });
     // What this role may do, brought up to date each time the app starts.
     inject(PermissionsStore).refresh();
     // The Reading Galaxy's saved readers are brought up to date each time the app starts.

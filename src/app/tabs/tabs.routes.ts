@@ -192,6 +192,12 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/no-access/no-access.page').then(m => m.NoAccessPage),
       },
       {
+        // The Reading Galaxy tab, for staff and students; the tab bar stays.
+        path: 'galaxy',
+        ...READ,
+        loadComponent: () => import('../pages/reports/galaxy.page').then(m => m.GalaxyPage),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('../pages/profile/profile.page').then(m => m.ProfilePage),
       },

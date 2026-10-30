@@ -1,9 +1,12 @@
 <ion-header>
   <ion-toolbar>
     <!-- Staff come from the books report, students from My books. -->
-    <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="meId === undefined ? '/tabs/dashboard/reports/BOOKS' : '/tabs/my-books'" text=""></ion-back-button>
-    </ion-buttons>
+    <!-- Opened as its own tab there's nowhere to go back to. -->
+    @if (!asTab) {
+      <ion-buttons slot="start">
+        <ion-back-button [defaultHref]="meId === undefined ? '/tabs/dashboard/reports/BOOKS' : '/tabs/my-books'" text=""></ion-back-button>
+      </ion-buttons>
+    }
     <ion-title>Reading Galaxy</ion-title>
   </ion-toolbar>
 </ion-header>

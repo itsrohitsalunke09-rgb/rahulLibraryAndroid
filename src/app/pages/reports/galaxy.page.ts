@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, ModalController, ViewDidLeave, ViewWillEnter,
 } from '@ionic/angular';
@@ -30,6 +31,8 @@ export class GalaxyPage implements ViewWillEnter, ViewDidLeave, OnDestroy {
   private auth = inject(AuthService);
   /** The student looking, whose body twinkles; staff have none. */
   readonly meId = this.auth.isStaff() ? undefined : this.auth.user()?.id;
+  /** Opened from the Reading Galaxy tab (no back button) rather than from My books or the Books report. */
+  readonly asTab = inject(Router).url.startsWith('/tabs/galaxy');
   readonly year = this.store.year;
   /** Shown at once from the copy saved on the phone, then refreshed. */
   readonly readers = this.store.readers;
