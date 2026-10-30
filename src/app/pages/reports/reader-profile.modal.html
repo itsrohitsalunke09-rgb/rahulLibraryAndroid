@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [appSwipeTabs]="['ALL', 'ISSUED', 'OVERDUE', 'RETURNED']" [swipeCurrent]="filter() ?? 'ALL'" (swipeTo)="swipeTo($event)">
+<ion-content [appSwipeTabs]="['ALL', 'ISSUED', 'OVERDUE', 'RETURNED']" [swipeCurrent]="filter() ?? 'ALL'" [swipeSlide]="txList()?.nativeElement ?? null" (swipeTo)="swipeTo($event)">
   <section class="hero">
     <span [class]="'planet planet-skin ' + kind" [style.--hue]="hue" aria-hidden="true"></span>
     <h2>{{ reader.studentName }}</h2>
@@ -44,6 +44,8 @@
 
   <!-- Tap a card to list only those books, tap again for all; swiping the list moves along them too. -->
   <div class="stats">
+    <button type="button" class="all" [class.on]="!filter()" [attr.aria-pressed]="!filter()"
+            (click)="swipeTo('ALL')"><strong>{{ books() ? count().all : '–' }}</strong> all</button>
     <button type="button" class="out" [class.on]="filter() === 'ISSUED'" [attr.aria-pressed]="filter() === 'ISSUED'"
             (click)="toggle('ISSUED')"><strong>{{ books() ? count().issued : '–' }}</strong> issued</button>
     <button type="button" class="late" [class.on]="filter() === 'OVERDUE'" [attr.aria-pressed]="filter() === 'OVERDUE'"
@@ -74,6 +76,8 @@
       }
     </div>
     @let list = listed();
+    <!-- Only this part slides in on a swipe; the cards and heading above stay put. -->
+    <div #txList>
     @if (!list.length) {
       <p class="pad empty">{{ filter() ? 'No such books.' : 'No books in ' + shownYear() + '.' }}</p>
     }
@@ -92,6 +96,7 @@
         </ion-item>
       }
     </ion-list>
+    </div>
     <!-- 20 more as the list nears its end, as in the Catalog. -->
     <ion-infinite-scroll [disabled]="showing() >= list.length" (ionInfinite)="more($event)">
       <ion-infinite-scroll-content></ion-infinite-scroll-content>

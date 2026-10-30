@@ -14,6 +14,8 @@ export class SwipeTabsDirective {
   /** The filter tabs, in the order they appear. */
   readonly appSwipeTabs = input.required<readonly string[]>();
   readonly swipeCurrent = input.required<string>();
+  /** What slides in on a swipe; the whole host when unset. Give the list, so cards above it stay put. */
+  readonly swipeSlide = input<HTMLElement | null>(null);
   readonly swipeTo = output<string>();
 
   private start?: { x: number; y: number };
@@ -53,7 +55,7 @@ export class SwipeTabsDirective {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
-    this.host.nativeElement.animate?.(
+    (this.swipeSlide() ?? this.host.nativeElement).animate?.(
       [{ transform: `translateX(${from * 48}px)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
       { duration: 220, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
     );

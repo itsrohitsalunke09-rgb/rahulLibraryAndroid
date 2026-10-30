@@ -28,7 +28,7 @@ describe('ReaderProfileModal filters', () => {
     fixture.detectChanges();
     const p = fixture.componentInstance;
 
-    expect(p.count()).toEqual({ issued: 1, overdue: 1, returned: 1 });
+    expect(p.count()).toEqual({ all: 2, issued: 1, overdue: 1, returned: 1 });
     expect(p.listed().map(b => b.id)).toEqual([1, 2]);
     p.toggle('OVERDUE');
     expect(p.listed().map(b => b.id)).toEqual([3]);

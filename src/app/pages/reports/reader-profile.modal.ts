@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import {
   InfiniteScrollCustomEvent, IonButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
   IonLabel, IonList, IonTitle, IonToolbar, ModalController,
@@ -70,7 +70,7 @@ export class ReaderProfileModal implements OnInit {
   /** Issued and Returned for the chosen year; Overdue across all years (a late book needs chasing whatever its year). */
   readonly count = computed(() => {
     const year = this.yearBooks();
-    return { issued: year.filter(b => b.status === 'ISSUED').length,
+    return { all: year.length, issued: year.filter(b => b.status === 'ISSUED').length,
       overdue: (this.books() ?? []).filter(b => b.status === 'OVERDUE').length,
       returned: year.filter(b => b.status === 'RETURNED').length };
   });
@@ -84,6 +84,8 @@ export class ReaderProfileModal implements OnInit {
   });
   /** Rows on screen: 20 at first, 20 more each time the list is scrolled to its end (as in the Catalog). */
   readonly showing = signal(PAGE_SIZE);
+  /** The list part that slides on a swipe. */
+  readonly txList = viewChild<ElementRef<HTMLElement>>('txList');
   readonly shownBooks = computed(() => this.listed().slice(0, this.showing()));
 
   more(event: InfiniteScrollCustomEvent) {

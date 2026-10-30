@@ -59,6 +59,8 @@ export class PeriodicalReportPage implements ViewWillEnter {
   pick(value: string) {
     if (value && value <= this.thisMonth && value !== this.month()) {
       this.month.set(value);
+      // The old month's numbers go at once; the skeleton shows until the new month arrives.
+      this.report.set(null);
       this.load();
     }
   }

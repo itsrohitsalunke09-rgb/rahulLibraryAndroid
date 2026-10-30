@@ -34,7 +34,7 @@
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin: 16px 20px 0;
 
@@ -57,6 +57,7 @@
     small { font-size: 10px; }
   }
 
+  .all { background: var(--app-mint-soft); }
   .late { background: var(--app-rust-soft); }
   .back { background: var(--app-success-soft); }
 
