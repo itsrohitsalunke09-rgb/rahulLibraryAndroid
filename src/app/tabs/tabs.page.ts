@@ -46,9 +46,28 @@ export class TabsPage {
   async openTab(event: Event) {
     event.stopPropagation();
     const tab = (event as CustomEvent<{ tab: string }>).detail.tab;
+    const now = Date.now();
+    const doubleTap = tab === this.lastTap.tab && now - this.lastTap.at < DOUBLE_TAP_MS;
+    this.lastTap = doubleTap ? { tab: '', at: 0 } : { tab, at: now };
     await this.tabs().select(tab);
     if (this.router.url.split('?')[0] !== `/tabs/${tab}`) {
       await this.tabs().select(tab);
     }
+    if (doubleTap) {
+      this.refreshShown();
+    }
+  }
+
+  private lastTap = { tab: '', at: 0 };
+
+  /** Double tap on a tab: back to the top and reload, as a pull-down does (screens without data just scroll). */
+  private refreshShown() {
+    document.querySelector<HTMLIonContentElement>('ion-router-outlet .ion-page:not(.ion-page-hidden) ion-content')
+      ?.scrollToTop(300);
+    const page = this.tabs().outlet?.component as { refresh?: (event: { target: { complete(): void } }) => void } | undefined;
+    page?.refresh?.({ target: { complete: () => undefined } });
   }
 }
+
+/** Two taps on the same tab within this time count as a double tap. */
+const DOUBLE_TAP_MS = 350;

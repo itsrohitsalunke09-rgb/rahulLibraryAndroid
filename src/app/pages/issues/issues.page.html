@@ -1,5 +1,9 @@
 <ion-header>
   <ion-toolbar>
+    <!-- Opened from the Dashboard's cards. -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/dashboard" text=""></ion-back-button>
+    </ion-buttons>
     <ion-title>
       Issues &amp; returns
       @if (issues.loaded() && !issues.error()) {
@@ -29,7 +33,7 @@
   }
 </ion-header>
 
-<ion-content>
+<ion-content [appSwipeTabs]="query() ? [] : ['YEAR', 'OUT', 'OVERDUE', 'RETURNED']" [swipeCurrent]="filter()" (swipeTo)="setFilter($event)">
   <!-- Opened by the Year tab; kept outside the header so focusing it never
        scrolls the tab row out of sight. Picks which year's issues (by issued date) to show. -->
   <app-year-select #yearPicker label="Issue year" [value]="year()" (yearChange)="setYear($event)" />

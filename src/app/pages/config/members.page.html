@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="marathi" lang="mr">सभासद</span>
+      @if (all(); as list) {
+        <span class="count">{{ query() ? shown().length + ' found' : list.length + ' student' + (list.length === 1 ? '' : 's') }}</span>
+      }
+    </ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Name, username or phone" [debounce]="200"
+                   (ionInput)="query.set(($event.detail.value ?? '').trim())"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (error()) {
+    <p class="page-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (all()) {
+    @if (shown().length) {
+      <!-- Same rows as the Books report's students; tap for transactions, issuing a book or the account. -->
+      <ion-list inset="true" lines="full">
+        @for (m of shown(); track m.account.id) {
+          <ion-item button detail="false" (click)="open(m)">
+            <ion-label>
+              <h2>{{ m.account.fullName }}</h2>
+              <p>
+                {{ m.summary.issued }} issued · {{ m.summary.returned }} returned
+                @if (m.summary.overdue) { · <span class="overdue">{{ m.summary.overdue }} overdue</span> }
+              </p>
+            </ion-label>
+            <span slot="end" class="total">{{ m.summary.total }} book{{ m.summary.total === 1 ? '' : 's' }}</span>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!error()) {
+      <div class="empty-state">
+        @if (query()) {
+          <h2>No student matches "{{ query() }}"</h2>
+          <p>Try the first letters of a name, a username or a phone number.</p>
+        } @else {
+          <h2>No students yet</h2>
+          <p>Students added under People show here.</p>
+        }
+      </div>
+    }
+  } @else if (!error()) {
+    <app-page-skeleton [count]="false" [rows]="8" />
+  }
+</ion-content>

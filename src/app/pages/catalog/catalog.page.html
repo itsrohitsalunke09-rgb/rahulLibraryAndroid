@@ -1,10 +1,10 @@
 <!-- Built from Figma "rahul-library" › Catalog - Mobile (node 15:952). -->
 <ion-header>
   <ion-toolbar>
-    <!-- Staff come here from Registers. -->
-    @if (auth.isStaff()) {
+    <!-- Picking a book for a member (Registers › सभासद): back to the members. -->
+    @if (issueTo()) {
       <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+        <ion-back-button defaultHref="/tabs/config/members" text=""></ion-back-button>
       </ion-buttons>
     }
     <ion-title>
@@ -59,10 +59,14 @@
   }
 </ion-header>
 
-<ion-content>
+<ion-content [appSwipeTabs]="['books', 'papers', 'clippings']" [swipeCurrent]="tab()" (swipeTo)="setTab($event)">
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+
+  @if (issueTo(); as s) {
+    <p class="picking" role="status">Tap an available book to issue it to <strong>{{ s.fullName }}</strong>.</p>
+  }
 
   @if (tab() === 'clippings') {
     @if (clippingsError()) {

@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
+  IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, 
   IonTitle, IonToolbar, ViewWillEnter
@@ -18,6 +18,7 @@ import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPi
 import { UiService } from '../../core/ui.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 
 /**
  * OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number.
@@ -31,10 +32,10 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'YEAR'];
   templateUrl: 'issues.page.html',
   styleUrls: ['../catalog/catalog.page.scss', 'issues.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe,
-    PageSkeletonComponent, YearSelectComponent
+    PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective
   ],
 })
 export class IssuesPage implements ViewWillEnter {

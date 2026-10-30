@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import {
-  IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonRefresher, IonRefresherContent, ModalController, ViewWillEnter
+  IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonRefresher, IonRefresherContent, ModalController, RefresherCustomEvent,
+  ViewWillEnter
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { NewsStory } from '../../core/models';
@@ -19,8 +20,13 @@ import { StoryModal } from './story.modal';
 export class NewspaperPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
-
   readonly stories = new PagedList<NewsStory>((page, size) => this.api.news(page, size), 'Could not load the news.');
+
+  /** Pull-down, or a double tap on the News tab. */
+  refresh(event: RefresherCustomEvent) {
+    this.stories.refresh(event);
+  }
+
   /** Today's date under the library name, e.g. "Saturday, 17 October 2026". */
   readonly today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 

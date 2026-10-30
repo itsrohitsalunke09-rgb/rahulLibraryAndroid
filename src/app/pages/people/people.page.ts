@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll,
   IonInfiniteScrollContent, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonSearchbar,
-  IonTitle, IonToolbar, ModalController, ViewWillEnter
+  IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { peopleOutline } from 'ionicons/icons';
@@ -40,6 +40,11 @@ export class PeoplePage implements ViewWillEnter {
 
   readonly query = signal('');
   readonly people = new PagedList<UserAccount>((page, size) => this.fetch(page, size), 'Could not load people.');
+
+  /** Pull-down, or a double tap on the People tab. */
+  refresh(event: RefresherCustomEvent) {
+    this.people.refresh(event);
+  }
 
   constructor() {
     addIcons({ peopleOutline });

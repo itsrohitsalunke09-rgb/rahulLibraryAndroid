@@ -9,7 +9,7 @@
       </ion-tab-button>
     }
 
-    <!-- Staff open the catalog from Registers instead. -->
+    <!-- Students' Catalog comes first; staff have it after News. -->
     @if (!auth.isStaff()) {
       <ion-tab-button tab="catalog" href="/tabs/catalog">
         <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span></span>
@@ -23,9 +23,10 @@
     </ion-tab-button>
 
     @if (auth.isStaff()) {
-      <ion-tab-button tab="issues" href="/tabs/issues">
-        <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-issues.svg)" aria-hidden="true"></span></span>
-        <ion-label>Issues</ion-label>
+      <!-- Catalog in Issues' old place; Issues & returns now opens from the Dashboard's cards. -->
+      <ion-tab-button tab="catalog" href="/tabs/catalog">
+        <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span></span>
+        <ion-label>Catalog</ion-label>
       </ion-tab-button>
 
       <ion-tab-button tab="people" href="/tabs/people">

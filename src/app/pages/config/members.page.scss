@@ -1,0 +1,28 @@
+ion-back-button {
+  --color: var(--app-ink);
+  --icon-font-size: 22px;
+}
+
+/* Student count next to the title, as in the Catalog. */
+.count {
+  margin-inline-start: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
+/* Total books on the right: the Books report's pill. */
+.total {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.overdue {
+  color: var(--app-rust);
+  font-weight: 600;
+}

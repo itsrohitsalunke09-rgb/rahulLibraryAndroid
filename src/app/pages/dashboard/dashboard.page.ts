@@ -90,7 +90,7 @@ export class DashboardPage implements ViewWillEnter {
   /** Issues on its Year tab, for the year chosen here (no year chosen = the year Issues already shows). */
   openTransactions() {
     const year = this.year();
-    this.router.navigate(['/tabs/issues'], { queryParams: year ? { status: 'YEAR', year } : { status: 'YEAR' } });
+    this.router.navigate(['/tabs/dashboard/issues'], { queryParams: year ? { status: 'YEAR', year } : { status: 'YEAR' } });
   }
 
   go(link: string) {
@@ -182,9 +182,9 @@ export function paperSummary(day: DayRegister, magazines: MagazineCard[], today:
 
 function toTiles(s: Dashboard): Tile[] {
   return [
-    { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/issues', query: { status: 'OVERDUE' } },
-    { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/issues', query: { status: 'OUT' } },
-    { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/config/catalog' },
+    { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/dashboard/issues', query: { status: 'OVERDUE' } },
+    { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/dashboard/issues', query: { status: 'OUT' } },
+    { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/catalog' },
     { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/people' },
   ];
 }

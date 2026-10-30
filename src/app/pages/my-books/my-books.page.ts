@@ -12,6 +12,7 @@ import { errorMessage } from '../../core/ui.service';
 import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 import { PermissionsStore } from '../../core/permissions.store';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -27,7 +28,7 @@ type Tab = 'CURRENT' | 'RETURNED' | 'REQUESTED' | 'SUGGESTED';
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
     IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe,
-    PageSkeletonComponent, RouterLink,
+    PageSkeletonComponent, RouterLink, SwipeTabsDirective,
   ],
 })
 export class MyBooksPage implements ViewWillEnter {

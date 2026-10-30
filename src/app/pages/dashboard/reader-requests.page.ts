@@ -9,6 +9,7 @@ import { IssueBookModal, IssueChoice } from '../catalog/issue-book.modal';
 import { formatDate } from '../../core/dates';
 import { ReaderRequest } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 import { PermissionsStore } from '../../core/permissions.store';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -22,7 +23,7 @@ import { UiService, errorMessage } from '../../core/ui.service';
   styleUrls: ['reader-requests.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    IonSegment, IonSegmentButton, IonList, IonItem, IonLabel, PageSkeletonComponent,
+    IonSegment, IonSegmentButton, IonList, IonItem, IonLabel, PageSkeletonComponent, SwipeTabsDirective,
   ],
 })
 export class ReaderRequestsPage implements ViewWillEnter {

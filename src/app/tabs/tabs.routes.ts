@@ -35,10 +35,15 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/news/news.page').then(m => m.NewspaperPage),
       },
       {
-        path: 'issues',
+        // Issues & returns has no tab now (Catalog took its place): it opens from the Dashboard's cards.
+        path: 'dashboard/issues',
         ...READ,
         ...STAFF_ONLY,
         loadComponent: () => import('../pages/issues/issues.page').then(m => m.IssuesPage),
+      },
+      {
+        path: 'issues',
+        redirectTo: 'dashboard/issues',
       },
       {
         path: 'people',
@@ -53,7 +58,14 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/config.page').then(m => m.ConfigPage),
       },
       {
-        // Staff open the catalog from Registers (they have no Catalog tab).
+        // Registers › सभासद: every student, with their books, issuing and account.
+        path: 'config/members',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/members.page').then(m => m.MembersPage),
+      },
+      {
+        // Picking a book to issue to a member (?issueTo=student id), from Registers › सभासद.
         path: 'config/catalog',
         ...READ,
         ...STAFF_ONLY,
