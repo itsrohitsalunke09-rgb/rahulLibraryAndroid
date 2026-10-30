@@ -30,13 +30,13 @@ describe('ReaderProfileModal filters', () => {
 
     expect(p.count()).toEqual({ all: 2, issued: 1, overdue: 1, returned: 1 });
     expect(p.listed().map(b => b.id)).toEqual([1, 2]);
-    p.toggle('OVERDUE');
+    p.swipeTo('OVERDUE');
     expect(p.listed().map(b => b.id)).toEqual([3]);
     p.swipeTo('RETURNED');
     expect(p.listed().map(b => b.id)).toEqual([2]);
     p.setYear(2025);
     expect(p.listed().map(b => b.id)).toEqual([4]);
-    p.toggle('RETURNED');
+    p.swipeTo('ALL');
     expect(p.listed().map(b => b.id)).toEqual([3, 4]);
   });
 });

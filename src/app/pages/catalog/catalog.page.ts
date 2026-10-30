@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import {
   AlertController, IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
-  IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
+  IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
+import { FilterCard, FilterCardsComponent } from '../../core/filter-cards.component';
 import { BookDetailModal } from './book-detail.modal';
 import { BookFormModal } from './book-form.modal';
 import { PermissionsStore } from '../../core/permissions.store';
@@ -25,7 +26,7 @@ import { ImportBooksModal } from './import-books.modal';
   styleUrls: ['catalog.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonSegment, IonSegmentButton, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe,
+    FilterCardsComponent, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe,
     PageSkeletonComponent, SwipeTabsDirective
   ],
 })
@@ -57,11 +58,25 @@ export class CatalogPage implements ViewWillEnter {
   readonly clippingsError = signal('');
   readonly clippingQuery = signal('');
   readonly shownClippings = computed(() => searchClippings(this.clippings() ?? [], this.clippingQuery()));
+  /** The three tabs as the app's filter cards, each with its count ("–" until loaded). */
+  readonly cards = computed<FilterCard[]>(() => [
+    { value: 'books', label: 'पुस्तके', marathi: true, tone: 'out',
+      count: this.books.loaded() ? this.books.total() : null },
+    { value: 'papers', label: 'दैनिके & नियतकालिके', marathi: true, count: this.papers()?.length ?? null },
+    { value: 'clippings', label: 'कात्रणे', marathi: true, tone: 'back', count: this.clippings()?.length ?? null },
+  ]);
   protected readonly yearsLabel = yearsLabel;
 
   ionViewWillEnter() {
     // Reload only when stale, so availability is current without refetching on every tab switch.
     this.books.revisit();
+    // The other two cards' counts, once (both lists are small).
+    if (!this.papers()) {
+      this.loadPapers();
+    }
+    if (!this.clippings()) {
+      this.loadClippings();
+    }
     // Fresh each visit: staff may have marked a request done since, which lets the student ask again.
     if (!this.auth.isStaff()) {
       this.loadOpenRequests();

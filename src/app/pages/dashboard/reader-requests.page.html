@@ -6,10 +6,7 @@
     <ion-title>Requests &amp; suggestions</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-segment [value]="kind()" (ionChange)="setKind($event.detail.value)">
-      <ion-segment-button value="REQUEST">Requests{{ all() ? ' (' + count('REQUEST') + ')' : '' }}</ion-segment-button>
-      <ion-segment-button value="SUGGESTION">Suggestions{{ all() ? ' (' + count('SUGGESTION') + ')' : '' }}</ion-segment-button>
-    </ion-segment>
+    <app-filter-cards [cards]="cards()" [value]="kind()" (picked)="setKind($event.value)" />
   </ion-toolbar>
 </ion-header>
 

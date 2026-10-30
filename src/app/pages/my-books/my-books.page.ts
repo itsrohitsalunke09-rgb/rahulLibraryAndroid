@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBadge, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonItem,
-  IonLabel, IonList, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton,
+  IonLabel, IonList, IonRefresher, IonRefresherContent,
   IonTitle, IonToolbar, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -13,6 +13,7 @@ import { PagedList } from '../../core/paged-list';
 import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe } from '../../core/pipes';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
+import { FilterCard, FilterCardsComponent } from '../../core/filter-cards.component';
 import { PermissionsStore } from '../../core/permissions.store';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -26,7 +27,7 @@ type Tab = 'CURRENT' | 'RETURNED' | 'REQUESTED' | 'SUGGESTED';
   styleUrls: ['my-books.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonTitle, IonContent, IonRefresher, IonRefresherContent, IonList,
-    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonSegment, IonSegmentButton,
+    IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, FilterCardsComponent,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe,
     PageSkeletonComponent, RouterLink, SwipeTabsDirective,
   ],
@@ -50,6 +51,16 @@ export class MyBooksPage implements ViewWillEnter {
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate)));
   readonly returned = computed(() => this.issues.items().filter(i => i.status === 'RETURNED'));
   readonly overdueCount = computed(() => this.current().filter(i => i.status === 'OVERDUE').length);
+  /** The filter cards; a count shows "–" until its list has loaded. */
+  readonly cards = computed<FilterCard[]>(() => {
+    const loaded = this.issues.loaded();
+    return [
+      { value: 'CURRENT', label: 'With me', count: loaded ? this.current().length : null, tone: this.overdueCount() ? 'late' : 'out' },
+      { value: 'RETURNED', label: 'Returned', count: loaded ? this.returned().length : null, tone: 'back' },
+      { value: 'REQUESTED', label: 'Requests', count: this.requests()?.length ?? null },
+      { value: 'SUGGESTED', label: 'Suggested', count: this.suggestions()?.length ?? null },
+    ];
+  });
 
   constructor() {
     addIcons({ bookmarksOutline });

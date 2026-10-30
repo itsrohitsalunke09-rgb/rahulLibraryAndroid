@@ -17,11 +17,7 @@
     </ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
-      <ion-segment-button value="books" class="marathi">पुस्तके</ion-segment-button>
-      <ion-segment-button value="papers" class="marathi">दैनिके &amp; नियतकालिके</ion-segment-button>
-      <ion-segment-button value="clippings" class="marathi">कात्रणे</ion-segment-button>
-    </ion-segment>
+    <app-filter-cards [cards]="cards()" [value]="tab()" (picked)="setTab($event.value)" />
   </ion-toolbar>
   @if (tab() === 'clippings') {
   <ion-toolbar class="search-bar">

@@ -1,9 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonItem, IonLabel, IonList, IonRefresher,
-  IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, 
+  IonRefresherContent, IonSearchbar, IonSelect, IonSelectOption,
   IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -19,6 +19,7 @@ import { UiService } from '../../core/ui.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
+import { FilterCard, FilterCardsComponent } from '../../core/filter-cards.component';
 
 /**
  * OUT = every copy not yet returned (overdue included), matching the dashboard's "Issued" number.
@@ -32,10 +33,10 @@ const FILTERS: Filter[] = ['OUT', 'OVERDUE', 'RETURNED', 'YEAR'];
   templateUrl: 'issues.page.html',
   styleUrls: ['../catalog/catalog.page.scss', 'issues.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonSegment, IonSegmentButton, IonContent, IonRefresher,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher,
     IonRefresherContent, IonList, IonItem, IonLabel, IonBadge, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPipe,
-    PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective
+    PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective, FilterCardsComponent
   ],
 })
 export class IssuesPage implements ViewWillEnter {
@@ -113,6 +114,14 @@ export class IssuesPage implements ViewWillEnter {
     this.loadCounts();
     this.issues.refresh(event);
   }
+
+  /** The filter cards: the year (tap again for another year) first, as the page opens on it. */
+  readonly cards = computed<FilterCard[]>(() => [
+    { value: 'YEAR', label: String(this.year()), count: this.count('YEAR'), caret: true },
+    { value: 'OUT', label: 'Out', count: this.count('OUT'), tone: 'out' },
+    { value: 'OVERDUE', label: 'Overdue', count: this.count('OVERDUE'), tone: 'late' },
+    { value: 'RETURNED', label: 'Returned', count: this.count('RETURNED'), tone: 'back' },
+  ]);
 
   count(filter: Filter): number | null {
     const c = this.counts();

@@ -8,17 +8,7 @@
   &.due-success { color: var(--ion-color-success); }
 }
 
-/* Year tab: a caret shows it opens a list. */
-.year-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
 
-.year-caret {
-  --icon-size: 14px;
-}
 
 
 /* Back to the Dashboard, which opens this page. */

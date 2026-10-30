@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent,
-  IonSegment, IonSegmentButton, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
+  IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiService } from '../../core/api.service';
@@ -10,6 +10,7 @@ import { formatDate } from '../../core/dates';
 import { ReaderRequest } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
+import { FilterCard, FilterCardsComponent } from '../../core/filter-cards.component';
 import { PermissionsStore } from '../../core/permissions.store';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -23,7 +24,7 @@ import { UiService, errorMessage } from '../../core/ui.service';
   styleUrls: ['reader-requests.page.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRefresher, IonRefresherContent,
-    IonSegment, IonSegmentButton, IonList, IonItem, IonLabel, PageSkeletonComponent, SwipeTabsDirective,
+    FilterCardsComponent, IonList, IonItem, IonLabel, PageSkeletonComponent, SwipeTabsDirective,
   ],
 })
 export class ReaderRequestsPage implements ViewWillEnter {
@@ -41,6 +42,11 @@ export class ReaderRequestsPage implements ViewWillEnter {
     .sort((a, b) => Number(!!a.doneAt) - Number(!!b.doneAt)));
   /** Only open ones count, as on the Dashboard. */
   readonly count = (kind: ReaderRequest['kind']) => (this.all() ?? []).filter(r => r.kind === kind && !r.doneAt).length;
+  /** Open requests and suggestions as filter cards; "–" until loaded. */
+  readonly cards = computed<FilterCard[]>(() => [
+    { value: 'REQUEST', label: 'Requests', count: this.all() ? this.count('REQUEST') : null, tone: 'out' },
+    { value: 'SUGGESTION', label: 'Suggestions', count: this.all() ? this.count('SUGGESTION') : null },
+  ]);
   readonly clearing = signal<number | null>(null);
   readonly formatDate = formatDate;
 

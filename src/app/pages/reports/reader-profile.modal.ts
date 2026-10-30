@@ -11,6 +11,7 @@ import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { PAGE_SIZE } from '../../core/paged-list';
 import { YearSelectComponent } from '../../core/year-select.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
+import { FilterCard, FilterCardsComponent } from '../../core/filter-cards.component';
 import { PermissionsStore } from '../../core/permissions.store';
 import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
@@ -30,7 +31,7 @@ import { UserFormModal } from '../people/user-form.modal';
   imports: [
     IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInfiniteScroll,
     IonInfiniteScrollContent,
-    MarathiPipe, PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective,
+    MarathiPipe, PageSkeletonComponent, YearSelectComponent, SwipeTabsDirective, FilterCardsComponent,
   ],
 })
 export class ReaderProfileModal implements OnInit {
@@ -75,6 +76,16 @@ export class ReaderProfileModal implements OnInit {
       returned: year.filter(b => b.status === 'RETURNED').length };
   });
   readonly favourite = computed(() => favouriteCategory(this.yearBooks()));
+  /** The count cards (the app's filter cards): All and Issued / Returned for the year, Overdue for all years. */
+  readonly cards = computed<FilterCard[]>(() => {
+    const c = this.books() ? this.count() : null;
+    return [
+      { value: 'ALL', label: 'All', count: c?.all ?? null },
+      { value: 'ISSUED', label: 'Issued', count: c?.issued ?? null, tone: 'out' },
+      { value: 'OVERDUE', label: 'Overdue', count: c?.overdue ?? null, tone: 'late', sub: 'all years' },
+      { value: 'RETURNED', label: 'Returned', count: c?.returned ?? null, tone: 'back' },
+    ];
+  });
   readonly listed = computed(() => {
     const f = this.filter();
     if (f === 'OVERDUE') {
@@ -104,11 +115,6 @@ export class ReaderProfileModal implements OnInit {
     this.showing.set(PAGE_SIZE);
   }
 
-  /** Tap a card to list only those books; tap it again for all. */
-  toggle(f: StatusFilter) {
-    this.filter.set(this.filter() === f ? null : f);
-    this.showing.set(PAGE_SIZE);
-  }
 
   ngOnInit() {
     if (this.year) {

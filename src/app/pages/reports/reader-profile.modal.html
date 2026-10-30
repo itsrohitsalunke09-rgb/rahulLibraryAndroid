@@ -42,17 +42,8 @@
     </div>
   }
 
-  <!-- Tap a card to list only those books, tap again for all; swiping the list moves along them too. -->
-  <div class="stats">
-    <button type="button" class="all" [class.on]="!filter()" [attr.aria-pressed]="!filter()"
-            (click)="swipeTo('ALL')"><strong>{{ books() ? count().all : '–' }}</strong> all</button>
-    <button type="button" class="out" [class.on]="filter() === 'ISSUED'" [attr.aria-pressed]="filter() === 'ISSUED'"
-            (click)="toggle('ISSUED')"><strong>{{ books() ? count().issued : '–' }}</strong> issued</button>
-    <button type="button" class="late" [class.on]="filter() === 'OVERDUE'" [attr.aria-pressed]="filter() === 'OVERDUE'"
-            (click)="toggle('OVERDUE')"><strong>{{ books() ? count().overdue : '–' }}</strong> overdue <small>all years</small></button>
-    <button type="button" class="back" [class.on]="filter() === 'RETURNED'" [attr.aria-pressed]="filter() === 'RETURNED'"
-            (click)="toggle('RETURNED')"><strong>{{ books() ? count().returned : '–' }}</strong> returned</button>
-  </div>
+  <!-- The app's filter cards; swiping the list moves along them too. -->
+  <app-filter-cards class="profile-cards" [cards]="cards()" [value]="filter() ?? 'ALL'" (picked)="swipeTo($event.value)" />
 
   @if (favourite(); as f) {
     <p class="favourite">Reads most: <strong [class.marathi]="f | marathi">{{ f }}</strong></p>
