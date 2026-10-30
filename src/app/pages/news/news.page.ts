@@ -22,13 +22,10 @@ export class NewspaperPage implements ViewWillEnter {
   private modals = inject(ModalController);
   readonly stories = new PagedList<NewsStory>((page, size) => this.api.news(page, size), 'Could not load the news.');
 
-  /** Pull-down, or a double tap on the News tab. */
+  /** Pull-down, or a double tap on the Programs & events tab. */
   refresh(event: RefresherCustomEvent) {
     this.stories.refresh(event);
   }
-
-  /** Today's date under the library name, e.g. "Saturday, 17 October 2026". */
-  readonly today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   ionViewWillEnter() {
     this.stories.revisit();

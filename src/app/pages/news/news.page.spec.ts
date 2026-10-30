@@ -31,11 +31,10 @@ describe('NewspaperPage', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('rendersNewsTitleAndDate', () => {
+  it('rendersTheTabsTitleWithoutADate', () => {
     const el = render(of(page([story(1)])));
-    const header = el.querySelector('.header')?.textContent ?? '';
-    expect(header).toContain('News');
-    expect(header).toContain(new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    const header = el.querySelector('.header')?.textContent?.trim() ?? '';
+    expect(header).toBe('Programs & events');
   });
 
   it('rendersOneCardPerStory', () => {
