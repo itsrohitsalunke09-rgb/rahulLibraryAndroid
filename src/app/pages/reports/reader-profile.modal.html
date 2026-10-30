@@ -5,7 +5,7 @@
         <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
       </ion-button>
     </ion-buttons>
-    <ion-title>Reading profile</ion-title>
+    <ion-title>{{ account ? 'Member' : 'Reading profile' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,8 +16,31 @@
     @if (planetName(kind); as name) {
       <p class="body-name">{{ name }} reader</p>
     }
-    <p>#{{ rank }} of {{ readers }} reader{{ readers === 1 ? '' : 's' }} in {{ year }} · {{ reader.books }} book{{ reader.books === 1 ? '' : 's' }}</p>
+    @if (year && rank) {
+      <p>#{{ rank }} of {{ readers }} reader{{ readers === 1 ? '' : 's' }} in {{ year }} · {{ reader.books }} book{{ reader.books === 1 ? '' : 's' }}</p>
+    } @else {
+      @let total = books()?.length ?? reader.books;
+      <p>{{ total }} book{{ total === 1 ? '' : 's' }} · all years{{ account?.phone ? ' · ' + account!.phone : '' }}</p>
+    }
   </section>
+
+  <!-- सभासद: what staff do for this student. -->
+  @if (account && (perms.can('REGISTER') || perms.can('UPDATE'))) {
+    <div class="actions">
+      @if (perms.can('REGISTER')) {
+        <button type="button" class="action primary" (click)="issueBook()">
+          <span class="icon" style="--icon: url(assets/icons/send.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Issue a book
+        </button>
+      }
+      @if (perms.can('UPDATE')) {
+        <button type="button" class="action" (click)="editAccount()">
+          <span class="icon" style="--icon: url(assets/icons/edit.svg); --icon-size: 18px" aria-hidden="true"></span>
+          Edit account
+        </button>
+      }
+    </div>
+  }
 
   <div class="stats">
     <span class="out"><strong>{{ books() ? count().issued : '–' }}</strong> issued</span>
@@ -32,7 +55,10 @@
   @if (error()) {
     <p class="form-error pad" role="alert">{{ error() }}</p>
   } @else if (books(); as list) {
-    <h3 class="section-title">Books in {{ year }}</h3>
+    <h3 class="section-title">{{ year ? 'Books in ' + year : 'All transactions' }}</h3>
+    @if (!list.length) {
+      <p class="pad empty">No books yet.</p>
+    }
     <ion-list inset="true" lines="full">
       @for (b of list; track b.id) {
         <ion-item>

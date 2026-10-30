@@ -98,3 +98,40 @@ ion-item {
     color: var(--ion-color-success);
   }
 }
+
+/* सभासद: Issue a book (filled) and Edit account (outlined), side by side, as Book details' buttons. */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 20px 0;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  border: 1px solid var(--app-rule);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--app-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &.primary {
+    border-color: transparent;
+    background: var(--app-accent);
+    color: var(--app-on-accent);
+  }
+
+  &:only-child { grid-column: 1 / -1; }
+}
+
+.empty {
+  color: var(--app-muted);
+  font-size: 14px;
+}

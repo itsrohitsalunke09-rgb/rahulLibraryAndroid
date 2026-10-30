@@ -1,21 +1,20 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import {
-  AlertController, IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
+  AlertController, IonBadge, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonSegment, IonSegmentButton, IonTitle,
   IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter
 } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { searchClippings, yearsLabel } from '../../core/clippings';
-import { Book, Clipping, FREQUENCY_LABELS, PeriodicalSummary, UserAccount, byFrequency } from '../../core/models';
+import { Book, Clipping, FREQUENCY_LABELS, PeriodicalSummary, byFrequency } from '../../core/models';
 import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
 import { UiService, errorMessage } from '../../core/ui.service';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { SwipeTabsDirective } from '../../core/swipe-tabs.directive';
 import { BookDetailModal } from './book-detail.modal';
-import { IssueBookModal, IssueChoice } from './issue-book.modal';
 import { BookFormModal } from './book-form.modal';
 import { PermissionsStore } from '../../core/permissions.store';
 import { ImportBooksModal } from './import-books.modal';
@@ -25,7 +24,7 @@ import { ImportBooksModal } from './import-books.modal';
   templateUrl: 'catalog.page.html',
   styleUrls: ['catalog.page.scss'],
   imports: [
-    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
+    IonHeader, IonToolbar, IonTitle, IonSearchbar, IonContent, IonRefresher, IonRefresherContent, IonList,
     IonSegment, IonSegmentButton, IonItem, IonLabel, IonBadge, IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe,
     PageSkeletonComponent, SwipeTabsDirective
   ],
@@ -40,10 +39,7 @@ export class CatalogPage implements ViewWillEnter {
   protected perms = inject(PermissionsStore);
   private searchbar = viewChild<IonSearchbar>('bookSearch');
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
   private readonly openRequests = signal(new Set<number>());
-  /** Opened from Registers › सभासद › Issue a book: a tapped book goes to this student. */
-  readonly issueTo = signal<UserAccount | null>(null);
 
   readonly query = signal('');
   readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not load books.');
@@ -64,11 +60,6 @@ export class CatalogPage implements ViewWillEnter {
   protected readonly yearsLabel = yearsLabel;
 
   ionViewWillEnter() {
-    const p = this.route.snapshot.queryParamMap;
-    const id = Number(p.get('issueTo'));
-    this.issueTo.set(this.auth.isStaff() && id
-      ? { id, fullName: p.get('name') ?? '', username: p.get('username') ?? '', role: 'STUDENT', active: true } as UserAccount
-      : null);
     // Reload only when stale, so availability is current without refetching on every tab switch.
     this.books.revisit();
     // Fresh each visit: staff may have marked a request done since, which lets the student ask again.
@@ -161,33 +152,7 @@ export class CatalogPage implements ViewWillEnter {
     this.books.reset();
   }
 
-  /** Picking for a member: the Issue screen with them chosen, then back to सभासद. */
-  private async issueToMember(book: Book, student: UserAccount) {
-    if (book.availableCopies < 1) {
-      this.ui.toast(`"${book.title}" is issued now; choose another book.`, 'error');
-      return;
-    }
-    const modal = await this.modals.create({ component: IssueBookModal, componentProps: { book, student } });
-    await modal.present();
-    const { data, role } = await modal.onWillDismiss<IssueChoice>();
-    if (role !== 'issue' || !data) {
-      return;
-    }
-    this.api.issueBook(book.id, data.student.id, data.days).subscribe({
-      next: () => {
-        this.ui.toast(`Issued to ${data.student.fullName}.`);
-        this.books.replace(b => b.id === book.id, { ...book, availableCopies: book.availableCopies - 1 });
-        this.router.navigate(['/tabs/config/members']);
-      },
-      error: err => this.ui.error(err, 'Could not issue the book.'),
-    });
-  }
-
   async open(book: Book) {
-    const student = this.issueTo();
-    if (student) {
-      return this.issueToMember(book, student);
-    }
     // An issue or an edit updates just this row, the moment it happens.
     const onChange = (changed: Book) => this.books.replace(b => b.id === changed.id, changed);
     const alreadyRequested = this.openRequests().has(book.id);

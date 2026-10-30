@@ -5,12 +5,20 @@ import {
 import { ApiService } from '../../core/api.service';
 import { formatDate } from '../../core/dates';
 import { PlanetKind, planetHue, planetName } from '../../core/galaxy';
-import { BookIssue, ReaderCount, issueStatus } from '../../core/models';
+import { Book, BookIssue, ReaderCount, UserAccount, issueStatus } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { PermissionsStore } from '../../core/permissions.store';
 import { MarathiPipe } from '../../core/pipes';
-import { errorMessage } from '../../core/ui.service';
+import { UiService, errorMessage } from '../../core/ui.service';
+import { BookFinderModal } from '../catalog/book-finder.modal';
+import { IssueBookModal, IssueChoice } from '../catalog/issue-book.modal';
+import { UserFormModal } from '../people/user-form.modal';
 
-/** A student's reading profile for the year: their place among readers, counts, favourite category and books. */
+/**
+ * A student's reading profile: counts, favourite category and books. From the Reading Galaxy it covers
+ * one year and their place among readers; from Registers › सभासद (with `account`) it covers all years
+ * and adds Edit account and Issue a book.
+ */
 @Component({
   selector: 'app-reader-profile',
   templateUrl: 'reader-profile.modal.html',
@@ -22,15 +30,22 @@ import { errorMessage } from '../../core/ui.service';
 })
 export class ReaderProfileModal implements OnInit {
   @Input({ required: true }) reader!: ReaderCount;
-  /** 1 = the year's top reader. */
-  @Input({ required: true }) rank!: number;
-  @Input({ required: true }) readers!: number;
-  @Input({ required: true }) year!: number;
+  /** 1 = the year's top reader; unset from सभासद. */
+  @Input() rank?: number;
+  @Input() readers?: number;
+  /** The year shown; unset = all years (सभासद). */
+  @Input() year?: number;
   /** The student's body in the galaxy (Sun, planet or dwarf planet, by rank). */
-  @Input({ required: true }) kind!: PlanetKind;
+  @Input() kind: PlanetKind = 'other';
+  /** From सभासद: the student's account, for Edit account and Issue a book. */
+  @Input() account?: UserAccount;
 
   private api = inject(ApiService);
   private modals = inject(ModalController);
+  private ui = inject(UiService);
+  protected perms = inject(PermissionsStore);
+  /** A book was issued or the account saved, so the list behind should reload. */
+  private changed = false;
   readonly formatDate = formatDate;
   readonly planetName = planetName;
   get hue() {
@@ -49,14 +64,55 @@ export class ReaderProfileModal implements OnInit {
   readonly favourite = computed(() => favouriteCategory(this.books() ?? []));
 
   ngOnInit() {
+    this.loadBooks();
+  }
+
+  close() {
+    this.modals.dismiss(null, this.changed ? 'changed' : 'cancel');
+  }
+
+  /** Find the book by reg. no. or title, then the usual Issue screen with this student chosen. */
+  async issueBook() {
+    const finder = await this.modals.create({ component: BookFinderModal });
+    await finder.present();
+    const { data: book, role } = await finder.onWillDismiss<Book>();
+    if (role !== 'pick' || !book) {
+      return;
+    }
+    const modal = await this.modals.create({ component: IssueBookModal, componentProps: { book, student: this.account } });
+    await modal.present();
+    const { data, role: chosen } = await modal.onWillDismiss<IssueChoice>();
+    if (chosen !== 'issue' || !data) {
+      return;
+    }
+    this.api.issueBook(book.id, data.student.id, data.days).subscribe({
+      next: () => {
+        this.changed = true;
+        this.ui.toast(`Issued to ${data.student.fullName}.`);
+        this.loadBooks();
+      },
+      error: err => this.ui.error(err, 'Could not issue the book.'),
+    });
+  }
+
+  async editAccount() {
+    const modal = await this.modals.create({ component: UserFormModal, componentProps: { user: this.account } });
+    await modal.present();
+    const { data, role } = await modal.onWillDismiss<UserAccount>();
+    if (role === 'deleted') {
+      this.modals.dismiss(null, 'changed');
+    } else if (role === 'saved' && data) {
+      this.changed = true;
+      this.account = data;
+      this.reader = { ...this.reader, studentName: data.fullName };
+    }
+  }
+
+  private loadBooks() {
     this.api.studentIssues(this.reader.studentId, this.year).subscribe({
       next: list => this.books.set(list),
       error: err => this.error.set(errorMessage(err, 'Could not load the books.')),
     });
-  }
-
-  close() {
-    this.modals.dismiss(null, 'cancel');
   }
 }
 

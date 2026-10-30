@@ -1,17 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import {
-  ActionSheetController, IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
+  IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { StudentSummary, UserAccount } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
-import { PermissionsStore } from '../../core/permissions.store';
 import { errorMessage } from '../../core/ui.service';
-import { UserFormModal } from '../people/user-form.modal';
-import { StudentBooksModal } from '../reports/student-books.modal';
+import { ReaderProfileModal } from '../reports/reader-profile.modal';
 
 /** A student with their book totals (all years); zeros for one who has had no books yet. */
 export interface Member {
@@ -32,8 +29,8 @@ export function members(students: UserAccount[], summaries: StudentSummary[]): M
 }
 
 /**
- * Registers › सभासद: every student with issued, returned and total books. A tap offers their
- * transactions (the Books report's list), issuing them a book (via the Catalog) and editing the account.
+ * Registers › सभासद: every student with issued, returned and total books. A tap opens their profile
+ * (as a planet does in the Reading Galaxy): all their transactions, Issue a book and Edit account.
  */
 @Component({
   selector: 'app-members',
@@ -47,9 +44,6 @@ export function members(students: UserAccount[], summaries: StudentSummary[]): M
 export class MembersPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
-  private sheets = inject(ActionSheetController);
-  private router = inject(Router);
-  private perms = inject(PermissionsStore);
 
   readonly all = signal<Member[] | null>(null);
   readonly error = signal('');
@@ -70,33 +64,18 @@ export class MembersPage implements ViewWillEnter {
     this.load(() => event.target.complete());
   }
 
+  /** The Reading Galaxy's profile screen, for all years, with Issue a book and Edit account. */
   async open(m: Member) {
-    const buttons = [
-      { text: 'Books & transactions', handler: () => void this.transactions(m) },
-      ...(this.perms.can('REGISTER') ? [{ text: 'Issue a book', handler: () => void this.issue(m) }] : []),
-      ...(this.perms.can('UPDATE') ? [{ text: 'Edit account', handler: () => void this.edit(m) }] : []),
-      { text: 'Cancel', role: 'cancel' },
-    ];
-    const sheet = await this.sheets.create({ header: m.account.fullName, buttons });
-    await sheet.present();
-  }
-
-  private async transactions(m: Member) {
-    const modal = await this.modals.create({ component: StudentBooksModal, componentProps: { student: m.summary } });
-    await modal.present();
-  }
-
-  /** The Catalog, to pick a book; it then opens the Issue screen with this student chosen. */
-  private issue(m: Member) {
-    const { id, fullName, username } = m.account;
-    this.router.navigate(['/tabs/config/catalog'], { queryParams: { issueTo: id, name: fullName, username } });
-  }
-
-  private async edit(m: Member) {
-    const modal = await this.modals.create({ component: UserFormModal, componentProps: { user: m.account } });
+    const modal = await this.modals.create({
+      component: ReaderProfileModal,
+      componentProps: {
+        reader: { studentId: m.account.id, studentName: m.account.fullName, books: m.summary.total },
+        account: m.account,
+      },
+    });
     await modal.present();
     const { role } = await modal.onWillDismiss();
-    if (role === 'saved' || role === 'deleted') {
+    if (role === 'changed') {
       this.load();
     }
   }

@@ -16,7 +16,6 @@ import { DueTextPipe, MarathiPipe, ShortDatePipe, StatusColorPipe, StatusLabelPi
 import { UiService, errorMessage } from '../../core/ui.service';
 import { BookFormModel, KEEP_TEXT_CATEGORY, bookFormFrom, toBookRequest, unlinkedCategory } from './book-request';
 import { PermissionsStore } from '../../core/permissions.store';
-import { IssueBookModal, IssueChoice } from './issue-book.modal';
 
 /** What the book card shows below the title (Figma: Details / Issue history / Edit expanded). */
 type Section = 'none' | 'details' | 'history' | 'edit';
@@ -135,29 +134,6 @@ export class BookDetailModal implements OnInit {
     });
   }
 
-  async issue() {
-    const modal = await this.modals.create({ component: IssueBookModal, componentProps: { book: this.current() } });
-    await modal.present();
-    const { data, role } = await modal.onWillDismiss<IssueChoice>();
-    if (role !== 'issue' || !data) {
-      return;
-    }
-    // Show the copy as gone at once; if the server refuses, put the book back as it was.
-    const before = this.current()!;
-    this.setBook({ ...before, availableCopies: 0 });
-    this.api.issueBook(before.id, data.student.id, data.days).subscribe({
-      next: () => {
-        this.ui.toast(`Issued to ${data.student.fullName}.`);
-        this.reloadBook();
-        this.loadHistory();
-      },
-      error: err => {
-        this.setBook(before);
-        this.ui.error(err, 'Could not issue the book.');
-      }
-    });
-  }
-
   /** A student asks the library for this book; staff see it on their Dashboard. */
   request() {
     this.busy.set(true);
@@ -200,14 +176,6 @@ export class BookDetailModal implements OnInit {
         this.busy.set(false);
         this.ui.error(err, 'Could not delete the book.');
       }
-    });
-  }
-
-  private reloadBook() {
-    this.api.book(this.current()!.id).subscribe({
-      next: book => this.setBook(book),
-      // The issue itself went through; only the copy count shown here is out of date.
-      error: err => this.ui.error(err, 'Book issued, but the copy count could not be refreshed.')
     });
   }
 

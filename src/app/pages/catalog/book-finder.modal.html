@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button class="close-x" aria-label="Close" (click)="close()">
+        <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Find a book</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Reg. no. or title" [debounce]="300" [autocomplete]="'off'"
+                   (ionInput)="search($event.detail.value)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (error()) {
+    <p class="form-error pad" role="alert">{{ error() }}</p>
+  } @else if (books(); as list) {
+    @if (list.length) {
+      @if (total() > list.length) {
+        <p class="hint">Showing {{ list.length }} of {{ total() }}. Type more of the number or title to narrow it.</p>
+      }
+      <ion-list inset="true" lines="full">
+        @for (book of list; track book.id) {
+          <ion-item [button]="book.availableCopies > 0" detail="false" [class.issued]="book.availableCopies < 1"
+                    (click)="pick(book)">
+            <ion-label>
+              <h2 [class.marathi]="book.category | marathi">{{ book.title }}</h2>
+              <p>
+                @if (book.registrationNumber) { Reg. no. {{ book.registrationNumber }} · }
+                {{ book.author }}
+              </p>
+            </ion-label>
+            <ion-badge slot="end" class="chip" [color]="book.availableCopies > 0 ? 'success' : 'warning'">
+              {{ book.availableCopies > 0 ? 'Available' : 'Issued' }}
+            </ion-badge>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <div class="empty-state">
+        <h2>No books match "{{ query() }}"</h2>
+        <p>Try the registration number or part of the title.</p>
+      </div>
+    }
+  } @else {
+    <app-page-skeleton [count]="false" [chip]="true" [rows]="6" />
+  }
+</ion-content>

@@ -65,11 +65,9 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/members.page').then(m => m.MembersPage),
       },
       {
-        // Picking a book to issue to a member (?issueTo=student id), from Registers › सभासद.
+        // Old address: staff have a Catalog tab now.
         path: 'config/catalog',
-        ...READ,
-        ...STAFF_ONLY,
-        loadComponent: () => import('../pages/catalog/catalog.page').then(m => m.CatalogPage),
+        redirectTo: 'catalog',
       },
       {
         path: 'profile/masters',

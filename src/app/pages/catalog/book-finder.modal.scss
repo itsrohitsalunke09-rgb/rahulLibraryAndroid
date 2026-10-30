@@ -1,0 +1,19 @@
+.pad {
+  margin: 16px;
+}
+
+.hint {
+  margin: 12px 20px 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+ion-label h2,
+ion-label p {
+  white-space: normal;
+}
+
+/* Issued books show, for reference, but can't be picked. */
+.issued ion-label {
+  opacity: 0.55;
+}

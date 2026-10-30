@@ -1,12 +1,6 @@
 <!-- Built from Figma "rahul-library" › Catalog - Mobile (node 15:952). -->
 <ion-header>
   <ion-toolbar>
-    <!-- Picking a book for a member (Registers › सभासद): back to the members. -->
-    @if (issueTo()) {
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/config/members" text=""></ion-back-button>
-      </ion-buttons>
-    }
     <ion-title>
       Catalog
       @if (tab() === 'books') {
@@ -64,9 +58,6 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  @if (issueTo(); as s) {
-    <p class="picking" role="status">Tap an available book to issue it to <strong>{{ s.fullName }}</strong>.</p>
-  }
 
   @if (tab() === 'clippings') {
     @if (clippingsError()) {
