@@ -129,6 +129,11 @@ export class ReaderProfileModal implements OnInit {
 
   /** Find the book by reg. no. or title, then the usual Issue screen with this student chosen. */
   async issueBook() {
+    // An inactive account can't borrow: the button looks disabled and says why when tapped.
+    if (this.account && !this.account.active) {
+      await this.ui.alert('Account inactive', 'Your account is inactivated, please activate the account.');
+      return;
+    }
     const finder = await this.modals.create({ component: BookFinderModal });
     await finder.present();
     const { data: book, role } = await finder.onWillDismiss<Book>();

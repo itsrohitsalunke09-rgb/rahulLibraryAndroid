@@ -107,6 +107,12 @@ ion-item {
     color: var(--app-on-accent);
   }
 
+  &.off {
+    border-color: transparent;
+    background: var(--app-disabled);
+    color: var(--app-disabled-text);
+  }
+
   &:only-child { grid-column: 1 / -1; }
 }
 

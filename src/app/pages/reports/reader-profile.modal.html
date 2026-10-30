@@ -28,7 +28,9 @@
   @if (account && (perms.can('REGISTER') || perms.can('UPDATE'))) {
     <div class="actions">
       @if (perms.can('REGISTER')) {
-        <button type="button" class="action primary" (click)="issueBook()">
+        <!-- Inactive account: greyed out, but still tappable to explain why. -->
+        <button type="button" class="action primary" [class.off]="!account.active" [attr.aria-disabled]="!account.active"
+                (click)="issueBook()">
           <span class="icon" style="--icon: url(assets/icons/send.svg); --icon-size: 18px" aria-hidden="true"></span>
           Issue a book
         </button>

@@ -20,6 +20,13 @@ export class UiService {
     await this.toast(errorMessage(err, fallback), 'error');
   }
 
+  /** A message that only needs reading: one OK button. */
+  async alert(header: string, message: string) {
+    const alert = await this.alerts.create({ header, message, buttons: ['OK'] });
+    await alert.present();
+    await alert.onDidDismiss();
+  }
+
   async confirm(header: string, message: string, confirmText = 'OK', destructive = false): Promise<boolean> {
     const alert = await this.alerts.create({
       header,
