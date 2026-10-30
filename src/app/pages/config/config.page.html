@@ -6,7 +6,7 @@
 
 <ion-content>
   <!-- Same cards as Dashboard › Reports, but each opens its register for marking. -->
-  <div class="wrap">
+  <div class="wrap" appStretch>
     @for (c of cards; track c.link) {
       <a class="report" [class]="c.tone" [routerLink]="c.link">
         <span class="icon kind" [style.--icon]="'url(assets/icons/' + c.icon + '.svg)'" aria-hidden="true"></span>

@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { StretchDirective } from '../../core/stretch.directive';
 
 /** Registers tab: a card per register to mark what came, and सभासद for each student's books (admin and librarian). Reports are on the Dashboard. */
 @Component({
   selector: 'app-config',
   templateUrl: 'config.page.html',
   styleUrls: ['../reports/reports.page.scss'],
-  imports: [RouterLink, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, StretchDirective],
 })
 export class ConfigPage {
   readonly cards = [

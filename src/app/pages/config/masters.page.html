@@ -8,104 +8,21 @@
 </ion-header>
 
 <ion-content>
-  <p class="intro">Lists the rest of the app picks from. Changes apply everywhere straight away.</p>
-
-  <ion-list inset="true" lines="full">
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/categories">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/tag.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Book categories</h2>
-        <p>Category number and name, used by the book form's Category dropdown</p>
-      </ion-label>
-      <div slot="end" class="end">
-        @if (categories.loaded()) {
-          <span class="count">{{ categories.items().length }}</span>
+  <!-- The Registers screen's soft cards; pulled past either end, they stretch and spring back. -->
+  <div class="wrap" appStretch>
+    <p class="intro">Lists the rest of the app picks from. Changes apply everywhere straight away.</p>
+    @for (c of cards(); track c.link) {
+      <a class="report" [class]="c.tone" [routerLink]="c.link">
+        <span class="icon kind" [style.--icon]="'url(assets/icons/' + c.icon + '.svg)'" aria-hidden="true"></span>
+        <span class="text">
+          <span class="title" [class.marathi]="c.marathi" [attr.lang]="c.marathi ? 'mr' : null">{{ c.title }}</span>
+          <span class="sub">{{ c.sub }}</span>
+        </span>
+        @if (c.count !== null) {
+          <span class="count" [attr.aria-label]="c.count + ' items'">{{ c.count }}</span>
         }
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/news">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/sheet.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>News &amp; events</h2>
-        <p>Event stories shown in the News tab</p>
-      </ion-label>
-      <div slot="end" class="end">
-        @if (storyCount() !== null) {
-          <span class="count">{{ storyCount() }}</span>
-        }
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/periodicals">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/copies.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Newspapers &amp; magazines</h2>
-        <p>Subscriptions and price per copy, used by the daily register</p>
-      </ion-label>
-      <div slot="end" class="end">
-        @if (periodicalCount() !== null) {
-          <span class="count">{{ periodicalCount() }}</span>
-        }
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/clippings">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/copies.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2 class="marathi">कात्रणे</h2>
-        <p>Newspaper clipping files: title and years, shown in Catalog</p>
-      </ion-label>
-      <div slot="end" class="end">
-        @if (clippingCount() !== null) {
-          <span class="count">{{ clippingCount() }}</span>
-        }
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/assets">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/tag.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Office assets</h2>
-        <p>What the office owns: how many, where, and their condition</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/permissions">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/field-shield.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>Roles &amp; permissions</h2>
-        <p>What librarians and students may read, write, update, delete, and the Reading Galaxy</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-    <ion-item button detail="false" routerLink="/tabs/profile/masters/about">
-      <span slot="start" class="master-icon" aria-hidden="true">
-        <span class="icon" style="--icon: url(assets/icons/book.svg); --icon-size: 20px"></span>
-      </span>
-      <ion-label>
-        <h2>About us page</h2>
-        <p>Library history, collection, activities and contact, shown from the login screen</p>
-      </ion-label>
-      <div slot="end" class="end">
-        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg); --icon-size: 16px" aria-hidden="true"></span>
-      </div>
-    </ion-item>
-  </ion-list>
+        <span class="icon chevron" style="--icon: url(assets/icons/chevron.svg)" aria-hidden="true"></span>
+      </a>
+    }
+  </div>
 </ion-content>

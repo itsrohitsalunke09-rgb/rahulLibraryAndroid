@@ -1,0 +1,19 @@
+/* On top of reports.page.scss (the Registers cards). */
+.intro {
+  margin: 0 4px 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+
+/* How many entries the master holds. */
+.count {
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--app-surface);
+  color: var(--app-ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
