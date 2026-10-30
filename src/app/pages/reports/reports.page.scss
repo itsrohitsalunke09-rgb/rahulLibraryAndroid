@@ -27,6 +27,8 @@ ion-back-button {
   &.weekly { background: var(--app-success-soft); }
   &.monthly { background: var(--app-yellow-soft); }
   &.books { background: var(--app-mint-soft); }
+  &.catalog { background: var(--app-lilac-soft); }
+  &.members { background: var(--app-rust-soft); }
 
   &:active { filter: brightness(0.96); }
 
