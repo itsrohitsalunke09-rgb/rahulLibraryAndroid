@@ -78,7 +78,16 @@ export class CatalogPage implements ViewWillEnter {
   }
 
   setTab(value: unknown) {
-    this.tab.set(value === 'papers' || value === 'clippings' ? value : 'books');
+    const next = value === 'papers' || value === 'clippings' ? value : 'books';
+    // Each tab's search box goes when the tab is left and comes back empty, so its search goes too:
+    // otherwise a search that found nothing would still filter the list behind an empty box.
+    if (next !== 'books' && this.query()) {
+      this.search('');
+    }
+    if (next !== 'clippings') {
+      this.clippingQuery.set('');
+    }
+    this.tab.set(next);
     if (this.tab() === 'papers' && !this.papers()) {
       this.loadPapers();
     }

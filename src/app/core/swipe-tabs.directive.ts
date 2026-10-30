@@ -1,4 +1,4 @@
-import { Directive, HostListener, input, output } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, input, output } from '@angular/core';
 
 /** A swipe must cover this much sideways (px), and be mostly sideways, to change the filter. */
 const MIN_SWIPE = 60;
@@ -44,6 +44,20 @@ export class SwipeTabsDirective {
     const next = tabs.indexOf(this.swipeCurrent()) + (dx < 0 ? 1 : -1);
     if (next >= 0 && next < tabs.length) {
       this.swipeTo.emit(tabs[next]);
+      this.slideIn(dx < 0 ? 1 : -1);
     }
   }
+
+  /** The new tab's list slides in from the side the finger came from. */
+  private slideIn(from: 1 | -1) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    this.host.nativeElement.animate?.(
+      [{ transform: `translateX(${from * 48}px)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
+      { duration: 220, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+    );
+  }
+
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
 }

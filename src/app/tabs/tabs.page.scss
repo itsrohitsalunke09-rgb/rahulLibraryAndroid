@@ -2,3 +2,31 @@
 ion-tab-bar.hidden {
   display: none;
 }
+
+/* Double-tap refresh: a round chip that drops in under the header, like ion-refresher's. */
+.tab-refresh {
+  position: fixed;
+  left: 50%;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-top: 14px;
+  border-radius: 50%;
+  background: var(--app-surface, #fff);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%);
+  animation: tab-refresh-in 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  ion-spinner { width: 24px; height: 24px; color: var(--app-accent); }
+}
+
+@keyframes tab-refresh-in {
+  from { opacity: 0; transform: translate(-50%, -28px) scale(0.6); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-refresh { animation: none; }
+}

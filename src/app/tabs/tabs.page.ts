@@ -1,8 +1,8 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
-import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
+import { IonIcon, IonLabel, IonSpinner, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { bookmarksOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
@@ -15,7 +15,7 @@ const FULL_SCREEN = ['/tabs/dashboard/reports/galaxy', '/tabs/my-books/galaxy'];
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonSpinner],
 })
 export class TabsPage {
   protected auth = inject(AuthService);
@@ -59,15 +59,36 @@ export class TabsPage {
   }
 
   private lastTap = { tab: '', at: 0 };
+  /** Double tap: a pull-down style spinner just under the page's header, `top` px from the screen top. */
+  readonly refreshing = signal<{ top: number } | null>(null);
 
   /** Double tap on a tab: back to the top and reload, as a pull-down does (screens without data just scroll). */
   private refreshShown() {
-    document.querySelector<HTMLIonContentElement>('ion-router-outlet .ion-page:not(.ion-page-hidden) ion-content')
-      ?.scrollToTop(300);
-    const page = this.tabs().outlet?.component as { refresh?: (event: { target: { complete(): void } }) => void } | undefined;
-    page?.refresh?.({ target: { complete: () => undefined } });
+    // The page on screen in the tab outlet (other tabs' pages stay in the DOM, hidden).
+    const pages = document.querySelectorAll<HTMLElement>('ion-tabs ion-router-outlet > .ion-page:not(.ion-page-hidden)');
+    const content = pages[pages.length - 1]?.querySelector<HTMLIonContentElement>('ion-content');
+    void content?.scrollToTop(300);
+    let page: { refresh?: (event: { target: { complete(): void } }) => void } | undefined;
+    try {
+      page = this.tabs().outlet?.component as typeof page;
+    } catch {
+      // Outlet not activated yet: nothing to reload.
+    }
+    if (typeof page?.refresh !== 'function') {
+      return;
+    }
+    const shownAt = Date.now();
+    this.refreshing.set({ top: content?.getBoundingClientRect().top ?? 56 });
+    // Stays at least a moment, so it reads as a refresh even when the data comes back at once.
+    const hide = () => setTimeout(() => this.refreshing.set(null), Math.max(0, MIN_SPIN_MS - (Date.now() - shownAt)));
+    page.refresh({ target: { complete: hide } });
+    // A page that never reports back still loses the spinner.
+    setTimeout(() => this.refreshing.set(null), 10_000);
   }
 }
+
+/** Shortest time the double-tap refresh spinner shows. */
+const MIN_SPIN_MS = 700;
 
 /** Two taps on the same tab within this time count as a double tap. */
 const DOUBLE_TAP_MS = 350;

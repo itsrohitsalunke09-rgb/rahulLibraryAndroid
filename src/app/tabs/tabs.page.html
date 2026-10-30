@@ -52,3 +52,10 @@
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>
+
+<!-- Double tap on a tab: the same circle a pull-down shows, just under the page's header. -->
+@if (refreshing(); as r) {
+  <div class="tab-refresh" [style.top.px]="r.top" role="status" aria-label="Refreshing">
+    <ion-spinner name="circular"></ion-spinner>
+  </div>
+}
