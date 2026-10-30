@@ -66,7 +66,9 @@ export class DashboardPage implements ViewWillEnter {
   private request?: Subscription;
   private papersRequest?: Subscription;
   private wishesRequest?: Subscription;
-  private freshness = new Freshness();
+  /** Coming back (e.g. from a card's screen) keeps the numbers for 10 minutes unless something changed
+   *  in the app; a pull-down or a double tap on the tab reloads at once. */
+  private freshness = new Freshness(10 * 60 * 1000);
 
   ionViewWillEnter() {
     if (this.freshness.isStale()) {
@@ -184,8 +186,8 @@ function toTiles(s: Dashboard): Tile[] {
   return [
     { label: 'Overdue', value: s.overdueCopies, symbol: 'assets/icons/overdue.svg', tone: 'danger', group: 'attention', link: '/tabs/dashboard/issues', query: { status: 'OVERDUE' } },
     { label: 'Out with students', value: s.issuedCopies, symbol: 'assets/icons/exchange.svg', tone: 'warning', group: 'attention', link: '/tabs/dashboard/issues', query: { status: 'OUT' } },
-    { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/config/catalog' },
-    { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/config/members' },
+    { label: 'Book titles', value: s.totalBooks, symbol: 'assets/icons/book.svg', tone: 'primary', group: 'more', link: '/tabs/dashboard/catalog' },
+    { label: 'Students', value: s.students, symbol: 'assets/icons/users.svg', tone: 'primary', group: 'more', link: '/tabs/dashboard/members' },
   ];
 }
 

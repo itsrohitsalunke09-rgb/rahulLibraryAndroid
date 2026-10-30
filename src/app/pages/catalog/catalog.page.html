@@ -4,7 +4,7 @@
     <!-- Staff come here from Registers › ग्रंथ दाखल नोंदवही (students have it as a tab). -->
     @if (auth.isStaff()) {
       <ion-buttons slot="start">
-        <ion-back-button defaultHref="/tabs/config" text=""></ion-back-button>
+        <ion-back-button [defaultHref]="backHref" text=""></ion-back-button>
       </ion-buttons>
     }
     <ion-title>

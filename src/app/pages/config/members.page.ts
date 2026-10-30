@@ -1,4 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { backTarget } from '../../core/back-button';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonRefresher,
   IonRefresherContent, IonSearchbar, IonTitle, IonToolbar, ModalController, RefresherCustomEvent, ViewWillEnter,
@@ -49,6 +51,8 @@ export function members(students: UserAccount[], summaries: StudentSummary[]): M
   ],
 })
 export class MembersPage implements ViewWillEnter {
+  /** Back goes to the tab it was opened from: the Dashboard or Registers. */
+  protected readonly backHref = backTarget(inject(Router).url, '/tabs/config');
   private api = inject(ApiService);
   private modals = inject(ModalController);
   private galaxy = inject(GalaxyReadersStore);

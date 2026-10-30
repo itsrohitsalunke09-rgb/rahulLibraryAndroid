@@ -15,6 +15,9 @@ export function markDataChanged() {
  * Data is stale once it is older than MAX_AGE or anything was changed through the app since.
  */
 export class Freshness {
+  /** maxAge: how long (ms) loaded data counts as current on a revisit. */
+  constructor(private maxAge = MAX_AGE) {}
+
   private loadedAt = 0;
   private seenChanges = -1;
 
@@ -30,6 +33,6 @@ export class Freshness {
   }
 
   isStale() {
-    return this.seenChanges !== changes() || Date.now() - this.loadedAt > MAX_AGE;
+    return this.seenChanges !== changes() || Date.now() - this.loadedAt > this.maxAge;
   }
 }

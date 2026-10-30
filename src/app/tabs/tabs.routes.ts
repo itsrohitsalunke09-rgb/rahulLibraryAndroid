@@ -129,6 +129,26 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/periodical-report.page').then(m => m.PeriodicalReportPage),
       },
       {
+        // The same screens as under Registers, opened from the Dashboard's cards: kept in the Dashboard's
+        // tab so Back returns to the Dashboard (not to Registers).
+        path: 'dashboard/register',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/periodical-register.page').then(m => m.PeriodicalRegisterPage),
+      },
+      {
+        path: 'dashboard/catalog',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/catalog/catalog.page').then(m => m.CatalogPage),
+      },
+      {
+        path: 'dashboard/members',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/config/members.page').then(m => m.MembersPage),
+      },
+      {
         // Students' book requests and suggestions (from the Dashboard card).
         path: 'dashboard/requests',
         ...READ,

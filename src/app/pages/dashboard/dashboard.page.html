@@ -82,7 +82,7 @@
         @if (p.newspapers.total || p.magazines.total) {
           <div class="circulation">
             @if (p.newspapers.total) {
-              <button class="metric paper" (click)="go('/tabs/config/periodicals/register')">
+              <button class="metric paper" (click)="go('/tabs/dashboard/register')">
                 <span class="metric-top">
                   <span class="value">{{ p.newspapers.received }}<small>/{{ p.newspapers.total }}</small></span>
                   <span class="icon" style="--icon: url(assets/icons/sheet.svg)" aria-hidden="true"></span>

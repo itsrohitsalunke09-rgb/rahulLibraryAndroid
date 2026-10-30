@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { backTarget } from '../../core/back-button';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonBackButton, IonButtons, IonContent, IonHeader, IonSpinner, IonTitle, IonToolbar, ViewWillEnter
 } from '@ionic/angular';
@@ -26,6 +27,8 @@ type Line = RegisterRow & { priceText: string; copiesText: string };
   ],
 })
 export class PeriodicalRegisterPage implements ViewWillEnter {
+  /** Back goes to the tab it was opened from: the Dashboard or Registers. */
+  protected readonly backHref = backTarget(inject(Router).url, '/tabs/config');
   private api = inject(ApiService);
   private ui = inject(UiService);
   protected auth = inject(AuthService);

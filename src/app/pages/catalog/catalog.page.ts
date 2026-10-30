@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { backTarget } from '../../core/back-button';
 import {
   AlertController, IonBackButton, IonBadge, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
   IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonTitle,
@@ -31,6 +32,8 @@ import { ImportBooksModal } from './import-books.modal';
   ],
 })
 export class CatalogPage implements ViewWillEnter {
+  /** Back goes to the tab it was opened from: the Dashboard or Registers. */
+  protected readonly backHref = backTarget(inject(Router).url, '/tabs/config');
   private api = inject(ApiService);
   private modals = inject(ModalController);
   private alerts = inject(AlertController);
