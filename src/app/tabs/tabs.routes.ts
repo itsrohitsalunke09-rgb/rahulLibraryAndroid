@@ -65,9 +65,11 @@ export const routes: Routes = [
         loadComponent: () => import('../pages/config/members.page').then(m => m.MembersPage),
       },
       {
-        // Old address: staff have a Catalog tab now.
+        // Registers › ग्रंथ दाखल नोंदवही: the Catalog for staff (they have no Catalog tab).
         path: 'config/catalog',
-        redirectTo: 'catalog',
+        ...READ,
+        ...STAFF_ONLY,
+        loadComponent: () => import('../pages/catalog/catalog.page').then(m => m.CatalogPage),
       },
       {
         path: 'profile/masters',

@@ -14,6 +14,7 @@ export class ConfigPage {
     { title: 'दैनिके', sub: 'Tick the newspapers that came today', link: '/tabs/config/periodicals/register', tone: 'daily', icon: 'sheet' },
     { title: 'साप्ताहिक', sub: 'Mark weekly magazine issues received', link: '/tabs/config/periodicals/magazines/WEEKLY', tone: 'weekly', icon: 'book' },
     { title: 'मासिक', sub: 'Mark monthly magazine issues received', link: '/tabs/config/periodicals/magazines/MONTHLY', tone: 'monthly', icon: 'book' },
+    { title: 'ग्रंथ दाखल नोंदवही', sub: 'The catalog: every book, add and edit books', link: '/tabs/config/catalog', tone: 'books', icon: 'tab-catalog' },
     { title: 'सभासद', sub: 'Students, their books, issue a book, edit an account', link: '/tabs/config/members', tone: 'books', icon: 'tab-people' },
   ];
 }
