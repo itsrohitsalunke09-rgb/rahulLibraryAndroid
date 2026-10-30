@@ -9,6 +9,8 @@ import { StudentSummary, UserAccount } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
 import { ReaderProfileModal } from '../reports/reader-profile.modal';
+import { planetTiers } from '../../core/galaxy';
+import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
 
 /** A student with their book totals (all years); zeros for one who has had no books yet. */
 export interface Member {
@@ -44,6 +46,7 @@ export function members(students: UserAccount[], summaries: StudentSummary[]): M
 export class MembersPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
+  private galaxy = inject(GalaxyReadersStore);
 
   readonly all = signal<Member[] | null>(null);
   readonly error = signal('');
@@ -58,6 +61,7 @@ export class MembersPage implements ViewWillEnter {
 
   ionViewWillEnter() {
     this.load();
+    this.galaxy.refresh();
   }
 
   refresh(event: RefresherCustomEvent) {
@@ -71,6 +75,8 @@ export class MembersPage implements ViewWillEnter {
       componentProps: {
         reader: { studentId: m.account.id, studentName: m.account.fullName, books: m.summary.total },
         account: m.account,
+        // The same body as in this year's Reading Galaxy; no books this year = the plain coloured planet.
+        kind: planetTiers(this.galaxy.readers() ?? []).get(m.account.id) ?? 'other',
       },
     });
     await modal.present();
