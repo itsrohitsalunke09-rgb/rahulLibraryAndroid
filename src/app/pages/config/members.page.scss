@@ -26,3 +26,17 @@ ion-back-button {
   color: var(--app-rust);
   font-weight: 600;
 }
+
+/* Before the name: green = active, grey = inactive, red = has an overdue book. */
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-inline-end: 6px;
+  border-radius: 50%;
+  vertical-align: 1px;
+
+  &.active { background: var(--ion-color-success); }
+  &.inactive { background: var(--app-muted); }
+  &.overdue { background: var(--ion-color-danger); }
+}

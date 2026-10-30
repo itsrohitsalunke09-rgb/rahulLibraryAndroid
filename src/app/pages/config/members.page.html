@@ -10,9 +10,17 @@
       }
     </ion-title>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar class="with-actions">
     <ion-searchbar placeholder="Name, username or phone" [debounce]="200"
                    (ionInput)="query.set(($event.detail.value ?? '').trim())"></ion-searchbar>
+    <!-- Add a student or staff account (the form picks the role); People's old add button. -->
+    @if (perms.can('WRITE')) {
+      <div slot="end" class="search-actions">
+        <button class="heading-action" aria-label="Add student or staff" (click)="add()">
+          <span class="icon" style="--icon: url(assets/icons/plus.svg); --icon-size: 20px" aria-hidden="true"></span>
+        </button>
+      </div>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -32,7 +40,13 @@
         @for (m of shown(); track m.account.id) {
           <ion-item button detail="false" (click)="open(m)">
             <ion-label>
-              <h2>{{ m.account.fullName }}</h2>
+              <!-- Red: has an overdue book; else green for an active account, grey for an inactive one. -->
+              @let state = m.summary.overdue ? 'overdue' : m.account.active ? 'active' : 'inactive';
+              <h2>
+                <span [class]="'dot ' + state" role="img"
+                      [attr.aria-label]="state === 'overdue' ? 'Has an overdue book' : state === 'active' ? 'Active' : 'Inactive'"></span>
+                {{ m.account.fullName }}
+              </h2>
               <p>
                 {{ m.summary.issued }} issued · {{ m.summary.returned }} returned
                 @if (m.summary.overdue) { · <span class="overdue">{{ m.summary.overdue }} overdue</span> }

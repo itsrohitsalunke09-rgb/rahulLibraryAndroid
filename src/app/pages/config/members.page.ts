@@ -9,8 +9,13 @@ import { StudentSummary, UserAccount } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
 import { ReaderProfileModal } from '../reports/reader-profile.modal';
+import { UserFormModal } from '../people/user-form.modal';
+import { PermissionsStore } from '../../core/permissions.store';
 import { planetTiers } from '../../core/galaxy';
 import { GalaxyReadersStore } from '../../core/galaxy-readers.store';
+
+/** Students fetched in one request; well above a village library's roll. */
+const ALL_STUDENTS = 2000;
 
 /** A student with their book totals (all years); zeros for one who has had no books yet. */
 export interface Member {
@@ -18,7 +23,7 @@ export interface Member {
   summary: StudentSummary;
 }
 
-/** Every active student, with or without books, joined to their totals by id; A to Z. */
+/** Every student (active or not), with or without books, joined to their totals by id; A to Z. */
 export function members(students: UserAccount[], summaries: StudentSummary[]): Member[] {
   const byId = new Map(summaries.map(s => [s.studentId, s]));
   return students
@@ -47,6 +52,8 @@ export class MembersPage implements ViewWillEnter {
   private api = inject(ApiService);
   private modals = inject(ModalController);
   private galaxy = inject(GalaxyReadersStore);
+  /** Add needs the Add (Write) permission, as on People. */
+  protected perms = inject(PermissionsStore);
 
   readonly all = signal<Member[] | null>(null);
   readonly error = signal('');
@@ -86,11 +93,22 @@ export class MembersPage implements ViewWillEnter {
     }
   }
 
+  /** A new student or staff account; a new student shows in the list after saving. */
+  async add() {
+    const modal = await this.modals.create({ component: UserFormModal });
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+    if (role === 'saved') {
+      this.load();
+    }
+  }
+
   private load(done?: () => void) {
-    forkJoin([this.api.searchStudents(''), this.api.studentSummaries()]).subscribe({
+    // Every student, active or not, in one page (one library: a few hundred at most).
+    forkJoin([this.api.users(0, ALL_STUDENTS, 'STUDENT'), this.api.studentSummaries()]).subscribe({
       next: ([students, summaries]) => {
         this.error.set('');
-        this.all.set(members(students, summaries));
+        this.all.set(members(students.content, summaries));
         done?.();
       },
       error: err => {
