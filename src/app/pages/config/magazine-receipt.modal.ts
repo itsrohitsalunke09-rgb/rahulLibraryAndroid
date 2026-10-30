@@ -4,7 +4,7 @@ import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, Io
 import { ApiService } from '../../core/api.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { localIsoDate } from '../../core/dates';
-import { defaultPeriod, magazinePeriods, weekStartDay } from '../../core/magazine-periods';
+import { defaultPeriod, magazinePeriods, monthsEnd, weekStartDay } from '../../core/magazine-periods';
 import { MagazineCard, MagazineReceipt, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -35,6 +35,8 @@ export class MagazineReceiptModal implements OnInit {
   issueNo: number | string = '';
   /** How many of this issue came; 1 unless more were bought. */
   copies: number | string = 1;
+  /** Monthly: months one issue covers; 2 for a combined (जोड) issue. */
+  months = 1;
   /** Monthly: the day it was published. */
   publishedOn = this.today;
   /** Weekly/fortnightly: the period it covers, this week (on the same weekday as the first issue) or half-month to start with. */
@@ -102,8 +104,11 @@ export class MagazineReceiptModal implements OnInit {
       this.error.set('Enter the copies (1 to 99).');
       return;
     }
-    // Monthly issues are dated by their published day; weekly ones by the week they cover.
-    const [from, to] = this.monthly ? [this.publishedOn, this.publishedOn] : [this.periodFrom, this.periodTo];
+    // Monthly issues are dated by their published day (to the end of the last month a combined issue
+    // covers); weekly ones by the week they cover.
+    const [from, to] = this.monthly
+      ? [this.publishedOn, this.months > 1 ? monthsEnd(this.publishedOn, this.months) : this.publishedOn]
+      : [this.periodFrom, this.periodTo];
     if (!from || !to) {
       this.error.set(this.monthly ? 'Enter the published date.' : 'Enter the from and to dates.');
       return;

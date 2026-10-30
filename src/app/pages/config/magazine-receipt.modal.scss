@@ -51,7 +51,8 @@
     border-color: var(--app-accent);
   }
 
-  input {
+  input,
+  select {
     flex: 1;
     min-width: 0;
     border: 0;
