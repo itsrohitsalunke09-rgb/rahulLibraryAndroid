@@ -5,7 +5,12 @@
         <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 18px" aria-hidden="true"></span>
       </ion-button>
     </ion-buttons>
-    <ion-title>Find a book</ion-title>
+    <ion-title>
+      Find a book
+      @if (query() && books.loaded() && !books.error()) {
+        <span class="count">{{ books.total() }} found</span>
+      }
+    </ion-title>
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar placeholder="Reg. no. or title" [debounce]="300" [autocomplete]="'off'"
@@ -14,37 +19,49 @@
 </ion-header>
 
 <ion-content>
-  @if (error()) {
-    <p class="form-error pad" role="alert">{{ error() }}</p>
-  } @else if (books(); as list) {
-    @if (list.length) {
-      @if (total() > list.length) {
-        <p class="hint">Showing {{ list.length }} of {{ total() }}. Type more of the number or title to narrow it.</p>
-      }
-      <ion-list inset="true" lines="full">
-        @for (book of list; track book.id) {
-          <ion-item [button]="book.availableCopies > 0" detail="false" [class.issued]="book.availableCopies < 1"
-                    (click)="pick(book)">
-            <ion-label>
-              <h2 [class.marathi]="book.category | marathi">{{ book.title }}</h2>
-              <p>
-                @if (book.registrationNumber) { Reg. no. {{ book.registrationNumber }} · }
-                {{ book.author }}
-              </p>
-            </ion-label>
-            <ion-badge slot="end" class="chip" [color]="book.availableCopies > 0 ? 'success' : 'warning'">
-              {{ book.availableCopies > 0 ? 'Available' : 'Issued' }}
-            </ion-badge>
-          </ion-item>
-        }
-      </ion-list>
-    } @else {
-      <div class="empty-state">
-        <h2>No books match "{{ query() }}"</h2>
-        <p>Try the registration number or part of the title.</p>
-      </div>
-    }
+  @if (!query()) {
+    <!-- Nothing listed until something is typed. -->
+    <div class="empty-state">
+      <span class="icon empty-icon" style="--icon: url(assets/icons/search.svg)" aria-hidden="true"></span>
+      <h2>Find the book to issue</h2>
+      <p>Type its registration number or part of the title.</p>
+    </div>
   } @else {
-    <app-page-skeleton [count]="false" [chip]="true" [rows]="6" />
+    @if (books.error()) {
+      <p class="form-error pad" role="alert">{{ books.error() }}</p>
+    }
+    @if (books.loaded()) {
+      @if (books.items().length) {
+        <ion-list inset="true" lines="full">
+          @for (book of books.items(); track book.id) {
+            <ion-item [button]="book.availableCopies > 0" detail="false" [class.issued]="book.availableCopies < 1"
+                      (click)="pick(book)">
+              <ion-label>
+                <h2 [class.marathi]="book.category | marathi">{{ book.title }}</h2>
+                <p>
+                  @if (book.registrationNumber) { Reg. no. {{ book.registrationNumber }} · }
+                  {{ book.author }}
+                </p>
+              </ion-label>
+              <ion-badge slot="end" class="chip" [color]="book.availableCopies > 0 ? 'success' : 'warning'">
+                {{ book.availableCopies > 0 ? 'Available' : 'Issued' }}
+              </ion-badge>
+            </ion-item>
+          }
+        </ion-list>
+      } @else if (!books.error()) {
+        <div class="empty-state">
+          <h2>No books match "{{ query() }}"</h2>
+          <p>Try the registration number or part of the title.</p>
+        </div>
+      }
+    } @else if (!books.error()) {
+      <app-page-skeleton [count]="false" [chip]="true" [rows]="6" />
+    }
+
+    <!-- The next 20 matches load as the list nears its end. -->
+    <ion-infinite-scroll [disabled]="books.finished()" (ionInfinite)="books.more($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   }
 </ion-content>

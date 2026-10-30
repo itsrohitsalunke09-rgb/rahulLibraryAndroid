@@ -2,9 +2,11 @@
   margin: 16px;
 }
 
-.hint {
-  margin: 12px 20px 0;
+/* Match count next to the title, as in the Catalog. */
+.count {
+  margin-inline-start: 8px;
   font-size: 13px;
+  font-weight: 400;
   color: var(--app-muted);
 }
 

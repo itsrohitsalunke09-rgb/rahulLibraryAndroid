@@ -1,21 +1,18 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
-  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonSearchbar, IonTitle, IonToolbar,
-  ModalController,
+  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonInfiniteScroll, IonInfiniteScrollContent, IonItem, IonLabel,
+  IonList, IonSearchbar, IonTitle, IonToolbar, ModalController,
 } from '@ionic/angular';
-import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { Book } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
+import { PagedList } from '../../core/paged-list';
 import { MarathiPipe } from '../../core/pipes';
-import { errorMessage } from '../../core/ui.service';
-
-/** Matches shown at a time; typing more of the title or number narrows them. */
-const RESULTS = 20;
 
 /**
- * Find a book to issue by registration number or title (the Catalog's search); a tap on an available
- * book closes with it (role 'pick'). Issued ones show but can't be picked.
+ * Find a book to issue by registration number or title (the Catalog's search). Nothing shows until
+ * something is typed; then every match, 20 at a time as the list scrolls. A tap on an available book
+ * closes with it (role 'pick'); issued ones show but can't be picked.
  */
 @Component({
   selector: 'app-book-finder',
@@ -23,36 +20,21 @@ const RESULTS = 20;
   styleUrls: ['book-finder.modal.scss'],
   imports: [
     IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonSearchbar, IonContent, IonList, IonItem, IonLabel, IonBadge,
-    MarathiPipe, PageSkeletonComponent,
+    IonInfiniteScroll, IonInfiniteScrollContent, MarathiPipe, PageSkeletonComponent,
   ],
 })
-export class BookFinderModal implements OnDestroy {
+export class BookFinderModal {
   private api = inject(ApiService);
   private modals = inject(ModalController);
 
   readonly query = signal('');
-  readonly books = signal<Book[] | null>(null);
-  readonly total = signal(0);
-  readonly error = signal('');
-  private request?: Subscription;
-
-  constructor() {
-    this.search('');
-  }
+  readonly books = new PagedList<Book>((page, size) => this.api.books(this.query(), page, size), 'Could not search the books.');
 
   search(value: string | null | undefined) {
-    const q = (value ?? '').trim();
-    this.query.set(q);
-    this.request?.unsubscribe();
-    this.books.set(null);
-    this.request = this.api.books(q, 0, RESULTS).subscribe({
-      next: page => {
-        this.error.set('');
-        this.books.set(page.content);
-        this.total.set(page.totalElements);
-      },
-      error: err => this.error.set(errorMessage(err, 'Could not search the books.')),
-    });
+    this.query.set((value ?? '').trim());
+    if (this.query()) {
+      this.books.reset();
+    }
   }
 
   pick(book: Book) {
@@ -63,9 +45,5 @@ export class BookFinderModal implements OnDestroy {
 
   close() {
     this.modals.dismiss(null, 'cancel');
-  }
-
-  ngOnDestroy() {
-    this.request?.unsubscribe();
   }
 }
