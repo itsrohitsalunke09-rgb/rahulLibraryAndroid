@@ -37,9 +37,8 @@ export class ReaderRequestsPage implements ViewWillEnter {
   readonly all = signal<ReaderRequest[] | null>(null);
   readonly error = signal('');
   readonly kind = signal<ReaderRequest['kind']>('REQUEST');
-  /** Open ones first (newest first), then the done ones. */
-  readonly shown = computed(() => (this.all() ?? []).filter(r => r.kind === this.kind())
-    .sort((a, b) => Number(!!a.doneAt) - Number(!!b.doneAt)));
+  /** Only open ones, newest first; a done one leaves this list (the student still sees it in My books). */
+  readonly shown = computed(() => (this.all() ?? []).filter(r => r.kind === this.kind() && !r.doneAt));
   /** Only open ones count, as on the Dashboard. */
   readonly count = (kind: ReaderRequest['kind']) => (this.all() ?? []).filter(r => r.kind === kind && !r.doneAt).length;
   /** Open requests and suggestions as filter cards; "–" until loaded. */
@@ -109,12 +108,12 @@ export class ReaderRequestsPage implements ViewWillEnter {
     });
   }
 
-  /** Done keeps it on the list, marked done (the student still sees it); Delete removes it. */
+  /** Done takes it off this list (the student still sees it, marked done); Delete removes it for everyone. */
   async done(r: ReaderRequest, remove = false) {
     const what = r.kind === 'REQUEST' ? 'request' : 'suggestion';
     const asked = remove
       ? this.ui.confirm(`Delete this ${what}?`, `"${r.title}" from ${r.studentName} will be deleted.`, 'Delete', true)
-      : this.ui.confirm(`Mark this ${what} done?`, `"${r.title}" from ${r.studentName} stays listed as done.`, 'Done');
+      : this.ui.confirm(`Mark this ${what} done?`, `"${r.title}" from ${r.studentName} leaves this list; the student still sees it as done.`, 'Done');
     if (!(await asked)) {
       return;
     }

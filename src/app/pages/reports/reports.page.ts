@@ -13,6 +13,7 @@ export class ReportsPage {
   readonly cards = [
     { title: 'दैनिके', sub: 'Newspapers, day by day', link: '/tabs/dashboard/reports/DAILY', tone: 'daily', icon: 'sheet' },
     { title: 'साप्ताहिक', sub: 'Weekly magazines, week by week', link: '/tabs/dashboard/reports/WEEKLY', tone: 'weekly', icon: 'book' },
+    { title: 'पाक्षिक', sub: 'Fortnightly magazines, fortnight by fortnight', link: '/tabs/dashboard/reports/FORTNIGHTLY', tone: 'fortnightly', icon: 'book' },
     { title: 'मासिक', sub: 'Monthly magazines, month by month', link: '/tabs/dashboard/reports/MONTHLY', tone: 'monthly', icon: 'book' },
     { title: 'पुस्तकांची देवाण घेवाण', sub: 'Books given and returned, day by day', link: '/tabs/dashboard/reports/BOOKS', tone: 'books', icon: 'tab-issues' },
   ];

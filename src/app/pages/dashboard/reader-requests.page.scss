@@ -23,19 +23,6 @@ ion-label p {
   font-style: italic;
 }
 
-/* Done ones stay listed, dimmed, below the open ones. */
-.is-done ion-label { opacity: 0.6; }
-
-.done-badge {
-  align-self: center;
-  padding: 3px 10px;
-  border-radius: 100px;
-  background: var(--app-mint-soft);
-  color: var(--app-ink);
-  font-size: 12px;
-  font-weight: 600;
-}
-
 .actions {
   display: flex;
   flex-direction: column;

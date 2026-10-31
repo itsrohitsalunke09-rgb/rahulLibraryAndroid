@@ -25,6 +25,7 @@ ion-back-button {
 
   &.daily { background: var(--app-accent-soft); }
   &.weekly { background: var(--app-success-soft); }
+  &.fortnightly { background: var(--app-teal-soft); }
   &.monthly { background: var(--app-yellow-soft); }
   &.books { background: var(--app-mint-soft); }
   &.catalog { background: var(--app-lilac-soft); }

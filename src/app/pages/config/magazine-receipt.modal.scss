@@ -79,6 +79,31 @@
   }
 }
 
+/* Monthly: the subscription year's months; tapped ones (and any between them) are what the issue covers. */
+.months {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.month {
+  height: 44px;
+  border: 1px solid var(--app-rule-strong);
+  border-radius: 12px;
+  background: var(--app-surface);
+  color: var(--app-ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--app-accent);
+    background: var(--app-accent);
+    color: var(--app-on-accent);
+    font-weight: 600;
+  }
+}
+
 /* "अंक" in front of the number. */
 .issue .prefix {
   font-size: 15px;

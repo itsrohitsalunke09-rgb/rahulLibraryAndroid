@@ -54,20 +54,21 @@
         <span class="label">Published on</span>
         <span class="box">
           <span class="icon" style="--icon: url(assets/icons/field-calendar.svg); --icon-size: 18px" aria-hidden="true"></span>
-          <input type="date" name="publishedOn" [max]="today" [(ngModel)]="publishedOn" />
+          <input type="date" name="publishedOn" [(ngModel)]="publishedOn" />
         </span>
       </label>
-      <!-- A combined issue (जोड अंक) counts as received for its month and the past months it covers. -->
-      <label class="field">
-        <span class="label">Covers</span>
-        <span class="box">
-          <select name="months" [(ngModel)]="months">
-            <option [ngValue]="1">1 month</option>
-            <option [ngValue]="2">2 months: this and the last (जोड अंक)</option>
-            <option [ngValue]="3">3 months: this and the 2 before</option>
-          </select>
+      <!-- A combined issue (जोड अंक) counts as received for every month it covers. -->
+      <div class="field">
+        <span class="label" id="covers-label">
+          Covers{{ covers().length ? ': ' + covers()[0].label + (covers().length > 1 ? ' – ' + covers()[covers().length - 1].label : '') : '' }}
         </span>
-      </label>
+        <div class="months" role="group" aria-labelledby="covers-label">
+          @for (p of periods(); track p.from) {
+            <button type="button" class="month" [class.on]="isCovered(p)" [attr.aria-pressed]="isCovered(p)"
+                    (click)="toggleMonth(p)">{{ p.label }}</button>
+          }
+        </div>
+      </div>
     } @else {
       <div class="range">
         <label class="field">

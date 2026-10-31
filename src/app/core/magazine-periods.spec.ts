@@ -1,4 +1,4 @@
-import { defaultPeriod, magazinePeriods, monthsStart, receiptLabel, subscriptionWindow, weekStartDay } from './magazine-periods';
+import { defaultPeriod, magazinePeriods, receiptLabel, subscriptionWindow, weekStartDay } from './magazine-periods';
 import { MagazineCard } from './models';
 
 const card = (over: Partial<MagazineCard> = {}): MagazineCard => ({
@@ -65,10 +65,14 @@ describe('magazine periods', () => {
     expect(receiptLabel({ periodFrom: '2026-12-28', periodTo: '2027-01-03' })).toBe('28 Dec 2026 – 3 Jan 2027');
   });
 
+  it('aMonthlyIssueSavedForWholeMonthsShowsItsPublishedDayAndMonths', () => {
+    expect(receiptLabel({ receivedOn: '2026-11-05', periodFrom: '2026-10-01', periodTo: '2026-12-31' })).toBe('5 Nov 2026 · Oct–Dec');
+    expect(receiptLabel({ receivedOn: '2026-11-05', periodFrom: '2026-11-01', periodTo: '2026-11-30' })).toBe('5 Nov 2026 · Nov');
+    const periods = magazinePeriods(card({ receipts: [{ id: 1, receivedOn: '2026-11-05', periodFrom: '2026-10-01', periodTo: '2026-12-31' }] }), '2026-11-10');
+    expect(periods.filter(p => p.state === 'received').map(p => p.from)).toEqual(['2026-10-01', '2026-11-01', '2026-12-01']);
+  });
+
   it('aCombinedMonthlyIssueCoversItsMonthAndThePastOnes', () => {
-    expect(monthsStart('2026-11-05', 2)).toBe('2026-10-01');
-    expect(monthsStart('2027-01-20', 2)).toBe('2026-12-01');
-    expect(monthsStart('2026-11-05', 3)).toBe('2026-09-01');
     const jod = { id: 1, issueNo: 45, receivedOn: '2026-11-05', periodFrom: '2026-10-01', periodTo: '2026-11-05' };
     expect(receiptLabel(jod)).toBe('5 Nov 2026 · Oct–Nov');
     const periods = magazinePeriods(card({ receipts: [jod] }), '2026-12-10');

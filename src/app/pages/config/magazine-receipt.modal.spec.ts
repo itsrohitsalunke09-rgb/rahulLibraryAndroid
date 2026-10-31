@@ -23,16 +23,36 @@ describe('MagazineReceiptModal', () => {
     return { modal: fixture.componentInstance, fixture, addMagazineReceipt, dismiss };
   }
 
-  it('monthlyIssueIsItsNumberAndPublishedDateSuggestingTheNextNumber', () => {
-    const { modal, addMagazineReceipt, dismiss } = render({
-      periodicalId: 4, name: 'लोकराज्य', frequency: 'MONTHLY',
-      receipts: [{ id: 1, issueNo: 11, receivedOn: '2026-09-05', periodFrom: '2026-09-05', periodTo: '2026-09-05' }],
-    });
+  const monthly = (receipts: MagazineCard['receipts'] = []): MagazineCard => ({
+    periodicalId: 4, name: 'लोकराज्य', frequency: 'MONTHLY', subscriptionStart: '2026-01-01', subscriptionEnd: '2026-12-31', receipts,
+  });
+
+  it('monthlyIssueCoversTheMonthsTappedFirstToLastSuggestingTheNextNumber', () => {
+    const { modal, addMagazineReceipt, dismiss } = render(monthly(
+      [{ id: 1, issueNo: 11, receivedOn: '2026-09-05', periodFrom: '2026-09-05', periodTo: '2026-09-05' }]));
     expect(modal.issueNo).toBe(12);
+    const month = (from: string) => modal.periods().find(p => p.from === from)!;
+    modal.chosen.set([]);
+    modal.toggleMonth(month('2026-12-01'));
+    modal.toggleMonth(month('2026-10-01'));
+    // The month between the two tapped is covered too.
+    expect(modal.isCovered(month('2026-11-01'))).toBe(true);
     modal.publishedOn = '2026-10-05';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-05', periodTo: '2026-10-05', copies: 1 });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-01', periodTo: '2026-12-31', copies: 1 });
     expect(dismiss).toHaveBeenCalledWith(expect.objectContaining({ id: 9 }), 'saved');
+  });
+
+  it('monthlyNeedsNothing', () => {
+    const { modal, addMagazineReceipt } = render(monthly());
+    modal.issueNo = '';
+    modal.copies = '';
+    modal.publishedOn = '2026-03-10';
+    modal.chosen.set([]);
+    modal.save();
+    expect(modal.error()).toBe('');
+    // No month tapped: the published month.
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: null, receivedOn: '2026-03-10', periodFrom: '2026-03-01', periodTo: '2026-03-31', copies: 1 });
   });
 
   it('weeklyIssueIsItsNumberAndFromToDates', () => {
