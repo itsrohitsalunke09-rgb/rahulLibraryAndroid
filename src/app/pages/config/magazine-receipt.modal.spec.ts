@@ -39,7 +39,7 @@ describe('MagazineReceiptModal', () => {
     expect(modal.isCovered(month('2026-11-01'))).toBe(true);
     modal.publishedOn = '2026-10-05';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, receivedOn: '2026-10-05', periodFrom: '2026-10-01', periodTo: '2026-12-31', copies: 1 });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: 12, issueLabel: null, receivedOn: '2026-10-05', periodFrom: '2026-10-01', periodTo: '2026-12-31', copies: 1 });
     expect(dismiss).toHaveBeenCalledWith(expect.objectContaining({ id: 9 }), 'saved');
   });
 
@@ -52,7 +52,7 @@ describe('MagazineReceiptModal', () => {
     modal.save();
     expect(modal.error()).toBe('');
     // No month tapped: the published month.
-    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: null, receivedOn: '2026-03-10', periodFrom: '2026-03-01', periodTo: '2026-03-31', copies: 1 });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: null, issueLabel: null, receivedOn: '2026-03-10', periodFrom: '2026-03-01', periodTo: '2026-03-31', copies: 1 });
   });
 
   it('fortnightlyJodAnkCoversTheFortnightsTapped', () => {
@@ -65,9 +65,10 @@ describe('MagazineReceiptModal', () => {
     expect(modal.error()).toContain('fortnight');
     modal.togglePeriod(half('2026-09-01'));
     modal.togglePeriod(half('2026-09-16'));
-    modal.issueNo = 18;
+    // जोडअंक written in the अंक box is saved as written.
+    modal.issueNo = 'जोडअंक';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(5, { issueNo: 18, receivedOn: '2026-09-01', periodFrom: '2026-09-01', periodTo: '2026-09-30', copies: 1 });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(5, { issueNo: null, issueLabel: 'जोडअंक', receivedOn: '2026-09-01', periodFrom: '2026-09-01', periodTo: '2026-09-30', copies: 1 });
   });
 
   it('weeklyIssueIsItsNumberAndFromToDates', () => {
@@ -77,7 +78,7 @@ describe('MagazineReceiptModal', () => {
     modal.periodFrom = '2026-10-19';
     modal.periodTo = '2026-10-25';
     modal.save();
-    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25', copies: 1 });
+    expect(addMagazineReceipt).toHaveBeenCalledWith(7, { issueNo: 43, issueLabel: null, receivedOn: '2026-10-19', periodFrom: '2026-10-19', periodTo: '2026-10-25', copies: 1 });
   });
 
   it('newFromMovesToToTheEndOfThatIssueAndBarsEarlierDates', async () => {

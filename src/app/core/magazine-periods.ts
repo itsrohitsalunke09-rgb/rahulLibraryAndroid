@@ -114,21 +114,16 @@ function range(from: Date, to: Date): string {
     : `${day(from)}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${day(to)} ${to.getFullYear()}`;
 }
 
-/** A combined issue (जोड अंक): one that covers more than one month, fortnight or week. */
-export function isCombined(frequency: PeriodicalFrequency, r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>): boolean {
-  const from = parse(r.periodFrom);
-  const to = parse(r.periodTo);
-  if (frequency === 'MONTHLY') {
-    return from.getFullYear() !== to.getFullYear() || from.getMonth() !== to.getMonth();
-  }
-  // By length (over 7 days a week, over 16 a fortnight), so a range not lined up with the cells isn't miscounted.
-  const days = Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
-  return days > (frequency === 'WEEKLY' ? 7 : 16);
+/** "अंक 12", or exactly what was written in place of a number (e.g. "जोडअंक"); nothing when neither. */
+export function issueName(r: Pick<MagazineReceipt, 'issueNo' | 'issueLabel'>): string {
+  return r.issueLabel || (r.issueNo ? `अंक ${r.issueNo}` : '');
 }
 
-/** "अंक 12", or "जोड अंक 12" for a combined issue; without a number, "जोड अंक" or nothing. */
-export function issueName(frequency: PeriodicalFrequency, r: Pick<MagazineReceipt, 'issueNo' | 'periodFrom' | 'periodTo'>): string {
-  const word = isCombined(frequency, r) ? 'जोड अंक' : 'अंक';
-  return r.issueNo ? `${word} ${r.issueNo}` : word === 'जोड अंक' ? word : '';
+/** What was typed in the अंक box: "12" is a number; anything else (e.g. जोडअंक) is kept as written. */
+export function parseIssue(typed: unknown): { issueNo: number | null; issueLabel: string | null } {
+  const text = String(typed ?? '').trim();
+  return /^[1-9]\d{0,4}$/.test(text)
+    ? { issueNo: Number(text), issueLabel: null }
+    : { issueNo: null, issueLabel: text || null };
 }
 

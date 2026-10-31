@@ -33,7 +33,7 @@
               <h2 class="marathi">{{ v.card.name }}</h2>
               <p>
                 @if (v.last; as last) {
-                  Last <span class="marathi">{{ issueName(v.frequency, last) }}</span> · {{ receiptLabel(last, v.frequency) }}
+                  Last <span class="marathi">{{ issueName(last) }}</span> · {{ receiptLabel(last, v.frequency) }}
                 } @else {
                   No issues yet
                 }

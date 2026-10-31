@@ -4,7 +4,7 @@ import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonSpinner, Io
 import { ApiService } from '../../core/api.service';
 import { PermissionsStore } from '../../core/permissions.store';
 import { localIsoDate } from '../../core/dates';
-import { MagazinePeriod, defaultPeriod, issueName, magazinePeriods, weekStartDay } from '../../core/magazine-periods';
+import { MagazinePeriod, defaultPeriod, issueName, magazinePeriods, parseIssue, weekStartDay } from '../../core/magazine-periods';
 import { MagazineCard, MagazineReceipt, tel } from '../../core/models';
 import { UiService, errorMessage } from '../../core/ui.service';
 
@@ -31,7 +31,7 @@ export class MagazineReceiptModal implements OnInit {
   private ui = inject(UiService);
 
   readonly today = localIsoDate();
-  /** Suggested as the one after the last recorded. */
+  /** The अंक box: a number (suggested as the one after the last recorded) or text such as जोडअंक. */
   issueNo: number | string = '';
   /** How many of this issue came; 1 unless more were bought. */
   copies: number | string = 1;
@@ -124,9 +124,9 @@ export class MagazineReceiptModal implements OnInit {
       this.saveMonthly();
       return;
     }
-    const issueNo = Number(this.issueNo);
-    if (!Number.isInteger(issueNo) || issueNo < 1 || issueNo > 99999) {
-      this.error.set('Enter the issue number (अंक), e.g. 12.');
+    const issue = parseIssue(this.issueNo);
+    if (!issue.issueNo && !issue.issueLabel) {
+      this.error.set('Enter the अंक, e.g. 12 or जोडअंक.');
       return;
     }
     const copies = Number(this.copies);
@@ -152,31 +152,29 @@ export class MagazineReceiptModal implements OnInit {
       return;
     }
     // Received on: the week's (or first fortnight's) start.
-    this.send(issueNo, from, from, to, copies);
+    this.send(issue, from, from, to, copies);
   }
 
   /**
-   * Monthly: nothing is required. No number saves it without one, copies default to 1, no date is today,
+   * Monthly: nothing is required. No अंक saves it without one, copies default to 1, no date is today,
    * and no month tapped means the published month. It covers the 1st of its first month to the end of its last.
    */
   private saveMonthly() {
-    const issueNo = Number(this.issueNo);
     const copies = Number(this.copies);
     const publishedOn = this.publishedOn || this.today;
     const covers = this.covers();
     const [from, to] = covers.length
       ? [covers[0].from, covers[covers.length - 1].to]
       : [defaultPeriod('MONTHLY', publishedOn).from, defaultPeriod('MONTHLY', publishedOn).to];
-    this.send(Number.isInteger(issueNo) && issueNo >= 1 ? issueNo : null, publishedOn, from, to,
-      Number.isInteger(copies) && copies >= 1 ? copies : 1);
+    this.send(parseIssue(this.issueNo), publishedOn, from, to, Number.isInteger(copies) && copies >= 1 ? copies : 1);
   }
 
-  private send(issueNo: number | null, receivedOn: string, from: string, to: string, copies: number) {
+  private send(issue: ReturnType<typeof parseIssue>, receivedOn: string, from: string, to: string, copies: number) {
     this.saving.set(true);
     this.error.set('');
-    this.api.addMagazineReceipt(this.card.periodicalId, { issueNo, receivedOn, periodFrom: from, periodTo: to, copies }).subscribe({
+    this.api.addMagazineReceipt(this.card.periodicalId, { ...issue, receivedOn, periodFrom: from, periodTo: to, copies }).subscribe({
       next: receipt => {
-        const name = issueName(this.card.frequency, { issueNo, periodFrom: from, periodTo: to }) || 'issue';
+        const name = issueName(issue) || 'issue';
         this.ui.toast(`${this.card.name}: ${name}${copies > 1 ? ` (×${copies})` : ''} received.`);
         this.modals.dismiss(receipt, 'saved');
       },

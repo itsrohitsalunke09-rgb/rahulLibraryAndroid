@@ -34,8 +34,7 @@ export class MagazineDetailModal implements OnInit {
   readonly receipts = signal<MagazineReceipt[]>([]);
   readonly removing = signal<number | null>(null);
   readonly label = (r: MagazineReceipt) => receiptLabel(r, this.card.frequency);
-  /** "अंक 12", or "जोड अंक 12" when it covers more than one period. */
-  readonly issue = (r: MagazineReceipt) => issueName(this.card.frequency, r);
+  readonly issue = issueName;
   readonly labels = FREQUENCY_LABELS;
   readonly rupees = rupees;
   readonly formatDate = formatDate;

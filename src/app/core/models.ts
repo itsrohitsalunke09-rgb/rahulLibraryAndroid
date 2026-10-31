@@ -251,6 +251,8 @@ export interface MagazineReceipt {
   id: number;
   /** The issue number (अंक) printed on it. */
   issueNo?: number | null;
+  /** What was written in place of a number (e.g. जोडअंक), shown and exported as written. */
+  issueLabel?: string | null;
   receivedOn: string;
   periodFrom: string;
   periodTo: string;

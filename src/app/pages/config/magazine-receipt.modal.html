@@ -34,10 +34,10 @@
     </section>
 
     <label class="field">
-      <span class="label marathi">अंक (issue number)</span>
-      <span class="box issue">
-        <span class="prefix marathi" aria-hidden="true">अंक</span>
-        <input type="number" inputmode="numeric" min="1" step="1" name="issueNo" [(ngModel)]="issueNo" />
+      <span class="label marathi">अंक (issue number, or e.g. जोडअंक)</span>
+      <!-- Text, so जोडअंक can be written in place of a number; saved and exported as written. -->
+      <span class="box">
+        <input type="text" class="marathi" maxlength="30" name="issueNo" placeholder="12 or जोडअंक" [(ngModel)]="issueNo" />
       </span>
     </label>
 
@@ -60,12 +60,10 @@
     }
 
     @if (picker) {
-      <!-- More than one tapped is a जोड अंक: received for every month or fortnight it covers. -->
+      <!-- Tap more than one for an issue that covers several (a जोडअंक): each counts as received. -->
       <div class="field">
         <span class="label" id="covers-label">
-          Covers{{ covers().length ? ': ' + covers()[0].label + (covers().length > 1 ? ' to ' + covers()[covers().length - 1].label : '') : '' }}
-          @if (covers().length > 1) { <span class="marathi"> · जोड अंक</span> }
-        </span>
+          Covers{{ covers().length ? ': ' + covers()[0].label + (covers().length > 1 ? ' to ' + covers()[covers().length - 1].label : '') : '' }}        </span>
         <div class="months" [class.halves]="!monthly" role="group" aria-labelledby="covers-label">
           @for (p of periods(); track p.from) {
             <button type="button" class="month" [class.on]="isCovered(p)" [attr.aria-pressed]="isCovered(p)"

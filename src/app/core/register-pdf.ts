@@ -1,5 +1,4 @@
 import { Reader } from './book-moves';
-import { isCombined } from './magazine-periods';
 import { MagazineCard, MonthReport } from './models';
 
 export type Orientation = 'landscape' | 'portrait';
@@ -511,9 +510,8 @@ export function magazineTable(cards: MagazineCard[], year: number): RegisterTabl
     header: ['Magazine', ...MONTHS, 'Price Rs.'],
     body: cards.map((card, i) => [
       card.name,
-      // Issues recorded before numbering began show as *; a combined issue as "जोड 12".
-      ...MONTHS.map((_, m) => inMonth(card, m)
-        .map(r => `${isCombined(card.frequency, r) ? 'जोड ' : ''}${r.issueNo ?? '*'}`).join(',')),
+      // As written in the अंक box ("12" or "जोडअंक"); issues recorded before numbering began show as *.
+      ...MONTHS.map((_, m) => inMonth(card, m).map(r => r.issueLabel || (r.issueNo ?? '*')).join(',')),
       card.subscriptionAmount == null ? '' : shortPrice(card.subscriptionAmount),
     ]),
     totals: ['Total', ...MONTHS.map((_, m) => String(counts.reduce((sum, c) => sum + c[m], 0) || '')),
@@ -531,7 +529,7 @@ export function magazinePdf(cards: MagazineCard[], year: number, library: string
   for (let i = 0; i < Math.max(cards.length, 1); i += MAGAZINES_PER_PAGE) {
     const table = magazineTable(cards.slice(i, i + MAGAZINES_PER_PAGE), year);
     pages.push(drawTablePage([{ heading: String(year), table }], library, 'landscape', `${title} - ${year}`,
-      `Total subscription: Rs. ${subscriptionTotal(cards).toLocaleString('en-IN')}`, 'Cell = issue numbers (अंक) that came; जोड = combined issue; blank = none'));
+      `Total subscription: Rs. ${subscriptionTotal(cards).toLocaleString('en-IN')}`, 'Cell = issue numbers (अंक) that came; blank = none'));
   }
   return buildPdf(pages);
 }
