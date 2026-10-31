@@ -9,7 +9,7 @@
       </ion-tab-button>
     }
 
-    <!-- Students' Catalog comes first; staff have it after Programs & events. -->
+    <!-- Students' Catalog comes first; staff have it after Happenings. -->
     @if (!auth.isStaff()) {
       <ion-tab-button tab="catalog" href="/tabs/catalog">
         <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-catalog.svg)" aria-hidden="true"></span></span>
@@ -19,7 +19,7 @@
 
     <ion-tab-button tab="news" href="/tabs/news">
       <span class="tab-symbol"><span class="icon" style="--icon: url(assets/icons/tab-news.svg)" aria-hidden="true"></span></span>
-      <ion-label>Programs &amp; events</ion-label>
+      <ion-label>Happenings</ion-label>
     </ion-tab-button>
 
     @if (auth.isStaff()) {

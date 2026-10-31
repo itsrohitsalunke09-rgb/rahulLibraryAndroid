@@ -34,7 +34,7 @@ describe('NewspaperPage', () => {
   it('rendersTheTabsTitleWithoutADate', () => {
     const el = render(of(page([story(1)])));
     const header = el.querySelector('.header')?.textContent?.trim() ?? '';
-    expect(header).toBe('Programs & events');
+    expect(header).toBe('Happenings');
   });
 
   it('rendersOneCardPerStory', () => {

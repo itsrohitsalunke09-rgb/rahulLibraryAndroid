@@ -26,7 +26,7 @@ export class MastersPage implements ViewWillEnter {
     { title: 'Book categories', sub: 'Category number and name, used by the book form\'s Category dropdown',
       link: '/tabs/profile/masters/categories', tone: 'daily', icon: 'tag',
       count: this.categories.loaded() ? this.categories.items().length : null, marathi: false },
-    { title: 'Programs & events', sub: 'Event stories shown in the Programs & events tab',
+    { title: 'Happenings', sub: 'Event stories shown in the Happenings tab',
       link: '/tabs/profile/masters/news', tone: 'weekly', icon: 'sheet', count: this.storyCount(), marathi: false },
     { title: 'Newspapers & magazines', sub: 'Subscriptions and price per copy, used by the registers',
       link: '/tabs/profile/masters/periodicals', tone: 'monthly', icon: 'copies', count: this.periodicalCount(), marathi: false },

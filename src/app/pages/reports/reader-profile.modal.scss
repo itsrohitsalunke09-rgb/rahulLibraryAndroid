@@ -127,9 +127,10 @@ ion-item {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-inline-end: 20px;
+  // The row carries the section gap, so the heading and the year chip centre on the same line.
+  margin: 20px 20px 0 0;
 
-  .section-title { margin-bottom: 0; }
+  .section-title { margin: 0 0 0 24px; }
 }
 
 .filter-text {
