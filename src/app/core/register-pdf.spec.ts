@@ -155,6 +155,17 @@ describe('magazineTable', () => {
     expect(t.totals[0]).toBe('Total');
     expect(t.totals[13]).toBe('1500');
   });
+
+  it('marksACombinedIssueJod', () => {
+    const t = magazineTable([
+      { periodicalId: 5, name: 'Chitralekha', frequency: 'FORTNIGHTLY', receipts: [
+        { id: 1, issueNo: 18, receivedOn: '2026-09-01', periodFrom: '2026-09-01', periodTo: '2026-09-30' },
+        { id: 2, issueNo: 19, receivedOn: '2026-10-01', periodFrom: '2026-10-01', periodTo: '2026-10-15' },
+      ] },
+    ], 2026);
+    expect(t.body[0][9]).toBe('जोड 18');
+    expect(t.body[0][10]).toBe('19');
+  });
 });
 
 describe('bookMovesTable', () => {

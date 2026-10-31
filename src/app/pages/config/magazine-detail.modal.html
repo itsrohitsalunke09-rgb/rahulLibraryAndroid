@@ -51,11 +51,11 @@
       <ul class="issues">
         @for (r of sorted(); track r.id) {
           <li>
-            <span class="no marathi">{{ r.issueNo ? 'अंक ' + r.issueNo : '—' }}</span>
+            <span class="no marathi">{{ issue(r) || '—' }}</span>
             <span class="when">{{ label(r) }}{{ (r.copies ?? 1) > 1 ? ' · ×' + r.copies : '' }}</span>
             @if (perms.can('REGISTER')) {
             <button type="button" class="remove" [disabled]="removing() === r.id"
-                    [attr.aria-label]="'Remove ' + (r.issueNo ? 'अंक ' + r.issueNo : label(r))" (click)="remove(r)">
+                    [attr.aria-label]="'Remove ' + (issue(r) || label(r))" (click)="remove(r)">
               <span class="icon" style="--icon: url(assets/icons/close.svg); --icon-size: 14px" aria-hidden="true"></span>
             </button>
             }

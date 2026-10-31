@@ -33,8 +33,8 @@ describe('MagazineReceiptModal', () => {
     expect(modal.issueNo).toBe(12);
     const month = (from: string) => modal.periods().find(p => p.from === from)!;
     modal.chosen.set([]);
-    modal.toggleMonth(month('2026-12-01'));
-    modal.toggleMonth(month('2026-10-01'));
+    modal.togglePeriod(month('2026-12-01'));
+    modal.togglePeriod(month('2026-10-01'));
     // The month between the two tapped is covered too.
     expect(modal.isCovered(month('2026-11-01'))).toBe(true);
     modal.publishedOn = '2026-10-05';
@@ -53,6 +53,21 @@ describe('MagazineReceiptModal', () => {
     expect(modal.error()).toBe('');
     // No month tapped: the published month.
     expect(addMagazineReceipt).toHaveBeenCalledWith(4, { issueNo: null, receivedOn: '2026-03-10', periodFrom: '2026-03-01', periodTo: '2026-03-31', copies: 1 });
+  });
+
+  it('fortnightlyJodAnkCoversTheFortnightsTapped', () => {
+    const { modal, addMagazineReceipt } = render({
+      periodicalId: 5, name: 'चित्रलेखा', frequency: 'FORTNIGHTLY', subscriptionStart: '2026-01-01', subscriptionEnd: '2026-12-31', receipts: [],
+    });
+    const half = (from: string) => modal.periods().find(p => p.from === from)!;
+    modal.chosen.set([]);
+    modal.save();
+    expect(modal.error()).toContain('fortnight');
+    modal.togglePeriod(half('2026-09-01'));
+    modal.togglePeriod(half('2026-09-16'));
+    modal.issueNo = 18;
+    modal.save();
+    expect(addMagazineReceipt).toHaveBeenCalledWith(5, { issueNo: 18, receivedOn: '2026-09-01', periodFrom: '2026-09-01', periodTo: '2026-09-30', copies: 1 });
   });
 
   it('weeklyIssueIsItsNumberAndFromToDates', () => {

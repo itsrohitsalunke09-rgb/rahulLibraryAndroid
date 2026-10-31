@@ -1,4 +1,4 @@
-import { defaultPeriod, magazinePeriods, receiptLabel, subscriptionWindow, weekStartDay } from './magazine-periods';
+import { defaultPeriod, issueName, magazinePeriods, receiptLabel, subscriptionWindow, weekStartDay } from './magazine-periods';
 import { MagazineCard } from './models';
 
 const card = (over: Partial<MagazineCard> = {}): MagazineCard => ({
@@ -70,6 +70,20 @@ describe('magazine periods', () => {
     expect(receiptLabel({ receivedOn: '2026-11-05', periodFrom: '2026-11-01', periodTo: '2026-11-30' })).toBe('5 Nov 2026 · Nov');
     const periods = magazinePeriods(card({ receipts: [{ id: 1, receivedOn: '2026-11-05', periodFrom: '2026-10-01', periodTo: '2026-12-31' }] }), '2026-11-10');
     expect(periods.filter(p => p.state === 'received').map(p => p.from)).toEqual(['2026-10-01', '2026-11-01', '2026-12-01']);
+  });
+
+  it('anIssueCoveringMoreThanOnePeriodIsAJodAnk', () => {
+    const r = (periodFrom: string, periodTo: string, issueNo: number | null = 12) => ({ issueNo, periodFrom, periodTo });
+    expect(issueName('MONTHLY', r('2026-10-01', '2026-10-31'))).toBe('अंक 12');
+    expect(issueName('MONTHLY', r('2026-10-01', '2026-11-30'))).toBe('जोड अंक 12');
+    expect(issueName('FORTNIGHTLY', r('2026-10-16', '2026-10-31'))).toBe('अंक 12');
+    expect(issueName('FORTNIGHTLY', r('2026-10-01', '2026-10-31'))).toBe('जोड अंक 12');
+    expect(issueName('WEEKLY', r('2026-10-19', '2026-10-25'))).toBe('अंक 12');
+    expect(issueName('WEEKLY', r('2026-10-19', '2026-11-01'))).toBe('जोड अंक 12');
+    expect(issueName('MONTHLY', r('2026-10-01', '2026-11-30', null))).toBe('जोड अंक');
+    expect(issueName('MONTHLY', r('2026-10-01', '2026-10-31', null))).toBe('');
+    // A fortnightly जोड अंक over a whole month reads as dates, not as a monthly's "published · months".
+    expect(receiptLabel({ receivedOn: '2026-10-01', periodFrom: '2026-10-01', periodTo: '2026-10-31' }, 'FORTNIGHTLY')).toBe('1 Oct – 31 Oct 2026');
   });
 
   it('aCombinedMonthlyIssueCoversItsMonthAndThePastOnes', () => {

@@ -85,23 +85,50 @@ function covered(period: { from: string; to: string }, receipts: MagazineReceipt
 }
 
 /** "5 Oct 2026" for a monthly issue's published day, or "26 Oct – 1 Nov 2026" for the week a weekly one covers. */
-export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'> & Partial<Pick<MagazineReceipt, 'receivedOn'>>): string {
+export function receiptLabel(r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'> & Partial<Pick<MagazineReceipt, 'receivedOn'>>,
+                             frequency: PeriodicalFrequency = 'MONTHLY'): string {
   const from = parse(r.periodFrom);
   const to = parse(r.periodTo);
   const day = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  if (frequency !== 'MONTHLY') {
+    return range(from, to);
+  }
   // A monthly issue saved for whole months (the 1st of one to the end of another): published day and its months.
   if (from.getDate() === 1 && addDays(to, 1).getDate() === 1) {
     const sameMonth = from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth();
     const shown = r.receivedOn ? parse(r.receivedOn) : to;
     return `${day(shown)} ${shown.getFullYear()} · ${MONTHS[from.getMonth()]}${sameMonth ? '' : '–' + MONTHS[to.getMonth()]}`;
   }
-  // A monthly's combined issue: from the 1st of an earlier month to its published day ("5 Nov 2026 · Oct–Nov").
-  // (A week or fortnight starting on the 1st never reaches the next month.)
+  // A monthly's older combined issue: from the 1st of an earlier month to its published day ("5 Nov 2026 · Oct–Nov").
   if (from.getDate() === 1 && (to.getFullYear() * 12 + to.getMonth()) > (from.getFullYear() * 12 + from.getMonth())) {
     return `${day(to)} ${to.getFullYear()} · ${MONTHS[from.getMonth()]}–${MONTHS[to.getMonth()]}`;
   }
-  return r.periodFrom === r.periodTo
+  return range(from, to);
+}
+
+/** "5 Oct 2026", or "26 Oct – 1 Nov 2026". */
+function range(from: Date, to: Date): string {
+  const day = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  return from.getTime() === to.getTime()
     ? `${day(from)} ${from.getFullYear()}`
     : `${day(from)}${from.getFullYear() === to.getFullYear() ? '' : ' ' + from.getFullYear()} – ${day(to)} ${to.getFullYear()}`;
+}
+
+/** A combined issue (जोड अंक): one that covers more than one month, fortnight or week. */
+export function isCombined(frequency: PeriodicalFrequency, r: Pick<MagazineReceipt, 'periodFrom' | 'periodTo'>): boolean {
+  const from = parse(r.periodFrom);
+  const to = parse(r.periodTo);
+  if (frequency === 'MONTHLY') {
+    return from.getFullYear() !== to.getFullYear() || from.getMonth() !== to.getMonth();
+  }
+  // By length (over 7 days a week, over 16 a fortnight), so a range not lined up with the cells isn't miscounted.
+  const days = Math.round((to.getTime() - from.getTime()) / 86_400_000) + 1;
+  return days > (frequency === 'WEEKLY' ? 7 : 16);
+}
+
+/** "अंक 12", or "जोड अंक 12" for a combined issue; without a number, "जोड अंक" or nothing. */
+export function issueName(frequency: PeriodicalFrequency, r: Pick<MagazineReceipt, 'issueNo' | 'periodFrom' | 'periodTo'>): string {
+  const word = isCombined(frequency, r) ? 'जोड अंक' : 'अंक';
+  return r.issueNo ? `${word} ${r.issueNo}` : word === 'जोड अंक' ? word : '';
 }
 

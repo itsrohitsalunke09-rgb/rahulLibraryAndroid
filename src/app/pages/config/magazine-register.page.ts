@@ -6,7 +6,7 @@ import {
 } from '@ionic/angular';
 import { ApiService } from '../../core/api.service';
 import { localIsoDate } from '../../core/dates';
-import { magazinePeriods, receiptLabel } from '../../core/magazine-periods';
+import { issueName, magazinePeriods, receiptLabel } from '../../core/magazine-periods';
 import { FREQUENCY_LABELS, MARATHI_FREQUENCY, MagazineCard, MagazineReceipt, PeriodicalFrequency, byFrequency } from '../../core/models';
 import { PageSkeletonComponent } from '../../core/page-skeleton.component';
 import { errorMessage } from '../../core/ui.service';
@@ -41,6 +41,7 @@ export class MagazineRegisterPage implements ViewWillEnter {
   readonly frequency = inject(ActivatedRoute).snapshot.paramMap.get('frequency') as PeriodicalFrequency | null;
   readonly title = this.frequency ? MARATHI_FREQUENCY[this.frequency] : 'Magazine register';
   readonly receiptLabel = receiptLabel;
+  readonly issueName = issueName;
 
   /** Each magazine's counts and latest issue, grouped by frequency and narrowed by the search box. */
   readonly groups = computed(() => {
